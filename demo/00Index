@@ -1,3 +1,3 @@
-lalonde		General examples of MatchIt methods, using Lalonde dataset
-analysis	Demo of analysis procedures to estimate treatment effects
-diagnose	Demo of how to diagnose a propensity score model
+analysis	Methods for analysis of outcome using matched samples
+diagnose	Propensity score specification procedure
+lalonde		Examples of matching methods, using National Supported Work demonstration data

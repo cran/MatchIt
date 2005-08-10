@@ -54,7 +54,7 @@ subclassify <- function(formula,data,in.sample,pscore,nearest=TRUE,
     q <- NULL
     if(counter){cat("Done\n")}
   }
-  else if(subclass) {
+  else if(any(subclass>0)){
     if(counter){cat("Subclassifying...")}  
     n <- length(treat)
     if(nearest){
