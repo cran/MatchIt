@@ -1,3 +1,7 @@
-analysis	Methods for analysis of outcome using matched samples
-diagnose	Propensity score specification procedure
-lalonde		Examples of matching methods, using National Supported Work demonstration data
+exact		Demo of exact matching, using Lalonde dataset
+full		Demo of full matching, using Lalonde dataset
+match.data      Demo of obtaining matched data
+nearest		Demos of nearest neighbor matching, using Lalonde dataset
+subclass	Demo of subclassification, using Lalonde dataset
+optimal		Demo of optimal matching, using Lalonde dataset
+Zelig           Demo of using Zelig with MatchIt for parametric causal inference after matching
