@@ -14,6 +14,10 @@ discard <- function(treat, pscore, option, X) {
   else if (option == "treat")   # discard treated units only
     discarded <- (pscore < pmin0 | pscore > pmax0)
   else if (option == "convex.hull"){ # discard units not in T convex hull
+    if (!("whatif" %in% .packages(all = TRUE)))
+      install.packages("whatif", CRAN="http://gking.harvard.edu")
+    if (!("lpSolve" %in% .packages(all = TRUE)))
+      install.packages("lpSolve")
     require(whatif)
     require(lpSolve)
     wif <- whatif(cfact = X[treat==0,], data = X[treat==1,])
