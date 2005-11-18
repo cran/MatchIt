@@ -12,8 +12,8 @@ summary.matchit.subclass <- function(object, interactions = FALSE,
 
   ## Summary Stats
   aa <- apply(XX,2,qoi,tt=treat,ww=as.numeric(weights!=0),standardize=standardize)
-  sum.all <- as.data.frame(matrix(0,kk,7))
-  sum.matched <- as.data.frame(matrix(0,kk,7))
+  sum.all <- as.data.frame(matrix(0,kk,6))
+  sum.matched <- as.data.frame(matrix(0,kk,6))
   row.names(sum.all) <- row.names(sum.matched) <- nam
   names(sum.all) <- names(sum.matched) <- names(aa[[1]])
   sum.all.int <- sum.matched.int <- NULL
@@ -39,11 +39,11 @@ summary.matchit.subclass <- function(object, interactions = FALSE,
   ## By Subclass
   qbins <- max(object$subclass,na.rm=TRUE)
   if(interactions){
-    q.table <- array(0,dim=c(kk+sum(1:kk),7,qbins))
+    q.table <- array(0,dim=c(kk+sum(1:kk),6,qbins))
     ii <- 0
     nn <- NULL
   } else {
-    q.table <- array(0,dim=c(kk,7,qbins))
+    q.table <- array(0,dim=c(kk,6,qbins))
   }
   aa <- apply(XX,2,qoi.by.sub,tt=treat,ww=weights,
                   qq=object$subclass,standardize=standardize)
@@ -79,7 +79,7 @@ summary.matchit.subclass <- function(object, interactions = FALSE,
   }
   sum.subclass <- sum.all
   for(i in 1:kk){
-    for(j in 1:7){
+    for(j in 1:6){
       if(j==3) {
         sum.subclass[i,j] <- sqrt(sum((wsub^2)*(q.table[i,j,]^2)))
       } else {
@@ -90,9 +90,9 @@ summary.matchit.subclass <- function(object, interactions = FALSE,
 
   ## Imbalance Reduction
   stat0 <- abs(cbind(sum.all[,2]-sum.all[,1],
-                     sum.all[,5:7]))
+                     sum.all[,4:6]))
   stat1 <- abs(cbind(sum.subclass[,2]-sum.subclass[,1],
-                     sum.subclass[,5:7]))
+                     sum.subclass[,4:6]))
   reduction <- as.data.frame(100*(stat0-stat1)/stat0)
   if(sum(stat0==0 & stat1==0, na.rm=T)>0){
     reduction[stat0==0 & stat1==0] <- 0
@@ -100,8 +100,12 @@ summary.matchit.subclass <- function(object, interactions = FALSE,
   if(sum(stat0==0 & stat1>0,na.rm=T)>0){
     reduction[stat0==0 & stat1>0] <- -Inf
   }
-  names(reduction) <- c("Mean and Std. Bias", "QQ Med","QQ Mean", "QQ Max")
-
+  if (standardize)
+    names(reduction) <- c("Std. Mean Diff.", "eCDF Med","eCDF Mean",
+                          "eCDF Max")
+  else
+    names(reduction) <- c("Mean Diff.", "eQQ Med","eQQ Mean",
+                          "eQQ Max")
   ## output
   res <- list(call=object$call, sum.all = sum.all, sum.matched = sum.matched,
               sum.subclass = sum.subclass, reduction = reduction,
