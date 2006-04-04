@@ -1,6 +1,9 @@
 match.data <- function(object, group = "all", distance = "distance",
                        weights = "weights", subclass = "subclass") {
   data <- eval(object$call$data)
+  if (!is.data.frame(data) & !is.null(object$model))
+    data <- eval(object$call$data,
+                 env = attr(terms(object$model), ".Environment"))
   treat <- object$treat
   wt <- object$weights
   vars <- names(data)
