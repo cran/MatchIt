@@ -65,13 +65,12 @@ matchit2nearest <-  function(treat, X, data, distance, discarded,
   ## total number of matches (including ratios) = ratio * n1
   tr <- length(match.matrix[match.matrix!=-1])
   r <- 1
- 
- ## Caliper for matching (=0 if caliper matching not done)
- if (caliper > 0)
-   sd.cal <- caliper*sqrt(var(distance[in.sample==1]))
+  
+  ## Caliper for matching (=0 if caliper matching not done)
+  sd.cal <- caliper*sqrt(var(distance[in.sample==1]))
   
   ## Var-covar matrix for Mahalanobis (currently set for full sample)
- if (!is.null(mahvars)) {
+  if (!is.null(mahvars)) {
     if(!sum(mahvars%in%names(data))==length(mahvars)) {
 	    warning("Mahvars not contained in data.  Mahalanobis matching not done.",call.=FALSE)
 	    mahvars=NULL
