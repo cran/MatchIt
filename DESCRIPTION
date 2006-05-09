@@ -1,6 +1,6 @@
 Package: MatchIt
-Version: 2.2-8
-Date: 2006-05-01
+Version: 2.2-10
+Date: 2006-05-09
 Title: MatchIt: Nonparametric Preprocessing for Parametric Casual Inference
 Author: Daniel Ho <daniel.e.ho@gmail.com>,
         Kosuke Imai <kimai@Princeton.Edu>, 
@@ -18,4 +18,4 @@ LazyLoad: yes
 LazyData: yes
 License: GPL version 2 or newer
 URL: http://gking.harvard.edu/matchit
-Packaged: Mon May  1 09:32:20 2006; kimai
+Packaged: Wed May 10 09:33:05 2006; kimai
