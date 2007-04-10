@@ -15,7 +15,7 @@ weights = "weights", subclass = "subclass")
 \arguments{
 
   \item{object}{The output object from {\tt matchit()}. This is
-    a required input.
+    an required input.
   } 
   \item{group}{This argument specifies for which matched group the user
     wants to extract the data. Available options are \code{"all"} (all
