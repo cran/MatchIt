@@ -22,9 +22,12 @@ matchit.qqplot <- function(x,discrete.cutoff,
   }
   treat <- x$treat
   matched <- x$weights!=0
+
+  ratio <- x$call$ratio
+  if(is.null(ratio)){ratio <- 1}
   
-  ## For full matching, sample numdraws observations using the weights
-  if(x$call$method=="full") {
+  ## For full or ratio matching, sample numdraws observations using the weights
+  if(identical(x$call$method,"full") | (ratio!=1)) {
     t.plot <- sample(names(treat)[treat==1], numdraws/2, replace=TRUE, prob=x$weights[treat==1])
     c.plot <- sample(names(treat)[treat==0], numdraws/2, replace=TRUE, prob=x$weights[treat==0])
     
@@ -52,11 +55,7 @@ matchit.qqplot <- function(x,discrete.cutoff,
   nc <- length(nn)
   covariates <- data.matrix(covariates)
   oma <- c(4, 4, 6, 4)
-  if(interactive){
-    opar <- par(mfrow = c(3, 3), mar = rep.int(1/2, 4), oma = oma, ask=T)
-  } else {
-    opar <- par(mfrow = c(3, 3), mar = rep.int(1/2, 4), oma = oma, ask=F)
-  }
+  opar <- par(mfrow = c(3, 3), mar = rep.int(1/2, 4), oma = oma)
   on.exit(par(opar))
   for (i in 1:nc){
     xi <- covariates[,i]
@@ -94,5 +93,11 @@ matchit.qqplot <- function(x,discrete.cutoff,
     abline(a=(rr[2]-rr[1])*0.1,b=1,lty=2)
     abline(a=-(rr[2]-rr[1])*0.1,b=1,lty=2)
     box()
-  }  
+    if(interactive){
+      par(ask=T)
+    } else {
+      par(ask=F)
+    }
+  }
+  par(ask=F)
 }

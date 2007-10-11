@@ -26,9 +26,9 @@ summary.matchit <- function(object, interactions = FALSE,
   kk <- ncol(XX)
 
   ## Summary Stats
-  aa <- apply(XX,2,qoi,tt=treat,ww=weights,standardize=standardize)
-  sum.all <- as.data.frame(matrix(0,kk,6))
-  sum.matched <- as.data.frame(matrix(0,kk,6))
+  aa <- apply(XX,2,qoi,tt=treat,ww=weights,standardize=standardize,std=T)
+  sum.all <- as.data.frame(matrix(0,kk,7))
+  sum.matched <- as.data.frame(matrix(0,kk,7))
   row.names(sum.all) <- row.names(sum.matched) <- nam
   names(sum.all) <- names(sum.matched) <- names(aa[[1]])
   sum.all.int <- sum.matched.int <- NULL
@@ -38,7 +38,7 @@ summary.matchit <- function(object, interactions = FALSE,
     if(interactions){
       for(j in i:kk){
         x2 <- XX[,i]*as.matrix(XX[,j])
-        jqoi <- qoi(x2,tt=treat,ww=weights,standardize=standardize)
+        jqoi <- qoi(x2,tt=treat,ww=weights,standardize=standardize,std=T)
         sum.all.int <- rbind(sum.all.int,jqoi[1,])
         sum.matched.int <- rbind(sum.matched.int,jqoi[2,])
         row.names(sum.all.int)[nrow(sum.all.int)] <-
@@ -53,9 +53,9 @@ summary.matchit <- function(object, interactions = FALSE,
 
   ## Imbalance Reduction
   stat0 <- abs(cbind(sum.all[,2]-sum.all[,1],
-                     sum.all[,4:6]))
+                     sum.all[,5:7]))
   stat1 <- abs(cbind(sum.matched[,2]-sum.matched[,1],
-                     sum.matched[,4:6]))
+                     sum.matched[,5:7]))
   reduction <- as.data.frame(100*(stat0-stat1)/stat0)
   if(sum(stat0==0 & stat1==0, na.rm=T)>0){
     reduction[stat0==0 & stat1==0] <- 0

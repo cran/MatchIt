@@ -4,7 +4,7 @@ summary.matchit.subclass <- function(object, interactions = FALSE,
 
   X <- object$X
   ## Fix X matrix so that it doesn't have any factors
-  varnames <- colnames(X)
+ varnames <- colnames(X)
   for(var in varnames) {
         if(is.factor(X[,var])) {
                 tempX <- X[,!colnames(X)%in%c(var)]
