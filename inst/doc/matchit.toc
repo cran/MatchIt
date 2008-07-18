@@ -18,14 +18,15 @@
 \contentsline {subsubsection}{\numberline {3.1.2.4}Optimal Matching}{11}{subsubsection.3.1.2.4}
 \contentsline {subsubsection}{\numberline {3.1.2.5}Full Matching}{11}{subsubsection.3.1.2.5}
 \contentsline {subsubsection}{\numberline {3.1.2.6}Genetic Matching}{12}{subsubsection.3.1.2.6}
-\contentsline {section}{\numberline {3.2}Checking Balance}{12}{section.3.2}
-\contentsline {subsection}{\numberline {3.2.1}Quick Overview}{12}{subsection.3.2.1}
-\contentsline {subsection}{\numberline {3.2.2}Details}{12}{subsection.3.2.2}
-\contentsline {subsubsection}{\numberline {3.2.2.1}The {\tt summary()} Command}{12}{subsubsection.3.2.2.1}
+\contentsline {subsubsection}{\numberline {3.1.2.7}Coarsened Exact Matching}{12}{subsubsection.3.1.2.7}
+\contentsline {section}{\numberline {3.2}Checking Balance}{13}{section.3.2}
+\contentsline {subsection}{\numberline {3.2.1}Quick Overview}{13}{subsection.3.2.1}
+\contentsline {subsection}{\numberline {3.2.2}Details}{13}{subsection.3.2.2}
+\contentsline {subsubsection}{\numberline {3.2.2.1}The {\tt summary()} Command}{13}{subsubsection.3.2.2.1}
 \contentsline {subsubsection}{\numberline {3.2.2.2}The \texttt {plot()} Command}{14}{subsubsection.3.2.2.2}
 \contentsline {section}{\numberline {3.3}Conducting Analyses after Matching}{15}{section.3.3}
-\contentsline {subsection}{\numberline {3.3.1}Quick Overview}{15}{subsection.3.3.1}
-\contentsline {subsection}{\numberline {3.3.2}Examples}{16}{subsection.3.3.2}
+\contentsline {subsection}{\numberline {3.3.1}Quick Overview}{16}{subsection.3.3.1}
+\contentsline {subsection}{\numberline {3.3.2}Examples}{17}{subsection.3.3.2}
 \contentsline {chapter}{\numberline {4}Reference Manual}{21}{chapter.4}
 \contentsline {section}{\numberline {4.1}\texttt {matchit()}: Implementation of Matching Methods}{21}{section.4.1}
 \contentsline {subsubsection}{\numberline {4.1.0.1}Syntax}{21}{subsubsection.4.1.0.1}
@@ -37,32 +38,33 @@
 \contentsline {paragraph}{\numberline {4.1.0.2.5}Additional Arguments for Optimal Matching}{25}{paragraph.4.1.0.2.5}
 \contentsline {paragraph}{\numberline {4.1.0.2.6}Additional Arguments for Full Matching}{25}{paragraph.4.1.0.2.6}
 \contentsline {paragraph}{\numberline {4.1.0.2.7}Additional Arguments for Genetic Matching}{26}{paragraph.4.1.0.2.7}
+\contentsline {paragraph}{\numberline {4.1.0.2.8}Additional Arguments for Coarsened Exact Matching}{26}{paragraph.4.1.0.2.8}
 \contentsline {subsubsection}{\numberline {4.1.0.3}Output Values}{26}{subsubsection.4.1.0.3}
 \contentsline {section}{\numberline {4.2}\texttt {summary()}: Numerical Summaries of Balance}{27}{section.4.2}
 \contentsline {subsubsection}{\numberline {4.2.0.1}Syntax}{27}{subsubsection.4.2.0.1}
-\contentsline {subsubsection}{\numberline {4.2.0.2}Arguments}{27}{subsubsection.4.2.0.2}
+\contentsline {subsubsection}{\numberline {4.2.0.2}Arguments}{28}{subsubsection.4.2.0.2}
 \contentsline {subsubsection}{\numberline {4.2.0.3}Output Values}{28}{subsubsection.4.2.0.3}
 \contentsline {section}{\numberline {4.3}\texttt {plot()}: Graphical Summaries of Balance}{29}{section.4.3}
 \contentsline {subsection}{\numberline {4.3.1}Plot options for the matchit object}{29}{subsection.4.3.1}
-\contentsline {subsubsection}{\numberline {4.3.1.1}Syntax}{29}{subsubsection.4.3.1.1}
-\contentsline {subsubsection}{\numberline {4.3.1.2}Arguments}{29}{subsubsection.4.3.1.2}
+\contentsline {subsubsection}{\numberline {4.3.1.1}Syntax}{30}{subsubsection.4.3.1.1}
+\contentsline {subsubsection}{\numberline {4.3.1.2}Arguments}{30}{subsubsection.4.3.1.2}
 \contentsline {subsubsection}{\numberline {4.3.1.3}Output Values}{30}{subsubsection.4.3.1.3}
-\contentsline {subsection}{\numberline {4.3.2}Plot options for the matchit summary object}{30}{subsection.4.3.2}
-\contentsline {subsubsection}{\numberline {4.3.2.1}Syntax}{30}{subsubsection.4.3.2.1}
+\contentsline {subsection}{\numberline {4.3.2}Plot options for the matchit summary object}{31}{subsection.4.3.2}
+\contentsline {subsubsection}{\numberline {4.3.2.1}Syntax}{31}{subsubsection.4.3.2.1}
 \contentsline {subsubsection}{\numberline {4.3.2.2}Arguments}{31}{subsubsection.4.3.2.2}
 \contentsline {subsubsection}{\numberline {4.3.2.3}Output Values}{31}{subsubsection.4.3.2.3}
 \contentsline {section}{\numberline {4.4}\texttt {match.data()}: Extracting the Matched Data Set}{31}{section.4.4}
 \contentsline {subsection}{\numberline {4.4.1}Usage}{31}{subsection.4.4.1}
 \contentsline {subsection}{\numberline {4.4.2}Arguments}{31}{subsection.4.4.2}
 \contentsline {subsection}{\numberline {4.4.3}Examples}{32}{subsection.4.4.3}
-\contentsline {chapter}{\numberline {5}Frequently Asked Questions}{33}{chapter.5}
-\contentsline {section}{\numberline {5.1}How do I Cite this Work?}{33}{section.5.1}
-\contentsline {section}{\numberline {5.2}What if My datasets Are Big and Are Taking Up Too Much Memory?}{33}{section.5.2}
-\contentsline {section}{\numberline {5.3}How Exactly are the Weights Created?}{34}{section.5.3}
-\contentsline {section}{\numberline {5.4}How Do I Create Observation Names?}{34}{section.5.4}
-\contentsline {section}{\numberline {5.5}How Can I See Outcomes of Matched Pairs?}{35}{section.5.5}
-\contentsline {section}{\numberline {5.6}How Do I Ensure Replicability As \textsc {MatchIt}\ Versions Develop?}{35}{section.5.6}
-\contentsline {section}{\numberline {5.7}How Do I Use My Own Distance Measure with \textsc {MatchIt}\tmspace +\thinmuskip {.1667em}?}{35}{section.5.7}
-\contentsline {section}{\numberline {5.8}What Do I Do about Missing Data?}{36}{section.5.8}
-\contentsline {section}{\numberline {5.9}Why Preprocessing?}{36}{section.5.9}
-\contentsline {chapter}{\numberline {6}What's New?}{37}{chapter.6}
+\contentsline {chapter}{\numberline {5}Frequently Asked Questions}{34}{chapter.5}
+\contentsline {section}{\numberline {5.1}How do I Cite this Work?}{34}{section.5.1}
+\contentsline {section}{\numberline {5.2}What if My datasets Are Big and Are Taking Up Too Much Memory?}{34}{section.5.2}
+\contentsline {section}{\numberline {5.3}How Exactly are the Weights Created?}{35}{section.5.3}
+\contentsline {section}{\numberline {5.4}How Do I Create Observation Names?}{35}{section.5.4}
+\contentsline {section}{\numberline {5.5}How Can I See Outcomes of Matched Pairs?}{36}{section.5.5}
+\contentsline {section}{\numberline {5.6}How Do I Ensure Replicability As \textsc {MatchIt}\ Versions Develop?}{36}{section.5.6}
+\contentsline {section}{\numberline {5.7}How Do I Use My Own Distance Measure with \textsc {MatchIt}\tmspace +\thinmuskip {.1667em}?}{36}{section.5.7}
+\contentsline {section}{\numberline {5.8}What Do I Do about Missing Data?}{37}{section.5.8}
+\contentsline {section}{\numberline {5.9}Why Preprocessing?}{37}{section.5.9}
+\contentsline {chapter}{\numberline {6}What's New?}{38}{chapter.6}

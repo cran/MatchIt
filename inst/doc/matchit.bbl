@@ -1,11 +1,11 @@
-\begin{thebibliography}{22}
+\begin{thebibliography}{23}
 \newcommand{\enquote}[1]{``#1''}
 \expandafter\ifx\csname natexlab\endcsname\relax\def\natexlab#1{#1}\fi
 
-\bibitem[{Abadie and Imbens(2004)}]{AbaImb04}
-Abadie, A. and Imbens, G.~W. (2004), \enquote{Large sample properties of
-  matching estimators for average treatment effects,} Working paper.
-  http://elsa.berkeley.edu/$\sim$imbens/wp.shtml.
+\bibitem[{Abadie and Imbens(2007)}]{AbaImb07}
+Abadie, A. and Imbens, G.~W. (2007), \enquote{Bias-Corrected Matching
+  Estimators for Average Treatment Effects,}
+  {http://ksghome.harvard.edu/~aabadie/research.html}.
 
 \bibitem[{Breiman et~al.(1984)Breiman, Friedman, Olshen, and
   Stone}]{BreFriOls84}
@@ -21,7 +21,7 @@ Dehejia, R.~H. and Wahba, S. (1999), \enquote{Causal Effects in Nonexperimental
 \bibitem[{Diamond and Sekhon(2005)}]{DiaSek05}
 Diamond, A. and Sekhon, J. (2005), \enquote{Genetic Matching for Estimating
   Causal Effects: A New Method of Achieving Balance in Observational Studies,}
-  http://jsekhon.fas.harvard.edu/.
+  {http://jsekhon.fas.harvard.edu/}.
 
 \bibitem[{Gu and Rosenbaum(1993)}]{GuRos93}
 Gu, X. and Rosenbaum, P.~R. (1993), \enquote{Comparison of multivariate
@@ -41,11 +41,22 @@ Hastie, T.~J. and Tibshirani, R. (1990), \textit{Generalized Additive Models},
 Ho, D., Imai, K., King, G., and Stuart, E. (2007), \enquote{Matching as
   Nonparametric Preprocessing for Reducing Model Dependence in Parametric
   Causal Inference,} \textit{Political Analysis}, 15, 199--236,
-  http://gking.harvard.edu/files/abs/matchp-abs.shtml.
+  {http://gking.harvard.edu/files/abs/matchp-abs.shtml}.
 
-\bibitem[{Ho et~al.(2004)Ho, Imai, King, and Stuart}]{HoImaKin04}
-Ho, D.~E., Imai, K., King, G., and Stuart, E.~A. (2004), \enquote{MatchIt:
-  Matching Software for Causal Inference,} Http://gking.harvard.edu/matchit.
+\bibitem[{Ho et~al.(Forthcoming)Ho, Imai, King, and Stuart}]{HoImaKin07a}
+Ho, D.~E., Imai, K., King, G., and Stuart, E.~A. (Forthcoming),
+  \enquote{MatchIt: Nonparametric Preprocessing for Parametric Causal
+  Inference,} \textit{Journal of Statistical Software},
+  {http://gking.harvard.edu/matchit}.
+
+\bibitem[{Iacus et~al.(2008{\natexlab{a}})Iacus, King, and
+  Porro}]{IacKinPor08b}
+Iacus, S.~M., King, G., and Porro, G. (2008{\natexlab{a}}), \enquote{CEM:
+  Coarsened Exact Matching Software,} {http://gking.harvard.edu/cem}.
+
+\bibitem[{Iacus et~al.(2008{\natexlab{b}})Iacus, King, and Porro}]{IacKinPor08}
+--- (2008{\natexlab{b}}), \enquote{Matching for Causal Inference Without
+  Balance Checking,} {http://gking.harvard.edu/files/abs/cem-abs.shtml}.
 
 \bibitem[{Imai(2005)}]{Imai05}
 Imai, K. (2005), \enquote{Do Get-Out-The-Vote Calls Reduce Turnout? The
@@ -54,13 +65,13 @@ Imai, K. (2005), \enquote{Do Get-Out-The-Vote Calls Reduce Turnout? The
 
 \bibitem[{Imai et~al.(2006)Imai, King, and Lau}]{ImaKinLau06}
 Imai, K., King, G., and Lau, O. (2006), \enquote{Zelig: Everyone's Statistical
-  Software,} Http://gking.harvard.edu/zelig.
+  Software,} {http://gking.harvard.edu/zelig}.
 
-\bibitem[{Imai et~al.(2007)Imai, King, and Stuart}]{ImaKinStu07}
-Imai, K., King, G., and Stuart, E. (2007), \enquote{Misunderstandings Among
+\bibitem[{Imai et~al.(2008)Imai, King, and Stuart}]{ImaKinStu08}
+Imai, K., King, G., and Stuart, E. (2008), \enquote{Misunderstandings Among
   Experimentalists and Observationalists about Causal Inference,}
-  \textit{Journal of the Royal Statistical Society, Series A},
-  http://gking.harvard.edu/files/abs/matchse-abs.shtml.
+  \textit{Journal of the Royal Statistical Society, {S}eries {A}}, 171, part 2,
+  481--502, {http://gking.harvard.edu/files/abs/matchse-abs.shtml}.
 
 \bibitem[{Imai and van Dyk(2004)}]{ImaDyk04}
 Imai, K. and van Dyk, D.~A. (2004), \enquote{Causal Inference with General
@@ -71,21 +82,21 @@ Imai, K. and van Dyk, D.~A. (2004), \enquote{Causal Inference with General
 King, G., Honaker, J., Joseph, A., and Scheve, K. (2001), \enquote{Analyzing
   Incomplete Political Science Data: An Alternative Algorithm for Multiple
   Imputation,} \textit{American Political Science Review}, 95, 49--69,
-  http://gking.harvard.edu/files/abs/evil-abs.shtml.
+  {http://gking.harvard.edu/files/abs/evil-abs.shtml}.
 
 \bibitem[{King and Zeng(2006)}]{KinZen06}
 King, G. and Zeng, L. (2006), \enquote{The Dangers of Extreme Counterfactuals,}
   \textit{Political Analysis}, 14, 131--159,
-  http://gking.harvard.edu/files/abs/counterft-abs.shtml.
+  {http://gking.harvard.edu/files/abs/counterft-abs.shtml}.
 
 \bibitem[{King and Zeng(2007)}]{KinZen07}
 --- (2007), \enquote{When Can History Be Our Guide? The Pitfalls of
   Counterfactual Inference,} \textit{International Studies Quarterly},
-  183--210, http://gking.harvard.edu/files/abs/counterf-abs.shtml.
+  183--210, {http://gking.harvard.edu/files/abs/counterf-abs.shtml}.
 
 \bibitem[{Lalonde(1986)}]{lalonde86}
 Lalonde, R. (1986), \enquote{Evaluating the Econometric Evaluations of Training
-  Programs,} \textit{aer}, 76, 604--620.
+  Programs,} \textit{American Economic Review}, 76, 604--620.
 
 \bibitem[{Ripley(1996)}]{Ripley96}
 Ripley, B. (1996), \textit{Pattern Recognition and Neural Networks}, Cambridge
@@ -95,14 +106,10 @@ Ripley, B. (1996), \textit{Pattern Recognition and Neural Networks}, Cambridge
 Rosenbaum, P.~R. (2002), \textit{Observational Studies, 2nd Edition}, New York,
   NY: Springer Verlag.
 
-\bibitem[{Sekhon(2004)}]{Sekhon04}
-Sekhon, J.~S. (2004), \enquote{Multivariate and Propensity Score Matching
-  Software,} Http://jsekhon.fas.harvard.edu/matching/.
-
 \bibitem[{Stoll et~al.(2005)Stoll, King, and Zeng}]{StoKinZen05}
 Stoll, H., King, G., and Zeng, L. (2005), \enquote{WhatIf: Software for
   Evaluating Counterfactuals,} \textit{Journal of Statistical Software}, 15,
-  http://www.jstatsoft.org/index.php?vol=15.
+  {http://www.jstatsoft.org/index.php?vol=15}.
 
 \bibitem[{Venables and Ripley(2002)}]{VenRip02}
 Venables, W.~N. and Ripley, B.~D. (2002), \textit{Modern Applied Statistics

@@ -8,15 +8,18 @@ using R commands such as {\tt write.csv()} and {\tt write.table()} for
 ASCII files or {\tt write.dta()} in the {\tt foreign} package for a
 STATA binary file.
 
-When variable numbers of treated and control units have been matched to each other
-(e.g., through exact matching, full matching, or k:1 matching with replacement), the weights
-created by MatchIt should be used (e.g., in a weighted regression) to ensure that the matched treated and control groups
-are weighted up to be similar.  Users should also remember that the weights
-created by MatchIt estimate the average treatment effect on the treated, with
-the control units weighted to resemble the treated units.  See below for more detail on the weights.  
-With subclassification, estimates should be obtained within each subclass
-and then aggregated across subclasses.  When it is not possible to calculate an effect within each subclass,
-again the weights can be used to weight the matched units.
+When variable numbers of treated and control units have been matched
+to each other (e.g., through exact matching, full matching, or k:1
+matching with replacement), the weights created by MatchIt should be
+used (e.g., in a weighted regression) to ensure that the matched
+treated and control groups are weighted up to be similar.  Users
+should also remember that the weights created by MatchIt estimate the
+average treatment effect on the treated, with the control units
+weighted to resemble the treated units.  See below for more detail on
+the weights.  With subclassification, estimates should be obtained
+within each subclass and then aggregated across subclasses.  When it
+is not possible to calculate an effect within each subclass, again the
+weights can be used to weight the matched units.
 
 In this section, we show how to use
 \hlink{Zelig}{http://gking.harvard.edu/zelig/} with \MatchIt.  Zelig
@@ -86,31 +89,32 @@ To load the Zelig package after installing it, type
 \item[Model-Based Estimates] In our first example, we conduct a
   standard parametric analysis and compute quantities of interest in
   the most common way.  We begin with nearest neighbor matching with a
-  logistic regression-based propensity score, discarding with the
-  convex.hull \citep{KinZen06,KinZen07} option:
+  logistic regression-based propensity score, discarding control units
+  outside the convex hull of the treated units
+  \citep{KinZen06,KinZen07}:
 \begin{verbatim}
-> m.out0 <- matchit(treat ~ age + educ + black + hispan + nodegree + 
+> m.out <- matchit(treat ~ age + educ + black + hispan + nodegree + 
                     married + re74 + re75, method = "nearest", discard
-                    = "convex.hull", data = lalonde)
+                    = "hull.control", data = lalonde)
 \end{verbatim}
   Then we check balance using the summary and plot procedures (which
   we don't show here).  When the best balance is achieved, 
   we run the parametric analysis:
 \begin{verbatim}
-> z.out0 <- zelig(re78 ~ treat + age + educ + black + hispan + nodegree + 
-                  married + re74 + re75, data = match.data(m.out0), 
+> z.out <- zelig(re78 ~ treat + age + educ + black + hispan + nodegree + 
+                  married + re74 + re75, data = match.data(m.out), 
                   model = "ls")
 \end{verbatim}
   and then set the explanatory variables at their means (the default)
   and change the treatment variable from a 0 to a 1:
 \begin{verbatim}
-> x.out0 <- setx(z.out0, treat=0)
-> x1.out0 <- setx(z.out0, treat=1)
+> x.out <- setx(z.out, treat=0)
+> x1.out <- setx(z.out, treat=1)
 \end{verbatim}
 and finally compute the result and examine a summary:
 \begin{verbatim}
-> s.out0 <- sim(z.out1, x = x.out1)
-> summary(s.out0)
+> s.out <- sim(z.out, x = x.out, x1 = x1.out)
+> summary(s.out)
 \end{verbatim}
 
 \item[Average Treatment Effect on the Treated] We illustrate now how
@@ -126,11 +130,10 @@ and finally compute the result and examine a summary:
 \end{verbatim}
   Then we check balance using the summary and plot procedures (which
   we don't show here).  We reestimate the matching procedure until we
-  achieve the best balance possible.  (The running examples here are meant merely to illustrate, not to suggest that we've achieved the best 
-balance.)  Then we 
-go to Zelig, and in this
-  case choose to fit a linear least squares model to the control group
-  only:
+  achieve the best balance possible.  (The running examples here are
+  meant merely to illustrate, not to suggest that we've achieved the
+  best balance.)  Then we go to Zelig, and in this case choose to fit
+  a linear least squares model to the control group only:
 \begin{verbatim}
 > z.out1 <- zelig(re78 ~ age + educ + black + hispan + nodegree + 
                   married + re74 + re75, data = match.data(m.out1, "control"), 
