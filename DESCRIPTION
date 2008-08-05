@@ -1,6 +1,6 @@
 Package: MatchIt
-Version: 2.4-5
-Date: 2008-07-20
+Version: 2.4-7
+Date: 2008-08-05
 Title: MatchIt
 Author: Daniel Ho <daniel.e.ho@gmail.com>,
         Elizabeth Stuart <stuart@stat.harvard.edu>,
@@ -17,4 +17,4 @@ Description: MatchIt preprocesses data by selecting approximate matched samples
 License: GPL (>= 2)
 URL: http://gking.harvard.edu/matchit/
 Suggests: cem
-Packaged: Sun Jul 20 20:17:26 2008; king
+Packaged: Tue Aug  5 00:40:42 2008; king
