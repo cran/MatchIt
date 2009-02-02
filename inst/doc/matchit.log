@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159-1.10b (Web2C 7.4.5) (format=pdflatex 2007.11.9)  5 AUG 2008 00:40
+This is pdfTeX, Version 3.14159-1.10b (Web2C 7.4.5) (format=pdflatex 2007.11.9)  2 FEB 2009 09:43
 **matchit
 (./matchit.tex{/usr/share/texmf/pdftex/config/pdftex.cfg}
 LaTeX2e <2001/06/01>
@@ -570,7 +570,7 @@ Package hyperref Warning: Token not allowed in a PDFDocEncoded string:
 [36]) [37]
 Chapter 6.
 
-Overfull \hbox (0.1057pt too wide) in paragraph at lines 118--120
+Overfull \hbox (0.1057pt too wide) in paragraph at lines 120--122
 []/cmbx12/2.4-7 /cmr12/(Au-gust 4, 2008): Fixed mi-nor bug in sub-clas-si-fi-ca
 -tion (thanks to Ben Domingue) 
  []
@@ -633,4 +633,4 @@ y/cm/cmtt10.pfb></usr/share/texmf/fonts/type1/bluesky/cm/cmr8.pfb></usr/share/t
 exmf/fonts/type1/bluesky/cm/cmr10.pfb></usr/share/texmf/fonts/type1/bluesky/cm/
 cmr12.pfb></usr/share/texmf/fonts/type1/bluesky/cm/cmr17.pfb>{/usr/share/texmf/
 dvips/tetex/0ef0afca.enc}</usr/share/texmf/fonts/type1/bluesky/cm/cmcsc10.pfb>
-Output written on matchit.pdf (42 pages, 430177 bytes).
+Output written on matchit.pdf (42 pages, 430354 bytes).

@@ -6,7 +6,7 @@
 
 \description{
   The \code{help.matchit} command launches html help for Matchit commands
-  and supported models.  The full manual is available online at
+  and supported methods.  The full manual is available online at
   \url{http://gking.harvard.edu/matchit}.
   }
 
@@ -30,7 +30,7 @@ help.matchit(object)
                                                                                                                                                              
 \author{
   Daniel Ho <\email{daniel.ho@yale.edu}>;  Kosuke Imai <\email{kimai@princeton.edu}>; Gary King
-  <\email{king@harvard.edu}>; Elizabeth Stuart<\email{stuart@stat.harvard.edu}>
+  <\email{king@harvard.edu}>; Elizabeth Stuart<\email{estuart@jhsph.edu}>
 }
 
 \keyword{documentation}
