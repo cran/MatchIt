@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159-1.10b (Web2C 7.4.5) (format=pdflatex 2007.11.9)  2 FEB 2009 09:43
+This is pdfTeX, Version 3.14159-1.10b (Web2C 7.4.5) (format=pdflatex 2007.11.9)  25 JUN 2009 23:57
 **matchit
 (./matchit.tex{/usr/share/texmf/pdftex/config/pdftex.cfg}
 LaTeX2e <2001/06/01>
@@ -322,7 +322,7 @@ LaTeX Font Warning: Font shape `OT1/cmr/bx/sc' undefined
 s been already used, duplicate ignored
 <to be read again> 
                    \penalty 
-l.32 ...4.1.0.1}Syntax}{21}{subsubsection.4.1.0.1}
+l.32 ...4.1.0.1}Syntax}{22}{subsubsection.4.1.0.1}
                                                    [1
 
 ])
@@ -423,30 +423,29 @@ LaTeX Font Info:    Font shape `OMS/cmr/m/n' in size <12> not available
 LaTeX Font Info:    Font shape `OT1/cmtt/bx/n' in size <12> not available
 (Font)              Font shape `OT1/cmtt/m/n' tried instead on input line 80.
 
-<figs/jitterplotnn.pdf, id=482, 867.24pt x 433.62pt>
+<figs/jitterplotnn.pdf, id=482, 433.62pt x 289.08pt>
 File: figs/jitterplotnn.pdf Graphic file (type pdf)
 
-<use figs/jitterplotnn.pdf>
-<figs/qqplotnn1.pdf, id=483, 198.7425pt x 198.7425pt> [14]
+<use figs/jitterplotnn.pdf> <figs/qqplotnn1.pdf, id=483, 289.08pt x 289.08pt>
 File: figs/qqplotnn1.pdf Graphic file (type pdf)
 
-<use figs/qqplotnn1.pdf> <figs/hist.pdf, id=488, 433.62pt x 433.62pt>
+<use figs/qqplotnn1.pdf> <figs/hist.pdf, id=484, 289.08pt x 289.08pt>
 File: figs/hist.pdf Graphic file (type pdf)
 
-<use figs/hist.pdf>) (./matchit2zelig.tex [15 <./figs/jitterplotnn.pdf> <./figs
-/qqplotnn1.pdf> <./figs/hist.pdf>] [16]
+<use figs/hist.pdf>) (./matchit2zelig.tex [14] [15 <./figs/jitterplotnn.pdf> <.
+/figs/qqplotnn1.pdf> <./figs/hist.pdf>] [16]
 Overfull \hbox (4.2199pt too wide) in paragraph at lines 104--104
  []/cmtt12/> z.out <- zelig(re78 ~ treat + age + educ + black + hispan + nodegr
 ee + 
  []
 
-
+[17]
 Overfull \hbox (41.26991pt too wide) in paragraph at lines 129--129
  []                    /cmtt12/married + re74 + re75, method = "nearest", data 
 = lalonde)[] 
  []
 
-[17]
+
 Overfull \hbox (41.26991pt too wide) in paragraph at lines 139--139
  []                  /cmtt12/married + re74 + re75, data = match.data(m.out1, "
 control"),[] 
@@ -494,7 +493,7 @@ Overfull \hbox (16.5699pt too wide) in paragraph at lines 266--266
  "ls",[] 
  []
 
-) [20]
+[20]) [21]
 Chapter 4.
 LaTeX Font Info:    Font shape `OT1/cmtt/bx/n' in size <17.28> not available
 (Font)              Font shape `OT1/cmtt/m/n' tried instead on input line 95.
@@ -503,15 +502,15 @@ LaTeX Font Info:    Font shape `OT1/cmtt/bx/n' in size <17.28> not available
 Package hyperref Warning: Difference (2) between bookmark levels is greater 
 (hyperref)                than one, level fixed on input line 1.
 
-[21
+[22
 
-] [22] [23] [24]
+] [23] [24] [25]
 Overfull \hbox (6.39474pt too wide) in paragraph at lines 243--248
 /cmr12/pack-age. See /cmtt12/help(fullmatch) /cmr12/or []http://www.stat.lsa.um
 ich.edu/~bbh/optmatch.html[]
  []
 
-[25]
+[26]
 Overfull \hbox (0.83185pt too wide) in paragraph at lines 284--286
 []/cmtt12/.../cmr12/: Ad-di-tional in-puts that can be passed to the /cmtt12/fu
 llmatch() /cmr12/func-tion in the /cmtt12/optmatch
@@ -523,7 +522,7 @@ Overfull \hbox (40.20618pt too wide) in paragraph at lines 334--338
 ce mea-sure. /cmtt12/summary(m.out$model)
  []
 
-[26]) (./summaryref.tex
+[27]) (./summaryref.tex
 
 Package hyperref Warning: Difference (2) between bookmark levels is greater 
 (hyperref)                than one, level fixed on input line 6.
@@ -540,23 +539,23 @@ Overfull \hbox (6.94044pt too wide) in paragraph at lines 15--20
 cmr12/, (DE-FAULT = /cmtt12/FALSE/cmr12/). 
  []
 
-[27] [28]
+[28] [29]
 Overfull \hbox (8.04178pt too wide) in paragraph at lines 78--82
 /cmr12/vari-ates $/cmmi12/X$ /cmr12/and their in-ter-ac-tions, where /cmtt12/Me
 ans Treated$/cmr12/= /cmmi12/^^V[] /cmr12/= [] [][] /cmmi12/w[]X[]$
  []
 
-) (./plotref.tex [29] [30]) (./mdataref.tex [31]
+) (./plotref.tex [30] [31]) (./mdataref.tex [32]
 Overfull \hbox (36.59523pt too wide) in paragraph at lines 83--83
 []/cmtt12/> unmatched.data <- lalonde[!row.names(lalonde)%in%row.names(match.da
 ta(m.out1)),][] 
  []
 
-[32]) (./faq.tex [33]
+[33]) (./faq.tex [34]
 Chapter 5.
-[34
+[35
 
-] [35]
+] [36]
 Overfull \hbox (48.94524pt too wide) in paragraph at lines 121--121
 []/cmtt12/cbind(lalonde[row.names(foo$match.matrix),"re78"], lalonde[foo$match.
 matrix,"re78"])[] 
@@ -567,17 +566,17 @@ Package hyperref Warning: Token not allowed in a PDFDocEncoded string:
 (hyperref)                \kern 1.95872pt
 (hyperref)                removed on input line 157.
 
-[36]) [37]
+[37]) [38]
 Chapter 6.
 
-Overfull \hbox (0.1057pt too wide) in paragraph at lines 120--122
+Overfull \hbox (0.1057pt too wide) in paragraph at lines 122--124
 []/cmbx12/2.4-7 /cmr12/(Au-gust 4, 2008): Fixed mi-nor bug in sub-clas-si-fi-ca
 -tion (thanks to Ben Domingue) 
  []
 
-[38
+[39
 
-] [39] (./matchit.bbl
+] [40] (./matchit.bbl
 Underfull \hbox (badness 3029) in paragraph at lines 22--25
 []/cmr12/Diamond, A. and Sekhon, J. (2005), ``Ge-netic Match-ing for Es-ti-mat-
 ing Causal
@@ -595,28 +594,28 @@ Underfull \hbox (badness 10000) in paragraph at lines 58--60
 k-ing,''
  []
 
-[40
+[41
 
 
 ])
 
 Package natbib Warning: There were undefined citations.
 
-[41] (./matchit.aux)
+[42] (./matchit.aux)
 
 LaTeX Font Warning: Some font shapes were not available, defaults substituted.
 
  ) 
 Here is how much of TeX's memory you used:
- 4456 strings out of 95437
- 56697 string characters out of 1190233
- 112297 words of memory out of 1000001
- 7198 multiletter control sequences out of 10000+50000
+ 4458 strings out of 95437
+ 56733 string characters out of 1190233
+ 112346 words of memory out of 1000001
+ 7199 multiletter control sequences out of 10000+50000
  19072 words of font info for 74 fonts, out of 500000 for 1000
  14 hyphenation exceptions out of 1000
- 34i,11n,41p,219b,459s stack positions out of 1500i,500n,5000p,200000b,5000s
- 714 PDF objects out of 300000
- 152 named destinations out of 131072
+ 34i,11n,41p,920b,459s stack positions out of 1500i,500n,5000p,200000b,5000s
+ 731 PDF objects out of 300000
+ 154 named destinations out of 131072
  465 words of extra memory for PDF output out of 65536
 {/usr/share/texmf/dvips/tetex/bbad153f.enc}</usr/share/texmf/fonts/type1/blue
 sky/cm/cmsy6.pfb>{/usr/share/texmf/dvips/tetex/aae443f0.enc}</usr/share/texmf/f
@@ -633,4 +632,4 @@ y/cm/cmtt10.pfb></usr/share/texmf/fonts/type1/bluesky/cm/cmr8.pfb></usr/share/t
 exmf/fonts/type1/bluesky/cm/cmr10.pfb></usr/share/texmf/fonts/type1/bluesky/cm/
 cmr12.pfb></usr/share/texmf/fonts/type1/bluesky/cm/cmr17.pfb>{/usr/share/texmf/
 dvips/tetex/0ef0afca.enc}</usr/share/texmf/fonts/type1/bluesky/cm/cmcsc10.pfb>
-Output written on matchit.pdf (42 pages, 430354 bytes).
+Output written on matchit.pdf (43 pages, 662242 bytes).
