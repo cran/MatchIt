@@ -76,6 +76,16 @@ matchit <- function(formula, data, method = "nearest", distance = "logit",
   }
   out2$distance <- distance
   out2$discarded <- discarded
+
+  ## basic summary
+  nn <- matrix(0, ncol=2, nrow=4)
+  nn[1,] <- c(sum(out2$treat==0), sum(out2$treat==1))
+  nn[2,] <- c(sum(out2$treat==0 & out2$weights>0), sum(out2$treat==1 & out2$weights>0))
+  nn[3,] <- c(sum(out2$treat==0 & out2$weights==0 & out2$discarded==0), sum(out2$treat==1 & out2$weights==0 & out2$discarded==0))
+  nn[4,] <- c(sum(out2$treat==0 & out2$weights==0 & out2$discarded==1), sum(out2$treat==1 & out2$weights==0 & out2$discarded==1))
+  dimnames(nn) <- list(c("All","Matched","Unmatched","Discarded"),
+                       c("Control","Treated"))
+  out2$nn <- nn
   
   return(out2)
 }

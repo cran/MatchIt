@@ -1,4 +1,4 @@
-\begin{thebibliography}{23}
+\begin{thebibliography}{21}
 \newcommand{\enquote}[1]{``#1''}
 \expandafter\ifx\csname natexlab\endcsname\relax\def\natexlab#1{#1}\fi
 
@@ -48,15 +48,6 @@ Ho, D.~E., Imai, K., King, G., and Stuart, E.~A. (Forthcoming),
   \enquote{MatchIt: Nonparametric Preprocessing for Parametric Causal
   Inference,} \textit{Journal of Statistical Software},
   {http://gking.harvard.edu/matchit}.
-
-\bibitem[{Iacus et~al.(2008{\natexlab{a}})Iacus, King, and
-  Porro}]{IacKinPor08b}
-Iacus, S.~M., King, G., and Porro, G. (2008{\natexlab{a}}), \enquote{CEM:
-  Coarsened Exact Matching Software,} {http://gking.harvard.edu/cem}.
-
-\bibitem[{Iacus et~al.(2008{\natexlab{b}})Iacus, King, and Porro}]{IacKinPor08}
---- (2008{\natexlab{b}}), \enquote{Matching for Causal Inference Without
-  Balance Checking,} {http://gking.harvard.edu/files/abs/cem-abs.shtml}.
 
 \bibitem[{Imai(2005)}]{Imai05}
 Imai, K. (2005), \enquote{Do Get-Out-The-Vote Calls Reduce Turnout? The
