@@ -1,4 +1,4 @@
-This is pdfeTeX, Version 3.141592-1.21a-2.2 (Web2C 7.5.4) (format=pdflatex 2009.9.1)  8 JAN 2011 22:10
+This is pdfeTeX, Version 3.141592-1.21a-2.2 (Web2C 7.5.4) (format=pdflatex 2009.9.1)  3 APR 2011 11:23
 entering extended mode
 **matchit
 (./matchit.tex
@@ -595,7 +595,7 @@ Package hyperref Warning: Token not allowed in a PDFDocEncoded string:
 [37]) [38]
 Chapter 6.
 
-Overfull \hbox (0.1057pt too wide) in paragraph at lines 130--132
+Overfull \hbox (0.1057pt too wide) in paragraph at lines 131--133
 []\OT1/cmr/bx/n/12 2.4-7 \OT1/cmr/m/n/12 (Au-gust 4, 2008): Fixed mi-nor bug in
  sub-clas-si-fi-ca-tion (thanks to Ben Domingue) 
  []
@@ -650,4 +650,4 @@ xmf/fonts/type1/bluesky/cm/cmtt10.pfb></usr/share/texmf/fonts/type1/bluesky/cm/
 cmr8.pfb></usr/share/texmf/fonts/type1/bluesky/cm/cmr10.pfb></usr/share/texmf/f
 onts/type1/bluesky/cm/cmr12.pfb></usr/share/texmf/fonts/type1/bluesky/cm/cmr17.
 pfb></usr/share/texmf/fonts/type1/bluesky/cm/cmcsc10.pfb>
-Output written on matchit.pdf (44 pages, 662741 bytes).
+Output written on matchit.pdf (44 pages, 662787 bytes).
