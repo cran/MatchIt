@@ -1,6 +1,6 @@
 Package: MatchIt
-Version: 2.4-17
-Date: 2011-04-03
+Version: 2.4-18
+Date: 2011-04-26
 Title: MatchIt
 Author: Daniel Ho <daniel.e.ho@gmail.com>, Elizabeth Stuart
         <stuart@stat.harvard.edu>, Kosuke Imai <kimai@Princeton.Edu>,
@@ -17,6 +17,6 @@ Description: MatchIt preprocesses data by selecting approximate matched
 License: GPL (>= 2)
 URL: http://gking.harvard.edu/matchit/
 Suggests: cem, optmatch, Matching, WhatIf, nnet, rpart, mgcv
-Packaged: 2011-04-03 15:23:15 UTC; rbuild
+Packaged: 2011-04-26 11:24:42 UTC; rbuild
 Repository: CRAN
-Date/Publication: 2011-04-04 07:36:55
+Date/Publication: 2011-04-26 13:09:11
