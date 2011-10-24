@@ -1,16 +1,10 @@
-    
-# stub makefile, does nothing, but causes R CMD build not to force rebuild pdf file
-
-REVAL=TRUE
-
-all:	MatchIt/inst/doc/matchit.pdf
-
-%.tex:	%.Rnw
-	echo "Sweave("$<", debug=TRUE, eval=$(REVAL))" | R --slave
-
-%.pdf:	%.tex
-	pdflatex $*
-	bibtex $*
-	pdflatex $*
-	pdflatex $*
-	pdflatex $*
+all:
+	pdflatex matchit
+	bibtex matchit
+	pdflatex matchit
+	pdflatex matchit
+matchit.pdf:
+	pdflatex matchit
+	bibtex matchit
+	pdflatex matchit
+	pdflatex matchit
