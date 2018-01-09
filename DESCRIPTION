@@ -1,7 +1,7 @@
 Package: MatchIt
-Version: 3.0.1
-Date: 2017-04-18
-Title: Nonparametric Preprocessing for Parametric Casual Inference
+Version: 3.0.2
+Date: 2018-01-09
+Title: Nonparametric Preprocessing for Parametric Causal Inference
 Description: Selects matched samples of the original treated and
     control groups with similar covariate distributions -- can be
     used to match exactly on covariates, to match on propensity
@@ -17,20 +17,21 @@ Authors@R: c(
   )
 Maintainer: Kosuke Imai <kimai@Princeton.Edu>
 Depends: R (>= 2.6)
-Imports: MASS, Matching, rgenoud
-Suggests: cem, nnet, optmatch, rpart, mgcv, WhatIf, R.rsp, testthat
+Imports: MASS, Matching
+Suggests: cem, nnet, optmatch, rpart, mgcv, WhatIf, R.rsp, testthat,
+        rgenoud
 VignetteBuilder: R.rsp
 LazyLoad: yes
 LazyData: yes
 License: GPL (>= 2)
 URL: http://gking.harvard.edu/matchit
-RoxygenNote: 5.0.1
+RoxygenNote: 6.0.1
 NeedsCompilation: no
-Packaged: 2017-04-18 12:13:20 UTC; kimai
+Packaged: 2018-01-09 08:31:17 UTC; kimai
 Author: Daniel Ho [aut],
   Kosuke Imai [aut, cre],
   Gary King [aut],
   Elizabeth Stuart [aut],
   Alex Whitworth [ctb]
 Repository: CRAN
-Date/Publication: 2017-04-18 13:04:21 UTC
+Date/Publication: 2018-01-09 17:41:26 UTC
