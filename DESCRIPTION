@@ -1,6 +1,5 @@
 Package: MatchIt
-Version: 3.0.2
-Date: 2018-01-09
+Version: 4.0.0
 Title: Nonparametric Preprocessing for Parametric Causal Inference
 Description: Selects matched samples of the original treated and
     control groups with similar covariate distributions -- can be
@@ -9,29 +8,38 @@ Description: Selects matched samples of the original treated and
     package also implements a series of recommendations offered in
     Ho, Imai, King, and Stuart (2007) <DOI:10.1093/pan/mpl013>.
 Authors@R: c(
-  person("Daniel", "Ho", , "daniel.e.ho@gmail.com", c("aut")),
-  person("Kosuke", "Imai", , "kimai@Princeton.Edu", c("aut", "cre")),
-  person("Gary", "King", , "king@harvard.edu", c("aut")),
-  person("Elizabeth", "Stuart", , "stuart@stat.harvard.edu", c("aut")),
-  person("Alex", "Whitworth", , "whitworth.alex@gmail.com", c("ctb"))
+  person("Daniel", "Ho", email = "daniel.e.ho@gmail.com", role = c("aut"),
+         comment = c(ORCID = "0000-0002-2195-5469")),
+  person("Kosuke", "Imai", email = "imai@harvard.edu", role = c("aut"),
+         comment = c(ORCID = "0000-0002-2748-1022")),
+  person("Gary", "King", email = "king@harvard.edu", role = c("aut"),
+         comment = c(ORCID = "0000-0002-5327-7631")),
+  person("Elizabeth", "Stuart", email = "estuart@jhu.edu", role = c("aut"),
+         comment = c(ORCID = "0000-0002-9042-8611")),
+  person("Alex", "Whitworth", email = "whitworth.alex@gmail.com", role = c("ctb")),
+  person("Noah", "Greifer", role = c("ctb", "cre"), 
+         email = "noah.greifer@gmail.com",
+	       comment = c(ORCID="0000-0003-3067-7154"))
   )
-Maintainer: Kosuke Imai <kimai@Princeton.Edu>
-Depends: R (>= 2.6)
-Imports: MASS, Matching
-Suggests: cem, nnet, optmatch, rpart, mgcv, WhatIf, R.rsp, testthat,
-        rgenoud
-VignetteBuilder: R.rsp
-LazyLoad: yes
-LazyData: yes
+Depends: R (>= 3.0.0)
+Imports: backports (>= 1.1.8), Rcpp (>= 1.0.5)
+Suggests: optmatch, Matching, rgenoud, nnet, rpart, mgcv, CBPS, dbarts,
+        randomForest, cobalt (>= 4.2.3), boot, lmtest, sandwich (>=
+        2.5-1), survival, RcppProgress (>= 0.4.2), knitr, rmarkdown
+LinkingTo: Rcpp, RcppProgress
+Encoding: UTF-8
+LazyData: true
 License: GPL (>= 2)
-URL: http://gking.harvard.edu/matchit
-RoxygenNote: 6.0.1
-NeedsCompilation: no
-Packaged: 2018-01-09 08:31:17 UTC; kimai
-Author: Daniel Ho [aut],
-  Kosuke Imai [aut, cre],
-  Gary King [aut],
-  Elizabeth Stuart [aut],
-  Alex Whitworth [ctb]
+BugReports: https://github.com/kosukeimai/MatchIt/issues
+VignetteBuilder: knitr
+NeedsCompilation: yes
+Packaged: 2020-11-04 20:16:46 UTC; NoahGreifer
+Author: Daniel Ho [aut] (<https://orcid.org/0000-0002-2195-5469>),
+  Kosuke Imai [aut] (<https://orcid.org/0000-0002-2748-1022>),
+  Gary King [aut] (<https://orcid.org/0000-0002-5327-7631>),
+  Elizabeth Stuart [aut] (<https://orcid.org/0000-0002-9042-8611>),
+  Alex Whitworth [ctb],
+  Noah Greifer [ctb, cre] (<https://orcid.org/0000-0003-3067-7154>)
+Maintainer: Noah Greifer <noah.greifer@gmail.com>
 Repository: CRAN
-Date/Publication: 2018-01-09 17:41:26 UTC
+Date/Publication: 2020-11-14 15:40:02 UTC
