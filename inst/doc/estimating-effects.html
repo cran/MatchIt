@@ -12,7 +12,7 @@
 
 <meta name="author" content="Noah Greifer" />
 
-<meta name="date" content="2020-11-04" />
+<meta name="date" content="2020-11-24" />
 
 <title>Estimating Effects After Matching</title>
 
@@ -363,7 +363,7 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 
 <h1 class="title toc-ignore">Estimating Effects After Matching</h1>
 <h4 class="author">Noah Greifer</h4>
-<h4 class="date">2020-11-04</h4>
+<h4 class="date">2020-11-24</h4>
 
 
 <div id="TOC">
@@ -373,7 +373,6 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <li><a href="#identifying-the-estimand">Identifying the estimand</a></li>
 <li><a href="#modeling-the-outcome">Modeling the Outcome</a></li>
 <li><a href="#estimating-standard-errors-and-confidence-intervals">Estimating Standard Errors and Confidence Intervals</a></li>
-<li><a href="#bootstrapping">Bootstrapping</a></li>
 </ul></li>
 <li><a href="#estimating-treatment-effects-and-standard-errors-after-matching">Estimating Treatment Effects and Standard Errors After Matching</a>
 <ul>
@@ -407,6 +406,7 @@ pre code {
 <div id="introduction" class="section level2">
 <h2>Introduction</h2>
 <p>After assessing balance and deciding on a matching specification, it comes time to estimate the effect of the treatment in the matched sample. How the effect is estimated and interpreted depends on the desired estimand and the type of model used (if any). In addition to estimating effects, estimating the uncertainty of the effects is critical in communicating them and assessing whether the observed effect is compatible with there being no effect in the population. This guide explains how to estimate effects after various forms of matching and with various outcome types. There may be situations that are not covered here for which additional methodological research may be required, but some of the recommended methods here can be used to guide such applications.</p>
+<p>This guide is structured as follows: first, information on the concepts related to effect and standard error estimation is presented below. Then, instructions for how to estimate effects and standard errors are described. This section is split up first by the type of matching method performed (matching without replacement, matching with replacement, full matching, and subclassification) and then by the type of outcome (continuous, binary, and survival). Finally recommendations for reporting results and tips to avoid making common mistakes are presented.</p>
 <div id="identifying-the-estimand" class="section level3">
 <h3>Identifying the estimand</h3>
 <p>Before an effect is estimated, the estimand must be specified and clarified. Although some aspects of the estimand depend not only on how the effect is estimated after matching but also on the matching method itself, other aspects must be considered at the tine of effect estimation and interpretation. Here, we consider three aspects of the estimand: the population the effect is meant to generalize to (the target population), the effect measure, and whether the effect is marginal or conditional.</p>
@@ -431,12 +431,12 @@ pre code {
 <p><strong>Cluster-robust standard errors.</strong> A version of robust standard errors known as cluster-robust standard errors <span class="citation">(<a href="#ref-liang1986" role="doc-biblioref">Liang and Zeger 1986</a>)</span> can be used to account for dependence between observations within clusters (e.g., matched pairs). Abadie and Spiess <span class="citation">(<a href="#ref-abadie2019" role="doc-biblioref">2019</a>)</span> demonstrate analytically that cluster-robust standard errors are generally valid after matching, whereas regular robust standard errors can over- or under-estimate the true sampling variability of the effect estimator depending on the specification of the outcome model (if any) and degree of effect modification. A plethora of simulation studies have further confirmed the validity of cluster-robust standard errors after matching <span class="citation">(e.g., <a href="#ref-austin2009a" role="doc-biblioref">Austin 2009</a>, <a href="#ref-austin2013" role="doc-biblioref">2013a</a>; <a href="#ref-austin2014" role="doc-biblioref">Austin and Small 2014</a>; <a href="#ref-gayat2012" role="doc-biblioref">Gayat et al. 2012</a>; <a href="#ref-wan2019" role="doc-biblioref">Wan 2019</a>)</span>. Given this evidence favoring the use of cluster-robust standard errors, we recommend them in most cases and use them judiciously in the this guide<a href="#fn1" class="footnote-ref" id="fnref1"><sup>1</sup></a>.</p>
 <p>Here, we will use linear and generalized linear models as implemented by <code>lm()</code> and <code>glm()</code> and use <code>lmtest::coeftest()</code> and <code>lmtest::coefci()</code> along with <code>sandwich::vcovHC()</code> for robust standard errors and <code>sandwich::vcovCL()</code> for cluster-robust standard errors. There are several “types” (e.g., HC0, HC1, etc.) of robust standard errors that adjust the original standard errors in different ways; although more research is required on the benefits of using different types for estimating standard errors after matching, we use the default types here.</p>
 </div>
-</div>
-<div id="bootstrapping" class="section level3">
-<h3>Bootstrapping</h3>
+<div id="bootstrapping" class="section level4">
+<h4>Bootstrapping</h4>
 <p>Bootstrapping is a technique used to simulate the sampling distribution of an estimator by repeatedly drawing samples with replacement and estimating the effect in each bootstrap sample <span class="citation">(<a href="#ref-efron1993" role="doc-biblioref">Efron and Tibshirani 1993</a>)</span>. From the bootstrap distribution, standard errors and confidence interval can be computed in several ways, including using the standard deviation of the bootstrap estimates as the standard error estimate or using the 2.5 and 97.5 percentiles as 95% confidence interval bounds. Bootstrapping tends to be most useful when no analytic estimator of a standard error is possible or has been derived yet. Although Abadie and Imbens <span class="citation">(<a href="#ref-abadie2008" role="doc-biblioref">2008</a>)</span> found analytically that the bootstrap is inappropriate for matched samples, simulation evidence has found it to be adequate in many cases <span class="citation">(<a href="#ref-hill2006" role="doc-biblioref">Hill and Reiter 2006</a>; <a href="#ref-austin2014" role="doc-biblioref">Austin and Small 2014</a>; <a href="#ref-austin2017" role="doc-biblioref">Austin and Stuart 2017</a>)</span>. It is the most accessible method for computing standard errors after g-computation for nonlinear models.</p>
 <p>Typically, bootstrapping involves performing the entire estimation process in each bootstrap sample, including propensity score estimation, matching, and effect estimation. This tends to be the most straightforward route, though intervals from this method may be conservative in some cases (i.e., they are wider than necessary to achieve nominal coverage) <span class="citation">(<a href="#ref-austin2014" role="doc-biblioref">Austin and Small 2014</a>)</span>. Less conservative and more accurate intervals have been found when using different forms of the bootstrap, including the wild bootstrap develop by Bodory et al. <span class="citation">(<a href="#ref-bodory2020" role="doc-biblioref">2020</a>)</span> and the matched bootstrap described by Austin and Small <span class="citation">(<a href="#ref-austin2014" role="doc-biblioref">2014</a>)</span> and Abadie and Spiess <span class="citation">(<a href="#ref-abadie2019" role="doc-biblioref">Abadie and Spiess 2019</a>)</span>. The block bootstrap involves sampling matched pairs/strata of units from the matched sample and performing the analysis within each sample composed of the sampled pairs. Abadie and Spiess <span class="citation">(<a href="#ref-abadie2019" role="doc-biblioref">Abadie and Spiess 2019</a>)</span> derived analytically that the block bootstrap is valid for estimating SEs and CIs in the same circumstances cluster robust SEs are; indeed, the block bootstrap SE is known to approximate the cluster-robust SE <span class="citation">(<a href="#ref-cameron2015" role="doc-biblioref">Cameron and Miller 2015</a>)</span>. We use <code>boot()</code> from the <code>boot</code> package to implement bootstrapping.</p>
 <p>With bootstrapping, more bootstrap replications are always better but can take time and increase the chances that at least one error will occur within the bootstrap analysis (e.g., a bootstrap sample with zero treated units or zero units with an event). In general, numbers of replications upwards of 999 are recommended, with values one less than a multiple of 100 preferred to avoid interpolation when using the percentiles as confidence interval limits <span class="citation">(<a href="#ref-mackinnon2006" role="doc-biblioref">MacKinnon 2006</a>)</span>. There are several methods of computing bootstrap confidence intervals, but the bias-corrected accelerated (BCa) bootstrap confidence interval often performs best <span class="citation">(<a href="#ref-austin2014" role="doc-biblioref">Austin and Small 2014</a>; <a href="#ref-carpenter2000" role="doc-biblioref">Carpenter and Bithell 2000</a>)</span> and is easy to implement, simply by setting <code>type = &quot;bca&quot;</code> in the call to <code>boot.ci()</code> after running <code>boot()</code><a href="#fn2" class="footnote-ref" id="fnref2"><sup>2</sup></a>.</p>
+</div>
 </div>
 </div>
 <div id="estimating-treatment-effects-and-standard-errors-after-matching" class="section level2">

@@ -3,6 +3,8 @@
 #include <Rcpp.h>
 using namespace Rcpp;
 
+// [[Rcpp::plugins(cpp11)]]
+
 // [[Rcpp::export]]
 IntegerMatrix nn_matchC(const IntegerVector& treat,
                         const IntegerVector& ord,
@@ -25,7 +27,9 @@ IntegerMatrix nn_matchC(const IntegerVector& treat,
   double caliper_dist;
   NumericMatrix calcovs_covs_mat, mah_covs, mahSigma_inv, mah_covs_c;
   IntegerVector exact;
-  Function mah("mahalanobis");
+
+  Environment pkg = Environment::namespace_env("stats");
+  Function mah = pkg["mahalanobis"];
 
   bool use_exact = false;
   bool use_caliper_dist = false;
@@ -138,7 +142,7 @@ IntegerMatrix nn_matchC(const IntegerVector& treat,
 
       if (use_caliper_dist) {
         dt = distance[t_ind];
-        diff = abs(as<NumericVector>(distance[c_eligible]) - dt);
+        diff = Rcpp::abs(as<NumericVector>(distance[c_eligible]) - dt);
 
         ps_diff[c_eligible] = diff;
         ps_diff_assigned = true;
@@ -156,7 +160,7 @@ IntegerMatrix nn_matchC(const IntegerVector& treat,
 
           cal_var_t = cal_var[t_ind];
 
-          diff = abs(as<NumericVector>(cal_var[c_eligible]) - cal_var_t);
+          diff = Rcpp::abs(as<NumericVector>(cal_var[c_eligible]) - cal_var_t);
 
           cal_diff[c_eligible] = diff;
 
@@ -179,7 +183,7 @@ IntegerMatrix nn_matchC(const IntegerVector& treat,
           mah_covs_c(_,j) = as<NumericVector>(mah_covs_col[c_available]);
         }
         mah_covs_t = mah_covs( t_ind , _ );
-        match_distance = sqrt(mah(mah_covs_c, mah_covs_t, mahSigma_inv, true)); //mahalanobis in R
+        match_distance = sqrt(as<NumericVector>(mah(mah_covs_c, mah_covs_t, mahSigma_inv, true))); //mahalanobis in R
 
       } else {
         if (ps_diff_assigned) {
@@ -187,7 +191,7 @@ IntegerMatrix nn_matchC(const IntegerVector& treat,
           ps_diff_assigned = false; // reset for next iter
         } else {
           dt = distance[t_ind];
-          match_distance = abs(as<NumericVector>(distance[c_eligible]) - dt);
+          match_distance = Rcpp::abs(as<NumericVector>(distance[c_eligible]) - dt);
         }
       }
 

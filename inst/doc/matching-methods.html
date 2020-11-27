@@ -12,7 +12,7 @@
 
 <meta name="author" content="Noah Greifer" />
 
-<meta name="date" content="2020-11-04" />
+<meta name="date" content="2020-11-24" />
 
 <title>Matching Methods</title>
 
@@ -276,7 +276,7 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 
 <h1 class="title toc-ignore">Matching Methods</h1>
 <h4 class="author">Noah Greifer</h4>
-<h4 class="date">2020-11-04</h4>
+<h4 class="date">2020-11-24</h4>
 
 
 <div id="TOC">
@@ -367,7 +367,6 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 </div>
 <div id="coarsened-exact-matching-method-cem" class="section level3">
 <h3>Coarsened Exact Matching (<code>method = &quot;cem&quot;</code>)</h3>
-<p><u><strong>NOTE: coarsened exact matching is temporarily unavailable</strong></u></p>
 <p>Coarsened exact matching (CEM) is a form of stratum matching that involves first coarsening the covariates by creating bins and then performing exact matching on the new coarsened versions of the covariates <span class="citation">(<a href="#ref-iacus2012" role="doc-biblioref">Iacus, King, and Porro 2012</a>)</span>. The degree and method of coarsening can be controlled by the user to manage the trade-off between exact and approximate balancing. For example, coarsening a covariate to two bins will mean that units that differ greatly on the covariate might be placed into the same subclass, while coarsening a variable to five bins may require units to be dropped due to not finding matches. Like exact matching, CEM is susceptible to the curse of dimensionality, making it a less viable solution with many covariates, especially with few units. Dropping units can also change the target population of the estimated effect. See <code>?method_cem</code> for the documentation for <code>matchit()</code> with <code>method = &quot;cem&quot;</code>. CEM in <code>MatchIt</code> depends on the <code>cem()</code> function in the <code>cem</code> package <span class="citation">(<a href="#ref-iacus2009" role="doc-biblioref">Iacus, King, and Porro 2009</a>)</span> to perform the coarsening and matching. The subclassification weights are computed using the formulas in <code>MatchIt</code> rather than those in <code>cem</code>.</p>
 </div>
 <div id="subclassification-method-subclass" class="section level3">

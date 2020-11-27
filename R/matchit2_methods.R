@@ -12,6 +12,76 @@ matchit2null <- function(discarded, ...) {
   return(res)
 }
 # MATCHIT method = cem--------------------------------------
+matchit2cem <- function(treat, covs, estimand = "ATT", verbose = FALSE, ...) {
+
+  if (length(covs) == 0) stop("Covariates must be specified in the input formula to use coarsened exact matching.", call. = FALSE)
+
+  check.package("cem")
+
+  if (verbose) cat("Coarsened exact matching...\n")
+
+  A <- list(...)
+  A[["method"]] <- A[["k2k.method"]]
+
+  n.obs <- length(treat)
+
+  estimand <- toupper(estimand)
+  estimand <- match_arg(estimand, c("ATT", "ATC", "ATE"))
+
+  # cem takes the data all together and wants the treatment specified
+  # with the column name of the data frame. Here we massage the matchit
+  # inputs to this format. Note that X has its proper column names, but
+  # treat does not have the original column name.
+  cem.data <- data.frame(covs, treat)
+
+  args.excluded <- c("treatment", "baseline.group", "data", "verbose", "eval.imbalance",
+                     "keep.all", "drop", "L1.breaks", "L1.grouping")
+
+  if (verbose) eval.verbose <- base::eval
+  else eval.verbose <- utils::capture.output
+
+  eval.verbose({
+    mat <- tryCatch({
+      withCallingHandlers({
+        do.call(cem::cem, c(list(treatment = names(cem.data)[ncol(cem.data)],
+                                 data = cem.data,
+                                 verbose = TRUE, #verbosity controlled by eval.verbose
+                                 eval.imbalance = FALSE,
+                                 keep.all = FALSE,
+                                 drop = NULL),
+                            A[names(A) %in% setdiff(names(formals(cem::cem)), args.excluded)]))
+      },
+      warning = function(w) {
+        if (conditionMessage(w) != "no non-missing arguments to min; returning Inf") {
+          warning(paste0("(from cem) ", conditionMessage(w)), call. = FALSE, immediate. = TRUE)
+        }
+        invokeRestart("muffleWarning")
+      })
+    },
+    error = function(e) {
+      if (startsWith(conditionMessage(e), "subscript out of bounds")) {
+        stop("No units were matched. Try changing the coarsening options using the 'cutpoints' and 'grouping' arguments in cem(). See ?method_cem or ?cem::cem for details.", call. = FALSE)
+      }
+      else {
+        stop(paste0("(from cem) ", conditionMessage(e)), call. = FALSE)
+      }
+    })
+  })
+
+  strat <- setNames(rep(NA_character_, n.obs), names(treat))
+  if (!is.null(mat)) strat[mat$matched] <- mat$strata[mat$matched]
+  strat <- setNames(factor(strat, labels = seq_along(unique(strat[!is.na(strat)]))), names(treat))
+
+  if (verbose) cat("Calculating matching weights... ")
+
+  res <- list(subclass = strat,
+              weights = weights.subclass(strat, treat, estimand))
+
+  if (verbose) cat("Done.\n")
+
+  class(res) <- "matchit"
+  return(res)
+}
 
 # MATCHIT method = exact------------------------------------
 matchit2exact <- function(treat, covs, data, estimand = "ATT", verbose = FALSE, ...){
@@ -263,12 +333,13 @@ matchit2optimal <- function(treat, formula, data, distance, discarded,
   psclass <- factor(pair, labels = seq_len(nlevels(pair)))
   names(psclass) <- names(treat)
   na.class <- is.na(psclass)
+  ind1 <- which(treat == focal)
 
   mm <- matrix(NA_character_, ncol = ratio, nrow = sum(treat == focal),
                dimnames = list(names(treat)[treat == focal], NULL))
 
-  for (i in rownames(mm)[!na.class[treat == focal]]) {
-    matched.units <- names(treat)[treat != focal & !na.class & psclass == psclass[i]]
+  for (i in which(!na.class[treat == focal])) {
+    matched.units <- names(treat)[treat != focal & !na.class & psclass == psclass[ind1[i]]]
     if (length(matched.units) > 0) mm[i, seq_along(matched.units)] <- matched.units
   }
 
@@ -459,6 +530,8 @@ matchit2genetic <- function(treat, data, distance, discarded,
 
   lab_ <- names(treat_)
 
+  ind_ <- seq_along(treat)[ord]
+
   # if (!isFALSE(A$use.Match)) {
   withCallingHandlers({
     m.out <- Matching::Match(Tr = treat_, X = X_,
@@ -481,15 +554,17 @@ matchit2genetic <- function(treat, data, distance, discarded,
   })
 
   #Note: must use character match.matrix because of re-ordering treat into treat_
-  mm <- matrix(NA_character_, nrow = n1, ncol = max(table(m.out$index.treated)),
+  mm <- matrix(NA_integer_, nrow = n1, ncol = max(table(m.out$index.treated)),
                dimnames = list(lab1, NULL))
 
   unique.matched.focal <- unique(m.out$index.treated, nmax = n1)
 
+  ind1__ <- match(lab_, lab1)
   for (i in unique.matched.focal) {
-    matched.units <- lab_[m.out$index.control[m.out$index.treated == i]]
-    mm[lab_[i], seq_along(matched.units)] <- matched.units
+    matched.units <- ind_[m.out$index.control[m.out$index.treated == i]]
+    mm[ind1__[i], seq_along(matched.units)] <- matched.units
   }
+
   # }
   # else {
   #   ord1 <- ord[ord %in% which(treat == 1)]
@@ -516,18 +591,16 @@ matchit2genetic <- function(treat, data, distance, discarded,
 
   if (replace) {
     psclass <- NULL
-    weights <- weights.matrix(charmm2nummm(mm, treat), treat)
   }
   else {
     psclass <- mm2subclass(mm, treat)
-    weights <- weights.subclass(psclass, treat)
   }
 
   if (verbose) cat("Done.\n")
 
-  res <- list(match.matrix = mm,
+  res <- list(match.matrix = nummm2charmm(mm, treat),
               subclass = psclass,
-              weights = weights,
+              weights = weights.matrix(mm, treat),
               obj = g.out)
 
   class(res) <- "matchit"
@@ -699,20 +772,16 @@ matchit2nearest <-  function(treat, data, distance, discarded,
 
   if (replace) {
     psclass <- NULL
-    weights <- weights.matrix(mm, treat)
-    mm <- nummm2charmm(mm, treat)
   }
   else {
-    mm <- nummm2charmm(mm, treat)
     psclass <- mm2subclass(mm, treat)
-    weights <- weights.subclass(psclass, treat)
   }
 
   if (verbose) cat("Done.\n")
 
-  res <- list(match.matrix = mm,
+  res <- list(match.matrix = nummm2charmm(mm, treat),
               subclass = psclass,
-              weights = weights)
+              weights = weights.matrix(mm, treat))
 
   class(res) <- "matchit"
 
