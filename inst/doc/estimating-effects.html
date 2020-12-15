@@ -12,7 +12,7 @@
 
 <meta name="author" content="Noah Greifer" />
 
-<meta name="date" content="2020-11-24" />
+<meta name="date" content="2020-12-15" />
 
 <title>Estimating Effects After Matching</title>
 
@@ -27,45 +27,6 @@ document.addEventListener('DOMContentLoaded', function(e) {
     a = h.attributes;
     while (a.length > 0) h.removeAttribute(a[0].name);
   }
-});
-</script>
-<style type="text/css">
-a.anchor-section {margin-left: 10px; visibility: hidden; color: inherit;}
-a.anchor-section::before {content: '#';}
-.hasAnchor:hover a.anchor-section {visibility: visible;}
-</style>
-<script>// Anchor sections v1.0 written by Atsushi Yasumoto on Oct 3rd, 2020.
-document.addEventListener('DOMContentLoaded', function() {
-  // Do nothing if AnchorJS is used
-  if (typeof window.anchors === 'object' && anchors.hasOwnProperty('hasAnchorJSLink')) {
-    return;
-  }
-
-  const h = document.querySelectorAll('h1, h2, h3, h4, h5, h6');
-
-  // Do nothing if sections are already anchored
-  if (Array.from(h).some(x => x.classList.contains('hasAnchor'))) {
-    return null;
-  }
-
-  // Use section id when pandoc runs with --section-divs
-  const section_id = function(x) {
-    return ((x.classList.contains('section') || (x.tagName === 'SECTION'))
-            ? x.id : '');
-  };
-
-  // Add anchors
-  h.forEach(function(x) {
-    const id = x.id || section_id(x.parentElement);
-    if (id === '') {
-      return null;
-    }
-    let anchor = document.createElement('a');
-    anchor.href = '#' + id;
-    anchor.classList = ['anchor-section'];
-    x.classList.add('hasAnchor');
-    x.appendChild(anchor);
-  });
 });
 </script>
 
@@ -168,6 +129,29 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </script>
 
 
+
+<style type="text/css">
+/* for pandoc --citeproc since 2.11 */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+}
+.hanging div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}
+</style>
 
 <style type="text/css">body {
 background-color: #fff;
@@ -363,7 +347,7 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 
 <h1 class="title toc-ignore">Estimating Effects After Matching</h1>
 <h4 class="author">Noah Greifer</h4>
-<h4 class="date">2020-11-24</h4>
+<h4 class="date">2020-12-15</h4>
 
 
 <div id="TOC">
@@ -389,8 +373,8 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <li><a href="#failing-to-use-robust-or-cluster-robust-standard-errors">2. Failing to use robust or cluster-robust standard errors</a></li>
 <li><a href="#interpreting-conditional-effects-as-marginal-effects">3. Interpreting conditional effects as marginal effects</a></li>
 </ul></li>
-<li><a href="#code-to-generate-data-used-in-examples">Code to Generate Data used in Examples</a></li>
 <li><a href="#references">References</a></li>
+<li><a href="#code-to-generate-data-used-in-examples">Code to Generate Data used in Examples</a></li>
 </ul>
 </div>
 
@@ -466,9 +450,64 @@ pre code {
 <span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(<span class="st">&quot;boot&quot;</span>)</span>
 <span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(<span class="st">&quot;survival&quot;</span>)</span></code></pre></div>
 <p>Other packages may be of use but are not used here. The <code>margins</code> package can be useful for computing marginal effects and standard errors without bootstrapping. Some examples using <code>margins</code> are presented. The <code>survey</code> package can be used to estimate robust standard errors incorporating weights and provides functions for survey-weighted generalized linear models and Cox-proportional hazards models. It is often used with propensity score weighting. The <code>Zelig</code> package provides a broad interface to estimating marginal and conditional effects using simulation and was included in the original documentation for <code>MatchIt</code>. The <code>lme4</code> (and <code>lmerTest</code>) package performs mixed effects modeling, which can be useful for accounting for pair membership or other clustering features of the data.</p>
+<p>Because different matching methods require different treatments, instructions for each method are organized in the following sections, as designated by the table below. It is important to ensure the right methods are used with the matching specification used in order for the estimated effects and standard errors to be valid.</p>
+<table>
+<colgroup>
+<col width="41%" />
+<col width="58%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Section</th>
+<th>Matching Method</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><a href="#after-pair-matching-without-replacement">After Pair Matching Without Replacement</a></td>
+<td>Nearest neighbor matching without replacement</td>
+</tr>
+<tr class="even">
+<td>-</td>
+<td>Optimal matching</td>
+</tr>
+<tr class="odd">
+<td>-</td>
+<td>Genetic matching without replacement</td>
+</tr>
+<tr class="even">
+<td>-</td>
+<td>Coarsened exact matching with <code>k2k = TRUE</code></td>
+</tr>
+<tr class="odd">
+<td><a href="#after-pair-matching-with-replacement">After Pair Matching With Replacement</a></td>
+<td>Nearest neighbor matching with replacement</td>
+</tr>
+<tr class="even">
+<td>-</td>
+<td>Genetic matching with replacement</td>
+</tr>
+<tr class="odd">
+<td><a href="#after-full-matching">After Full Matching</a></td>
+<td>Full matching</td>
+</tr>
+<tr class="even">
+<td><a href="#after-stratum-matching">After Stratum Matching</a></td>
+<td>Propensity score subclassification</td>
+</tr>
+<tr class="odd">
+<td>-</td>
+<td>Exact matching</td>
+</tr>
+<tr class="even">
+<td>-</td>
+<td>Coarsened exact matching with <code>k2k = FALSE</code> (the default)</td>
+</tr>
+</tbody>
+</table>
 <div id="after-pair-matching-without-replacement" class="section level3">
 <h3>After Pair Matching Without Replacement</h3>
-<p>Pair matching without replacement yields the simplest way to estimate treatment effects and standard errors. In general, whether a caliper, common support restriction, exact matching specification, or k:1 matching specification is used, estimating the effect in the matched dataset (i.e., the output of <code>match.data()</code>) is straightforward and involves fitting a model for the outcome that incorporates the matching weights<a href="#fn3" class="footnote-ref" id="fnref3"><sup>3</sup></a>.</p>
+<p>Pair matching without replacement yields the simplest way to estimate treatment effects and standard errors. In general, whether a caliper, common support restriction, exact matching specification, or <span class="math inline">\(k\)</span>:1 matching specification is used, estimating the effect in the matched dataset (i.e., the output of <code>match.data()</code>) is straightforward and involves fitting a model for the outcome that incorporates the matching weights<a href="#fn3" class="footnote-ref" id="fnref3"><sup>3</sup></a>.</p>
 <p>First, we will perform nearest 1:1 neighbor propensity score matching without replacement.</p>
 <div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>mNN <span class="ot">&lt;-</span> <span class="fu">matchit</span>(A <span class="sc">~</span> X1 <span class="sc">+</span> X2 <span class="sc">+</span> X3 <span class="sc">+</span> X4 <span class="sc">+</span> X5 <span class="sc">+</span> </span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>                 X6 <span class="sc">+</span> X7 <span class="sc">+</span> X8 <span class="sc">+</span> X9, <span class="at">data =</span> d)</span>
@@ -1278,73 +1317,8 @@ pre code {
 <p>In addition, with continuous outcomes, conditional effects can be mistakenly interpreted as marginal effect estimates when treatment-covariate interactions are present in the outcome model. If the covariates are not centered at their mean in the target population (e.g., the treated group for the ATT, the full sample for the ATE, or the remaining matched sample for an ATM), the coefficient on treatment will not correspond to the marginal effect in the target population; it will correspond to the effect of treatment when the covariate values are equal to zero, which may not be meaningful or plausible. Marginal effects procedures (e.g., using the <code>margins</code> package or manually with bootstrapping as demonstrated above) are always the safest way to include covariates in the outcome model, especially in the presence of treatment-covariate interactions. Appropriately centering the covariates is a shortcut that is required when using the coefficient on treatment as a marginal effect estimate for continuous outcomes (demonstrated previously for full matching).</p>
 </div>
 </div>
-<div id="code-to-generate-data-used-in-examples" class="section level2">
-<h2>Code to Generate Data used in Examples</h2>
-<div class="sourceCode" id="cb99"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb99-1"><a href="#cb99-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Generatng data similar to Austin (2009) for demonstrating treatment effect estimation</span></span>
-<span id="cb99-2"><a href="#cb99-2" aria-hidden="true" tabindex="-1"></a>gen_X <span class="ot">&lt;-</span> <span class="cf">function</span>(n) {</span>
-<span id="cb99-3"><a href="#cb99-3" aria-hidden="true" tabindex="-1"></a>  X <span class="ot">&lt;-</span> <span class="fu">matrix</span>(<span class="fu">rnorm</span>(<span class="dv">9</span> <span class="sc">*</span> n), <span class="at">nrow =</span> n, <span class="at">ncol =</span> <span class="dv">9</span>)</span>
-<span id="cb99-4"><a href="#cb99-4" aria-hidden="true" tabindex="-1"></a>  X[,<span class="dv">5</span>] <span class="ot">&lt;-</span> <span class="fu">as.numeric</span>(X[,<span class="dv">5</span>] <span class="sc">&lt;</span> .<span class="dv">5</span>)</span>
-<span id="cb99-5"><a href="#cb99-5" aria-hidden="true" tabindex="-1"></a>  X</span>
-<span id="cb99-6"><a href="#cb99-6" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb99-7"><a href="#cb99-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb99-8"><a href="#cb99-8" aria-hidden="true" tabindex="-1"></a><span class="co">#~20% treated</span></span>
-<span id="cb99-9"><a href="#cb99-9" aria-hidden="true" tabindex="-1"></a>gen_A <span class="ot">&lt;-</span> <span class="cf">function</span>(X) {</span>
-<span id="cb99-10"><a href="#cb99-10" aria-hidden="true" tabindex="-1"></a>  LP_A <span class="ot">&lt;-</span> <span class="sc">-</span> <span class="fl">1.2</span> <span class="sc">+</span> <span class="fu">log</span>(<span class="dv">2</span>)<span class="sc">*</span>X[,<span class="dv">1</span>] <span class="sc">-</span> <span class="fu">log</span>(<span class="fl">1.5</span>)<span class="sc">*</span>X[,<span class="dv">2</span>] <span class="sc">+</span> <span class="fu">log</span>(<span class="dv">2</span>)<span class="sc">*</span>X[,<span class="dv">4</span>] <span class="sc">-</span> <span class="fu">log</span>(<span class="fl">2.4</span>)<span class="sc">*</span>X[,<span class="dv">5</span>] <span class="sc">+</span> <span class="fu">log</span>(<span class="dv">2</span>)<span class="sc">*</span>X[,<span class="dv">7</span>] <span class="sc">-</span> <span class="fu">log</span>(<span class="fl">1.5</span>)<span class="sc">*</span>X[,<span class="dv">8</span>]</span>
-<span id="cb99-11"><a href="#cb99-11" aria-hidden="true" tabindex="-1"></a>  P_A <span class="ot">&lt;-</span> <span class="fu">plogis</span>(LP_A)</span>
-<span id="cb99-12"><a href="#cb99-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rbinom</span>(<span class="fu">nrow</span>(X), <span class="dv">1</span>, P_A)</span>
-<span id="cb99-13"><a href="#cb99-13" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb99-14"><a href="#cb99-14" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb99-15"><a href="#cb99-15" aria-hidden="true" tabindex="-1"></a><span class="co"># Continuous outcome</span></span>
-<span id="cb99-16"><a href="#cb99-16" aria-hidden="true" tabindex="-1"></a>gen_Y_C <span class="ot">&lt;-</span> <span class="cf">function</span>(A, X) {</span>
-<span id="cb99-17"><a href="#cb99-17" aria-hidden="true" tabindex="-1"></a>  <span class="dv">2</span><span class="sc">*</span>A <span class="sc">+</span> <span class="dv">2</span><span class="sc">*</span>X[,<span class="dv">1</span>] <span class="sc">+</span> <span class="dv">2</span><span class="sc">*</span>X[,<span class="dv">2</span>] <span class="sc">+</span> <span class="dv">2</span><span class="sc">*</span>X[,<span class="dv">3</span>] <span class="sc">+</span> <span class="dv">1</span><span class="sc">*</span>X[,<span class="dv">4</span>] <span class="sc">+</span> <span class="dv">2</span><span class="sc">*</span>X[,<span class="dv">5</span>] <span class="sc">+</span> <span class="dv">1</span><span class="sc">*</span>X[,<span class="dv">6</span>] <span class="sc">+</span> <span class="fu">rnorm</span>(<span class="fu">length</span>(A), <span class="dv">0</span>, <span class="dv">5</span>)</span>
-<span id="cb99-18"><a href="#cb99-18" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb99-19"><a href="#cb99-19" aria-hidden="true" tabindex="-1"></a><span class="co">#Conditional:</span></span>
-<span id="cb99-20"><a href="#cb99-20" aria-hidden="true" tabindex="-1"></a><span class="co">#  MD: 2</span></span>
-<span id="cb99-21"><a href="#cb99-21" aria-hidden="true" tabindex="-1"></a><span class="co">#Marginal:</span></span>
-<span id="cb99-22"><a href="#cb99-22" aria-hidden="true" tabindex="-1"></a><span class="co">#  MD: 2</span></span>
-<span id="cb99-23"><a href="#cb99-23" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb99-24"><a href="#cb99-24" aria-hidden="true" tabindex="-1"></a><span class="co"># Binary outcome</span></span>
-<span id="cb99-25"><a href="#cb99-25" aria-hidden="true" tabindex="-1"></a>gen_Y_B <span class="ot">&lt;-</span> <span class="cf">function</span>(A, X) {</span>
-<span id="cb99-26"><a href="#cb99-26" aria-hidden="true" tabindex="-1"></a>  LP_B <span class="ot">&lt;-</span> <span class="sc">-</span><span class="dv">2</span> <span class="sc">+</span> <span class="fu">log</span>(<span class="fl">2.4</span>)<span class="sc">*</span>A <span class="sc">+</span> <span class="fu">log</span>(<span class="dv">2</span>)<span class="sc">*</span>X[,<span class="dv">1</span>] <span class="sc">+</span> <span class="fu">log</span>(<span class="dv">2</span>)<span class="sc">*</span>X[,<span class="dv">2</span>] <span class="sc">+</span> <span class="fu">log</span>(<span class="dv">2</span>)<span class="sc">*</span>X[,<span class="dv">3</span>] <span class="sc">+</span> <span class="fu">log</span>(<span class="fl">1.5</span>)<span class="sc">*</span>X[,<span class="dv">4</span>] <span class="sc">+</span> <span class="fu">log</span>(<span class="fl">2.4</span>)<span class="sc">*</span>X[,<span class="dv">5</span>] <span class="sc">+</span> <span class="fu">log</span>(<span class="fl">1.5</span>)<span class="sc">*</span>X[,<span class="dv">6</span>]</span>
-<span id="cb99-27"><a href="#cb99-27" aria-hidden="true" tabindex="-1"></a>  P_B <span class="ot">&lt;-</span> <span class="fu">plogis</span>(LP_B)</span>
-<span id="cb99-28"><a href="#cb99-28" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rbinom</span>(<span class="fu">length</span>(A), <span class="dv">1</span>, P_B)</span>
-<span id="cb99-29"><a href="#cb99-29" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb99-30"><a href="#cb99-30" aria-hidden="true" tabindex="-1"></a><span class="co">#Conditional:</span></span>
-<span id="cb99-31"><a href="#cb99-31" aria-hidden="true" tabindex="-1"></a><span class="co">#  OR:   2.4</span></span>
-<span id="cb99-32"><a href="#cb99-32" aria-hidden="true" tabindex="-1"></a><span class="co">#  logOR: .875</span></span>
-<span id="cb99-33"><a href="#cb99-33" aria-hidden="true" tabindex="-1"></a><span class="co">#Marginal:</span></span>
-<span id="cb99-34"><a href="#cb99-34" aria-hidden="true" tabindex="-1"></a><span class="co">#  RD:    .144</span></span>
-<span id="cb99-35"><a href="#cb99-35" aria-hidden="true" tabindex="-1"></a><span class="co">#  RR:   1.54</span></span>
-<span id="cb99-36"><a href="#cb99-36" aria-hidden="true" tabindex="-1"></a><span class="co">#  logRR: .433</span></span>
-<span id="cb99-37"><a href="#cb99-37" aria-hidden="true" tabindex="-1"></a><span class="co">#  OR:   1.92</span></span>
-<span id="cb99-38"><a href="#cb99-38" aria-hidden="true" tabindex="-1"></a><span class="co">#  logOR  .655</span></span>
-<span id="cb99-39"><a href="#cb99-39" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb99-40"><a href="#cb99-40" aria-hidden="true" tabindex="-1"></a><span class="co"># Survival outcome</span></span>
-<span id="cb99-41"><a href="#cb99-41" aria-hidden="true" tabindex="-1"></a>gen_Y_S <span class="ot">&lt;-</span> <span class="cf">function</span>(A, X) {</span>
-<span id="cb99-42"><a href="#cb99-42" aria-hidden="true" tabindex="-1"></a>  LP_S <span class="ot">&lt;-</span> <span class="sc">-</span><span class="dv">2</span> <span class="sc">+</span> <span class="fu">log</span>(<span class="fl">2.4</span>)<span class="sc">*</span>A <span class="sc">+</span> <span class="fu">log</span>(<span class="dv">2</span>)<span class="sc">*</span>X[,<span class="dv">1</span>] <span class="sc">+</span> <span class="fu">log</span>(<span class="dv">2</span>)<span class="sc">*</span>X[,<span class="dv">2</span>] <span class="sc">+</span> <span class="fu">log</span>(<span class="dv">2</span>)<span class="sc">*</span>X[,<span class="dv">3</span>] <span class="sc">+</span> <span class="fu">log</span>(<span class="fl">1.5</span>)<span class="sc">*</span>X[,<span class="dv">4</span>] <span class="sc">+</span> <span class="fu">log</span>(<span class="fl">2.4</span>)<span class="sc">*</span>X[,<span class="dv">5</span>] <span class="sc">+</span> <span class="fu">log</span>(<span class="fl">1.5</span>)<span class="sc">*</span>X[,<span class="dv">6</span>]</span>
-<span id="cb99-43"><a href="#cb99-43" aria-hidden="true" tabindex="-1"></a>  <span class="fu">sqrt</span>(<span class="sc">-</span><span class="fu">log</span>(<span class="fu">runif</span>(<span class="fu">length</span>(A)))<span class="sc">*</span><span class="fl">2e4</span><span class="sc">*</span><span class="fu">exp</span>(<span class="sc">-</span>LP_S))</span>
-<span id="cb99-44"><a href="#cb99-44" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb99-45"><a href="#cb99-45" aria-hidden="true" tabindex="-1"></a><span class="co">#Conditional:</span></span>
-<span id="cb99-46"><a href="#cb99-46" aria-hidden="true" tabindex="-1"></a><span class="co">#  HR:   2.4</span></span>
-<span id="cb99-47"><a href="#cb99-47" aria-hidden="true" tabindex="-1"></a><span class="co">#  logHR: .875</span></span>
-<span id="cb99-48"><a href="#cb99-48" aria-hidden="true" tabindex="-1"></a><span class="co">#Marginal:</span></span>
-<span id="cb99-49"><a href="#cb99-49" aria-hidden="true" tabindex="-1"></a><span class="co">#  HR:   1.57</span></span>
-<span id="cb99-50"><a href="#cb99-50" aria-hidden="true" tabindex="-1"></a><span class="co">#  logHR: .452</span></span>
-<span id="cb99-51"><a href="#cb99-51" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb99-52"><a href="#cb99-52" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">19599</span>)</span>
-<span id="cb99-53"><a href="#cb99-53" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb99-54"><a href="#cb99-54" aria-hidden="true" tabindex="-1"></a>n <span class="ot">&lt;-</span> <span class="dv">2000</span></span>
-<span id="cb99-55"><a href="#cb99-55" aria-hidden="true" tabindex="-1"></a>X <span class="ot">&lt;-</span> <span class="fu">gen_X</span>(n)</span>
-<span id="cb99-56"><a href="#cb99-56" aria-hidden="true" tabindex="-1"></a>A <span class="ot">&lt;-</span> <span class="fu">gen_A</span>(X)</span>
-<span id="cb99-57"><a href="#cb99-57" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb99-58"><a href="#cb99-58" aria-hidden="true" tabindex="-1"></a>Y_C <span class="ot">&lt;-</span> <span class="fu">gen_Y_C</span>(A, X)</span>
-<span id="cb99-59"><a href="#cb99-59" aria-hidden="true" tabindex="-1"></a>Y_B <span class="ot">&lt;-</span> <span class="fu">gen_Y_B</span>(A, X)</span>
-<span id="cb99-60"><a href="#cb99-60" aria-hidden="true" tabindex="-1"></a>Y_S <span class="ot">&lt;-</span> <span class="fu">gen_Y_S</span>(A, X)</span>
-<span id="cb99-61"><a href="#cb99-61" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb99-62"><a href="#cb99-62" aria-hidden="true" tabindex="-1"></a>d <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(A, X, Y_C, Y_B, Y_S)</span></code></pre></div>
-</div>
-<div id="references" class="section level2 unnumbered">
-<h2 class="unnumbered">References</h2>
+<div id="references" class="section level2">
+<h2>References</h2>
 <div id="refs" class="references csl-bib-body hanging-indent">
 <div id="ref-abadie2008" class="csl-entry">
 Abadie, Alberto, and Guido W. Imbens. 2008. <span>“On the Failure of the Bootstrap for Matching Estimators.”</span> <em>Econometrica</em> 76 (6): 1537–57. <a href="https://www.jstor.org/stable/40056514">https://www.jstor.org/stable/40056514</a>.
@@ -1446,6 +1420,71 @@ Wan, Fei. 2019. <span>“Matched or Unmatched Analyses with Propensity<span>-</s
 Westreich, D., and S. Greenland. 2013. <span>“The Table 2 Fallacy: Presenting and Interpreting Confounder and Modifier Coefficients.”</span> <em>American Journal of Epidemiology</em> 177 (4): 292–98. <a href="https://doi.org/10.1093/aje/kws412">https://doi.org/10.1093/aje/kws412</a>.
 </div>
 </div>
+</div>
+<div id="code-to-generate-data-used-in-examples" class="section level2">
+<h2>Code to Generate Data used in Examples</h2>
+<div class="sourceCode" id="cb99"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb99-1"><a href="#cb99-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Generatng data similar to Austin (2009) for demonstrating treatment effect estimation</span></span>
+<span id="cb99-2"><a href="#cb99-2" aria-hidden="true" tabindex="-1"></a>gen_X <span class="ot">&lt;-</span> <span class="cf">function</span>(n) {</span>
+<span id="cb99-3"><a href="#cb99-3" aria-hidden="true" tabindex="-1"></a>  X <span class="ot">&lt;-</span> <span class="fu">matrix</span>(<span class="fu">rnorm</span>(<span class="dv">9</span> <span class="sc">*</span> n), <span class="at">nrow =</span> n, <span class="at">ncol =</span> <span class="dv">9</span>)</span>
+<span id="cb99-4"><a href="#cb99-4" aria-hidden="true" tabindex="-1"></a>  X[,<span class="dv">5</span>] <span class="ot">&lt;-</span> <span class="fu">as.numeric</span>(X[,<span class="dv">5</span>] <span class="sc">&lt;</span> .<span class="dv">5</span>)</span>
+<span id="cb99-5"><a href="#cb99-5" aria-hidden="true" tabindex="-1"></a>  X</span>
+<span id="cb99-6"><a href="#cb99-6" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb99-7"><a href="#cb99-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb99-8"><a href="#cb99-8" aria-hidden="true" tabindex="-1"></a><span class="co">#~20% treated</span></span>
+<span id="cb99-9"><a href="#cb99-9" aria-hidden="true" tabindex="-1"></a>gen_A <span class="ot">&lt;-</span> <span class="cf">function</span>(X) {</span>
+<span id="cb99-10"><a href="#cb99-10" aria-hidden="true" tabindex="-1"></a>  LP_A <span class="ot">&lt;-</span> <span class="sc">-</span> <span class="fl">1.2</span> <span class="sc">+</span> <span class="fu">log</span>(<span class="dv">2</span>)<span class="sc">*</span>X[,<span class="dv">1</span>] <span class="sc">-</span> <span class="fu">log</span>(<span class="fl">1.5</span>)<span class="sc">*</span>X[,<span class="dv">2</span>] <span class="sc">+</span> <span class="fu">log</span>(<span class="dv">2</span>)<span class="sc">*</span>X[,<span class="dv">4</span>] <span class="sc">-</span> <span class="fu">log</span>(<span class="fl">2.4</span>)<span class="sc">*</span>X[,<span class="dv">5</span>] <span class="sc">+</span> <span class="fu">log</span>(<span class="dv">2</span>)<span class="sc">*</span>X[,<span class="dv">7</span>] <span class="sc">-</span> <span class="fu">log</span>(<span class="fl">1.5</span>)<span class="sc">*</span>X[,<span class="dv">8</span>]</span>
+<span id="cb99-11"><a href="#cb99-11" aria-hidden="true" tabindex="-1"></a>  P_A <span class="ot">&lt;-</span> <span class="fu">plogis</span>(LP_A)</span>
+<span id="cb99-12"><a href="#cb99-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rbinom</span>(<span class="fu">nrow</span>(X), <span class="dv">1</span>, P_A)</span>
+<span id="cb99-13"><a href="#cb99-13" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb99-14"><a href="#cb99-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb99-15"><a href="#cb99-15" aria-hidden="true" tabindex="-1"></a><span class="co"># Continuous outcome</span></span>
+<span id="cb99-16"><a href="#cb99-16" aria-hidden="true" tabindex="-1"></a>gen_Y_C <span class="ot">&lt;-</span> <span class="cf">function</span>(A, X) {</span>
+<span id="cb99-17"><a href="#cb99-17" aria-hidden="true" tabindex="-1"></a>  <span class="dv">2</span><span class="sc">*</span>A <span class="sc">+</span> <span class="dv">2</span><span class="sc">*</span>X[,<span class="dv">1</span>] <span class="sc">+</span> <span class="dv">2</span><span class="sc">*</span>X[,<span class="dv">2</span>] <span class="sc">+</span> <span class="dv">2</span><span class="sc">*</span>X[,<span class="dv">3</span>] <span class="sc">+</span> <span class="dv">1</span><span class="sc">*</span>X[,<span class="dv">4</span>] <span class="sc">+</span> <span class="dv">2</span><span class="sc">*</span>X[,<span class="dv">5</span>] <span class="sc">+</span> <span class="dv">1</span><span class="sc">*</span>X[,<span class="dv">6</span>] <span class="sc">+</span> <span class="fu">rnorm</span>(<span class="fu">length</span>(A), <span class="dv">0</span>, <span class="dv">5</span>)</span>
+<span id="cb99-18"><a href="#cb99-18" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb99-19"><a href="#cb99-19" aria-hidden="true" tabindex="-1"></a><span class="co">#Conditional:</span></span>
+<span id="cb99-20"><a href="#cb99-20" aria-hidden="true" tabindex="-1"></a><span class="co">#  MD: 2</span></span>
+<span id="cb99-21"><a href="#cb99-21" aria-hidden="true" tabindex="-1"></a><span class="co">#Marginal:</span></span>
+<span id="cb99-22"><a href="#cb99-22" aria-hidden="true" tabindex="-1"></a><span class="co">#  MD: 2</span></span>
+<span id="cb99-23"><a href="#cb99-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb99-24"><a href="#cb99-24" aria-hidden="true" tabindex="-1"></a><span class="co"># Binary outcome</span></span>
+<span id="cb99-25"><a href="#cb99-25" aria-hidden="true" tabindex="-1"></a>gen_Y_B <span class="ot">&lt;-</span> <span class="cf">function</span>(A, X) {</span>
+<span id="cb99-26"><a href="#cb99-26" aria-hidden="true" tabindex="-1"></a>  LP_B <span class="ot">&lt;-</span> <span class="sc">-</span><span class="dv">2</span> <span class="sc">+</span> <span class="fu">log</span>(<span class="fl">2.4</span>)<span class="sc">*</span>A <span class="sc">+</span> <span class="fu">log</span>(<span class="dv">2</span>)<span class="sc">*</span>X[,<span class="dv">1</span>] <span class="sc">+</span> <span class="fu">log</span>(<span class="dv">2</span>)<span class="sc">*</span>X[,<span class="dv">2</span>] <span class="sc">+</span> <span class="fu">log</span>(<span class="dv">2</span>)<span class="sc">*</span>X[,<span class="dv">3</span>] <span class="sc">+</span> <span class="fu">log</span>(<span class="fl">1.5</span>)<span class="sc">*</span>X[,<span class="dv">4</span>] <span class="sc">+</span> <span class="fu">log</span>(<span class="fl">2.4</span>)<span class="sc">*</span>X[,<span class="dv">5</span>] <span class="sc">+</span> <span class="fu">log</span>(<span class="fl">1.5</span>)<span class="sc">*</span>X[,<span class="dv">6</span>]</span>
+<span id="cb99-27"><a href="#cb99-27" aria-hidden="true" tabindex="-1"></a>  P_B <span class="ot">&lt;-</span> <span class="fu">plogis</span>(LP_B)</span>
+<span id="cb99-28"><a href="#cb99-28" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rbinom</span>(<span class="fu">length</span>(A), <span class="dv">1</span>, P_B)</span>
+<span id="cb99-29"><a href="#cb99-29" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb99-30"><a href="#cb99-30" aria-hidden="true" tabindex="-1"></a><span class="co">#Conditional:</span></span>
+<span id="cb99-31"><a href="#cb99-31" aria-hidden="true" tabindex="-1"></a><span class="co">#  OR:   2.4</span></span>
+<span id="cb99-32"><a href="#cb99-32" aria-hidden="true" tabindex="-1"></a><span class="co">#  logOR: .875</span></span>
+<span id="cb99-33"><a href="#cb99-33" aria-hidden="true" tabindex="-1"></a><span class="co">#Marginal:</span></span>
+<span id="cb99-34"><a href="#cb99-34" aria-hidden="true" tabindex="-1"></a><span class="co">#  RD:    .144</span></span>
+<span id="cb99-35"><a href="#cb99-35" aria-hidden="true" tabindex="-1"></a><span class="co">#  RR:   1.54</span></span>
+<span id="cb99-36"><a href="#cb99-36" aria-hidden="true" tabindex="-1"></a><span class="co">#  logRR: .433</span></span>
+<span id="cb99-37"><a href="#cb99-37" aria-hidden="true" tabindex="-1"></a><span class="co">#  OR:   1.92</span></span>
+<span id="cb99-38"><a href="#cb99-38" aria-hidden="true" tabindex="-1"></a><span class="co">#  logOR  .655</span></span>
+<span id="cb99-39"><a href="#cb99-39" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb99-40"><a href="#cb99-40" aria-hidden="true" tabindex="-1"></a><span class="co"># Survival outcome</span></span>
+<span id="cb99-41"><a href="#cb99-41" aria-hidden="true" tabindex="-1"></a>gen_Y_S <span class="ot">&lt;-</span> <span class="cf">function</span>(A, X) {</span>
+<span id="cb99-42"><a href="#cb99-42" aria-hidden="true" tabindex="-1"></a>  LP_S <span class="ot">&lt;-</span> <span class="sc">-</span><span class="dv">2</span> <span class="sc">+</span> <span class="fu">log</span>(<span class="fl">2.4</span>)<span class="sc">*</span>A <span class="sc">+</span> <span class="fu">log</span>(<span class="dv">2</span>)<span class="sc">*</span>X[,<span class="dv">1</span>] <span class="sc">+</span> <span class="fu">log</span>(<span class="dv">2</span>)<span class="sc">*</span>X[,<span class="dv">2</span>] <span class="sc">+</span> <span class="fu">log</span>(<span class="dv">2</span>)<span class="sc">*</span>X[,<span class="dv">3</span>] <span class="sc">+</span> <span class="fu">log</span>(<span class="fl">1.5</span>)<span class="sc">*</span>X[,<span class="dv">4</span>] <span class="sc">+</span> <span class="fu">log</span>(<span class="fl">2.4</span>)<span class="sc">*</span>X[,<span class="dv">5</span>] <span class="sc">+</span> <span class="fu">log</span>(<span class="fl">1.5</span>)<span class="sc">*</span>X[,<span class="dv">6</span>]</span>
+<span id="cb99-43"><a href="#cb99-43" aria-hidden="true" tabindex="-1"></a>  <span class="fu">sqrt</span>(<span class="sc">-</span><span class="fu">log</span>(<span class="fu">runif</span>(<span class="fu">length</span>(A)))<span class="sc">*</span><span class="fl">2e4</span><span class="sc">*</span><span class="fu">exp</span>(<span class="sc">-</span>LP_S))</span>
+<span id="cb99-44"><a href="#cb99-44" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb99-45"><a href="#cb99-45" aria-hidden="true" tabindex="-1"></a><span class="co">#Conditional:</span></span>
+<span id="cb99-46"><a href="#cb99-46" aria-hidden="true" tabindex="-1"></a><span class="co">#  HR:   2.4</span></span>
+<span id="cb99-47"><a href="#cb99-47" aria-hidden="true" tabindex="-1"></a><span class="co">#  logHR: .875</span></span>
+<span id="cb99-48"><a href="#cb99-48" aria-hidden="true" tabindex="-1"></a><span class="co">#Marginal:</span></span>
+<span id="cb99-49"><a href="#cb99-49" aria-hidden="true" tabindex="-1"></a><span class="co">#  HR:   1.57</span></span>
+<span id="cb99-50"><a href="#cb99-50" aria-hidden="true" tabindex="-1"></a><span class="co">#  logHR: .452</span></span>
+<span id="cb99-51"><a href="#cb99-51" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb99-52"><a href="#cb99-52" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">19599</span>)</span>
+<span id="cb99-53"><a href="#cb99-53" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb99-54"><a href="#cb99-54" aria-hidden="true" tabindex="-1"></a>n <span class="ot">&lt;-</span> <span class="dv">2000</span></span>
+<span id="cb99-55"><a href="#cb99-55" aria-hidden="true" tabindex="-1"></a>X <span class="ot">&lt;-</span> <span class="fu">gen_X</span>(n)</span>
+<span id="cb99-56"><a href="#cb99-56" aria-hidden="true" tabindex="-1"></a>A <span class="ot">&lt;-</span> <span class="fu">gen_A</span>(X)</span>
+<span id="cb99-57"><a href="#cb99-57" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb99-58"><a href="#cb99-58" aria-hidden="true" tabindex="-1"></a>Y_C <span class="ot">&lt;-</span> <span class="fu">gen_Y_C</span>(A, X)</span>
+<span id="cb99-59"><a href="#cb99-59" aria-hidden="true" tabindex="-1"></a>Y_B <span class="ot">&lt;-</span> <span class="fu">gen_Y_B</span>(A, X)</span>
+<span id="cb99-60"><a href="#cb99-60" aria-hidden="true" tabindex="-1"></a>Y_S <span class="ot">&lt;-</span> <span class="fu">gen_Y_S</span>(A, X)</span>
+<span id="cb99-61"><a href="#cb99-61" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb99-62"><a href="#cb99-62" aria-hidden="true" tabindex="-1"></a>d <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(A, X, Y_C, Y_B, Y_S)</span></code></pre></div>
 </div>
 <div class="footnotes">
 <hr />
