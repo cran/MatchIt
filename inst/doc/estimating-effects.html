@@ -12,23 +12,11 @@
 
 <meta name="author" content="Noah Greifer" />
 
-<meta name="date" content="2020-12-15" />
+<meta name="date" content="2021-05-26" />
 
 <title>Estimating Effects After Matching</title>
 
-<script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
-// be compatible with the behavior of Pandoc < 2.8).
-document.addEventListener('DOMContentLoaded', function(e) {
-  var hs = document.querySelectorAll("div.section[class*='level'] > :first-child");
-  var i, h, a;
-  for (i = 0; i < hs.length; i++) {
-    h = hs[i];
-    if (!/^h[1-6]$/i.test(h.tagName)) continue;  // it should be a header h1-h6
-    a = h.attributes;
-    while (a.length > 0) h.removeAttribute(a[0].name);
-  }
-});
-</script>
+<script src="data:application/javascript;base64,Ly8gUGFuZG9jIDIuOSBhZGRzIGF0dHJpYnV0ZXMgb24gYm90aCBoZWFkZXIgYW5kIGRpdi4gV2UgcmVtb3ZlIHRoZSBmb3JtZXIgKHRvCi8vIGJlIGNvbXBhdGlibGUgd2l0aCB0aGUgYmVoYXZpb3Igb2YgUGFuZG9jIDwgMi44KS4KZG9jdW1lbnQuYWRkRXZlbnRMaXN0ZW5lcignRE9NQ29udGVudExvYWRlZCcsIGZ1bmN0aW9uKGUpIHsKICB2YXIgaHMgPSBkb2N1bWVudC5xdWVyeVNlbGVjdG9yQWxsKCJkaXYuc2VjdGlvbltjbGFzcyo9J2xldmVsJ10gPiA6Zmlyc3QtY2hpbGQiKTsKICB2YXIgaSwgaCwgYTsKICBmb3IgKGkgPSAwOyBpIDwgaHMubGVuZ3RoOyBpKyspIHsKICAgIGggPSBoc1tpXTsKICAgIGlmICghL15oWzEtNl0kL2kudGVzdChoLnRhZ05hbWUpKSBjb250aW51ZTsgIC8vIGl0IHNob3VsZCBiZSBhIGhlYWRlciBoMS1oNgogICAgYSA9IGguYXR0cmlidXRlczsKICAgIHdoaWxlIChhLmxlbmd0aCA+IDApIGgucmVtb3ZlQXR0cmlidXRlKGFbMF0ubmFtZSk7CiAgfQp9KTsK"></script>
 
 <style type="text/css">
   code{white-space: pre-wrap;}
@@ -40,7 +28,14 @@ document.addEventListener('DOMContentLoaded', function(e) {
     </style>
 
 
-<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css">
+  code {
+    white-space: pre;
+  }
+  .sourceCode {
+    overflow: visible;
+  }
+</style>
 <style type="text/css" data-origin="pandoc">
 pre > code.sourceCode { white-space: pre; position: relative; }
 pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
@@ -153,187 +148,7 @@ div.csl-indent {
 }
 </style>
 
-<style type="text/css">body {
-background-color: #fff;
-margin: 1em auto;
-max-width: 700px;
-overflow: visible;
-padding-left: 2em;
-padding-right: 2em;
-font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
-font-size: 14px;
-line-height: 1.35;
-}
-#TOC {
-clear: both;
-margin: 0 0 10px 10px;
-padding: 4px;
-width: 400px;
-border: 1px solid #CCCCCC;
-border-radius: 5px;
-background-color: #f6f6f6;
-font-size: 13px;
-line-height: 1.3;
-}
-#TOC .toctitle {
-font-weight: bold;
-font-size: 15px;
-margin-left: 5px;
-}
-#TOC ul {
-padding-left: 40px;
-margin-left: -1.5em;
-margin-top: 5px;
-margin-bottom: 5px;
-}
-#TOC ul ul {
-margin-left: -2em;
-}
-#TOC li {
-line-height: 16px;
-}
-table {
-margin: 1em auto;
-border-width: 1px;
-border-color: #DDDDDD;
-border-style: outset;
-border-collapse: collapse;
-}
-table th {
-border-width: 2px;
-padding: 5px;
-border-style: inset;
-}
-table td {
-border-width: 1px;
-border-style: inset;
-line-height: 18px;
-padding: 5px 5px;
-}
-table, table th, table td {
-border-left-style: none;
-border-right-style: none;
-}
-table thead, table tr.even {
-background-color: #f7f7f7;
-}
-p {
-margin: 0.5em 0;
-}
-blockquote {
-background-color: #f6f6f6;
-padding: 0.25em 0.75em;
-}
-hr {
-border-style: solid;
-border: none;
-border-top: 1px solid #777;
-margin: 28px 0;
-}
-dl {
-margin-left: 0;
-}
-dl dd {
-margin-bottom: 13px;
-margin-left: 13px;
-}
-dl dt {
-font-weight: bold;
-}
-ul {
-margin-top: 0;
-}
-ul li {
-list-style: circle outside;
-}
-ul ul {
-margin-bottom: 0;
-}
-pre, code {
-background-color: #f7f7f7;
-border-radius: 3px;
-color: #333;
-white-space: pre-wrap; 
-}
-pre {
-border-radius: 3px;
-margin: 5px 0px 10px 0px;
-padding: 10px;
-}
-pre:not([class]) {
-background-color: #f7f7f7;
-}
-code {
-font-family: Consolas, Monaco, 'Courier New', monospace;
-font-size: 85%;
-}
-p > code, li > code {
-padding: 2px 0px;
-}
-div.figure {
-text-align: center;
-}
-img {
-background-color: #FFFFFF;
-padding: 2px;
-border: 1px solid #DDDDDD;
-border-radius: 3px;
-border: 1px solid #CCCCCC;
-margin: 0 5px;
-}
-h1 {
-margin-top: 0;
-font-size: 35px;
-line-height: 40px;
-}
-h2 {
-border-bottom: 4px solid #f7f7f7;
-padding-top: 10px;
-padding-bottom: 2px;
-font-size: 145%;
-}
-h3 {
-border-bottom: 2px solid #f7f7f7;
-padding-top: 10px;
-font-size: 120%;
-}
-h4 {
-border-bottom: 1px solid #f7f7f7;
-margin-left: 8px;
-font-size: 105%;
-}
-h5, h6 {
-border-bottom: 1px solid #ccc;
-font-size: 105%;
-}
-a {
-color: #0033dd;
-text-decoration: none;
-}
-a:hover {
-color: #6666ff; }
-a:visited {
-color: #800080; }
-a:visited:hover {
-color: #BB00BB; }
-a[href^="http:"] {
-text-decoration: underline; }
-a[href^="https:"] {
-text-decoration: underline; }
-
-code > span.kw { color: #555; font-weight: bold; } 
-code > span.dt { color: #902000; } 
-code > span.dv { color: #40a070; } 
-code > span.bn { color: #d14; } 
-code > span.fl { color: #d14; } 
-code > span.ch { color: #d14; } 
-code > span.st { color: #d14; } 
-code > span.co { color: #888888; font-style: italic; } 
-code > span.ot { color: #007020; } 
-code > span.al { color: #ff0000; font-weight: bold; } 
-code > span.fu { color: #900; font-weight: bold; } 
-code > span.er { color: #a61717; background-color: #e3d2d2; } 
-</style>
+<link rel="stylesheet" href="data:text/css,body%20%7B%0Abackground%2Dcolor%3A%20%23fff%3B%0Amargin%3A%201em%20auto%3B%0Amax%2Dwidth%3A%20700px%3B%0Aoverflow%3A%20visible%3B%0Apadding%2Dleft%3A%202em%3B%0Apadding%2Dright%3A%202em%3B%0Afont%2Dfamily%3A%20%22Open%20Sans%22%2C%20%22Helvetica%20Neue%22%2C%20Helvetica%2C%20Arial%2C%20sans%2Dserif%3B%0Afont%2Dsize%3A%2014px%3B%0Aline%2Dheight%3A%201%2E35%3B%0A%7D%0A%23TOC%20%7B%0Aclear%3A%20both%3B%0Amargin%3A%200%200%2010px%2010px%3B%0Apadding%3A%204px%3B%0Awidth%3A%20400px%3B%0Aborder%3A%201px%20solid%20%23CCCCCC%3B%0Aborder%2Dradius%3A%205px%3B%0Abackground%2Dcolor%3A%20%23f6f6f6%3B%0Afont%2Dsize%3A%2013px%3B%0Aline%2Dheight%3A%201%2E3%3B%0A%7D%0A%23TOC%20%2Etoctitle%20%7B%0Afont%2Dweight%3A%20bold%3B%0Afont%2Dsize%3A%2015px%3B%0Amargin%2Dleft%3A%205px%3B%0A%7D%0A%23TOC%20ul%20%7B%0Apadding%2Dleft%3A%2040px%3B%0Amargin%2Dleft%3A%20%2D1%2E5em%3B%0Amargin%2Dtop%3A%205px%3B%0Amargin%2Dbottom%3A%205px%3B%0A%7D%0A%23TOC%20ul%20ul%20%7B%0Amargin%2Dleft%3A%20%2D2em%3B%0A%7D%0A%23TOC%20li%20%7B%0Aline%2Dheight%3A%2016px%3B%0A%7D%0Atable%20%7B%0Amargin%3A%201em%20auto%3B%0Aborder%2Dwidth%3A%201px%3B%0Aborder%2Dcolor%3A%20%23DDDDDD%3B%0Aborder%2Dstyle%3A%20outset%3B%0Aborder%2Dcollapse%3A%20collapse%3B%0A%7D%0Atable%20th%20%7B%0Aborder%2Dwidth%3A%202px%3B%0Apadding%3A%205px%3B%0Aborder%2Dstyle%3A%20inset%3B%0A%7D%0Atable%20td%20%7B%0Aborder%2Dwidth%3A%201px%3B%0Aborder%2Dstyle%3A%20inset%3B%0Aline%2Dheight%3A%2018px%3B%0Apadding%3A%205px%205px%3B%0A%7D%0Atable%2C%20table%20th%2C%20table%20td%20%7B%0Aborder%2Dleft%2Dstyle%3A%20none%3B%0Aborder%2Dright%2Dstyle%3A%20none%3B%0A%7D%0Atable%20thead%2C%20table%20tr%2Eeven%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0A%7D%0Ap%20%7B%0Amargin%3A%200%2E5em%200%3B%0A%7D%0Ablockquote%20%7B%0Abackground%2Dcolor%3A%20%23f6f6f6%3B%0Apadding%3A%200%2E25em%200%2E75em%3B%0A%7D%0Ahr%20%7B%0Aborder%2Dstyle%3A%20solid%3B%0Aborder%3A%20none%3B%0Aborder%2Dtop%3A%201px%20solid%20%23777%3B%0Amargin%3A%2028px%200%3B%0A%7D%0Adl%20%7B%0Amargin%2Dleft%3A%200%3B%0A%7D%0Adl%20dd%20%7B%0Amargin%2Dbottom%3A%2013px%3B%0Amargin%2Dleft%3A%2013px%3B%0A%7D%0Adl%20dt%20%7B%0Afont%2Dweight%3A%20bold%3B%0A%7D%0Aul%20%7B%0Amargin%2Dtop%3A%200%3B%0A%7D%0Aul%20li%20%7B%0Alist%2Dstyle%3A%20circle%20outside%3B%0A%7D%0Aul%20ul%20%7B%0Amargin%2Dbottom%3A%200%3B%0A%7D%0Apre%2C%20code%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0Aborder%2Dradius%3A%203px%3B%0Acolor%3A%20%23333%3B%0Awhite%2Dspace%3A%20pre%2Dwrap%3B%20%0A%7D%0Apre%20%7B%0Aborder%2Dradius%3A%203px%3B%0Amargin%3A%205px%200px%2010px%200px%3B%0Apadding%3A%2010px%3B%0A%7D%0Apre%3Anot%28%5Bclass%5D%29%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0A%7D%0Acode%20%7B%0Afont%2Dfamily%3A%20Consolas%2C%20Monaco%2C%20%27Courier%20New%27%2C%20monospace%3B%0Afont%2Dsize%3A%2085%25%3B%0A%7D%0Ap%20%3E%20code%2C%20li%20%3E%20code%20%7B%0Apadding%3A%202px%200px%3B%0A%7D%0Adiv%2Efigure%20%7B%0Atext%2Dalign%3A%20center%3B%0A%7D%0Aimg%20%7B%0Abackground%2Dcolor%3A%20%23FFFFFF%3B%0Apadding%3A%202px%3B%0Aborder%3A%201px%20solid%20%23DDDDDD%3B%0Aborder%2Dradius%3A%203px%3B%0Aborder%3A%201px%20solid%20%23CCCCCC%3B%0Amargin%3A%200%205px%3B%0A%7D%0Ah1%20%7B%0Amargin%2Dtop%3A%200%3B%0Afont%2Dsize%3A%2035px%3B%0Aline%2Dheight%3A%2040px%3B%0A%7D%0Ah2%20%7B%0Aborder%2Dbottom%3A%204px%20solid%20%23f7f7f7%3B%0Apadding%2Dtop%3A%2010px%3B%0Apadding%2Dbottom%3A%202px%3B%0Afont%2Dsize%3A%20145%25%3B%0A%7D%0Ah3%20%7B%0Aborder%2Dbottom%3A%202px%20solid%20%23f7f7f7%3B%0Apadding%2Dtop%3A%2010px%3B%0Afont%2Dsize%3A%20120%25%3B%0A%7D%0Ah4%20%7B%0Aborder%2Dbottom%3A%201px%20solid%20%23f7f7f7%3B%0Amargin%2Dleft%3A%208px%3B%0Afont%2Dsize%3A%20105%25%3B%0A%7D%0Ah5%2C%20h6%20%7B%0Aborder%2Dbottom%3A%201px%20solid%20%23ccc%3B%0Afont%2Dsize%3A%20105%25%3B%0A%7D%0Aa%20%7B%0Acolor%3A%20%230033dd%3B%0Atext%2Ddecoration%3A%20none%3B%0A%7D%0Aa%3Ahover%20%7B%0Acolor%3A%20%236666ff%3B%20%7D%0Aa%3Avisited%20%7B%0Acolor%3A%20%23800080%3B%20%7D%0Aa%3Avisited%3Ahover%20%7B%0Acolor%3A%20%23BB00BB%3B%20%7D%0Aa%5Bhref%5E%3D%22http%3A%22%5D%20%7B%0Atext%2Ddecoration%3A%20underline%3B%20%7D%0Aa%5Bhref%5E%3D%22https%3A%22%5D%20%7B%0Atext%2Ddecoration%3A%20underline%3B%20%7D%0A%0Acode%20%3E%20span%2Ekw%20%7B%20color%3A%20%23555%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%0Acode%20%3E%20span%2Edt%20%7B%20color%3A%20%23902000%3B%20%7D%20%0Acode%20%3E%20span%2Edv%20%7B%20color%3A%20%2340a070%3B%20%7D%20%0Acode%20%3E%20span%2Ebn%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Efl%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Ech%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Est%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Eco%20%7B%20color%3A%20%23888888%3B%20font%2Dstyle%3A%20italic%3B%20%7D%20%0Acode%20%3E%20span%2Eot%20%7B%20color%3A%20%23007020%3B%20%7D%20%0Acode%20%3E%20span%2Eal%20%7B%20color%3A%20%23ff0000%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%0Acode%20%3E%20span%2Efu%20%7B%20color%3A%20%23900%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%0Acode%20%3E%20span%2Eer%20%7B%20color%3A%20%23a61717%3B%20background%2Dcolor%3A%20%23e3d2d2%3B%20%7D%20%0A" type="text/css" />
 
 
 
@@ -347,7 +162,7 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 
 <h1 class="title toc-ignore">Estimating Effects After Matching</h1>
 <h4 class="author">Noah Greifer</h4>
-<h4 class="date">2020-12-15</h4>
+<h4 class="date">2021-05-26</h4>
 
 
 <div id="TOC">
@@ -365,6 +180,7 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <li><a href="#after-full-matching">After Full Matching</a></li>
 <li><a href="#after-stratum-matching">After Stratum Matching</a></li>
 <li><a href="#estimating-conditional-effects">Estimating Conditional Effects</a></li>
+<li><a href="#moderation-analysis">Moderation Analysis</a></li>
 <li><a href="#reporting-results">Reporting Results</a></li>
 </ul></li>
 <li><a href="#common-mistakes">Common Mistakes</a>
@@ -453,8 +269,8 @@ pre code {
 <p>Because different matching methods require different treatments, instructions for each method are organized in the following sections, as designated by the table below. It is important to ensure the right methods are used with the matching specification used in order for the estimated effects and standard errors to be valid.</p>
 <table>
 <colgroup>
-<col width="41%" />
 <col width="58%" />
+<col width="41%" />
 </colgroup>
 <thead>
 <tr class="header">
@@ -616,7 +432,8 @@ pre code {
 <p>For binary outcomes, effect estimation can be a bit more challenging, especially when including covariates. There are several measures of the effect one can consider, which include the odds ratio (OR), risk ratio/relative risk (RR), and risk difference (RD).</p>
 <p><strong>Without covariate adjustment.</strong> When omitting covariates from the outcome model, effect and standard error estimation is fairly straightforward. Below we demonstrate how to estimate the marginal log OR after nearest neighbor matching without replacement.</p>
 <div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Generalized linear model without covariates</span></span>
-<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>fit4 <span class="ot">&lt;-</span> <span class="fu">glm</span>(Y_B <span class="sc">~</span> A, <span class="at">data =</span> md, <span class="at">family =</span> <span class="fu">binomial</span>(<span class="at">link =</span> <span class="st">&quot;logit&quot;</span>))</span></code></pre></div>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>fit4 <span class="ot">&lt;-</span> <span class="fu">glm</span>(Y_B <span class="sc">~</span> A, <span class="at">data =</span> md, <span class="at">weights =</span> weights, </span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>            <span class="at">family =</span> <span class="fu">binomial</span>(<span class="at">link =</span> <span class="st">&quot;logit&quot;</span>))</span></code></pre></div>
 <p>By specifying <code>link = &quot;logit&quot;</code>, we fit a logistic regression model to estimate the marginal OR for treatment. To estimate the marginal RR we can specify <code>link = &quot;log&quot;</code>, and to estimate the RD we can specify <code>link = &quot;identity&quot;</code> or use <code>lm()</code> instead of <code>glm()</code>. Below we estimate cluster-robust standard errors, though it should be noted that these standard errors can be biased for the OR and should be used with caution <span class="citation">(<a href="#ref-austin2007a" role="doc-biblioref">Austin 2007</a>)</span>. Because we want the OR and the effects are estimated on the log OR scale, we have to exponentiate the coefficient on treatment to arrive at the OR (one would do this when estimating the OR or RR, but not the RD).</p>
 <div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Cluster-robust standard errors</span></span>
 <span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a><span class="fu">coeftest</span>(fit4, <span class="at">vcov. =</span> vcovCL, <span class="at">cluster =</span> <span class="sc">~</span>subclass)</span></code></pre></div>
@@ -706,9 +523,10 @@ pre code {
 <p><strong>Without covariate adjustment.</strong> Below we demonstrate estimation of the marginal hazard ratio using <code>coxph()</code> from the <code>survival</code> package. To request cluster-robust standard errors as recommended by Austin <span class="citation">(<a href="#ref-austin2013a" role="doc-biblioref">2013b</a>)</span>, we need to supply pair membership (stored in the <code>subclass</code> column of <code>md</code>) to the <code>cluster</code> argument and set <code>robust = TRUE</code>.</p>
 <div class="sourceCode" id="cb26"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Cox Regression for marginal HR</span></span>
 <span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a><span class="fu">coxph</span>(<span class="fu">Surv</span>(Y_S) <span class="sc">~</span> A, <span class="at">data =</span> md, <span class="at">robust =</span> <span class="cn">TRUE</span>, </span>
-<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a>      <span class="at">cluster =</span> subclass)</span></code></pre></div>
+<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a>      <span class="at">weights =</span> weights, <span class="at">cluster =</span> subclass)</span></code></pre></div>
 <pre><code>## Call:
-## coxph(formula = Surv(Y_S) ~ A, data = md, robust = TRUE, cluster = subclass)
+## coxph(formula = Surv(Y_S) ~ A, data = md, weights = weights, 
+##     robust = TRUE, cluster = subclass)
 ## 
 ##   coef exp(coef) se(coef) robust se z     p
 ## A 0.43      1.53     0.07      0.07 6 1e-09
@@ -736,7 +554,7 @@ pre code {
 <span id="cb28-17"><a href="#cb28-17" aria-hidden="true" tabindex="-1"></a>  md_boot <span class="ot">&lt;-</span> md[ids,]</span>
 <span id="cb28-18"><a href="#cb28-18" aria-hidden="true" tabindex="-1"></a>  </span>
 <span id="cb28-19"><a href="#cb28-19" aria-hidden="true" tabindex="-1"></a>  <span class="co">#Effect estimation</span></span>
-<span id="cb28-20"><a href="#cb28-20" aria-hidden="true" tabindex="-1"></a>  cox_fit_boot <span class="ot">&lt;-</span> <span class="fu">coxph</span>(<span class="fu">Surv</span>(Y_S) <span class="sc">~</span> A, <span class="at">data =</span> md_boot)</span>
+<span id="cb28-20"><a href="#cb28-20" aria-hidden="true" tabindex="-1"></a>  cox_fit_boot <span class="ot">&lt;-</span> <span class="fu">coxph</span>(<span class="fu">Surv</span>(Y_S) <span class="sc">~</span> A, <span class="at">data =</span> md_boot, <span class="at">weights =</span> weights)</span>
 <span id="cb28-21"><a href="#cb28-21" aria-hidden="true" tabindex="-1"></a>  </span>
 <span id="cb28-22"><a href="#cb28-22" aria-hidden="true" tabindex="-1"></a>  <span class="co">#Compute the marginal HR by exponentiating the coefficient</span></span>
 <span id="cb28-23"><a href="#cb28-23" aria-hidden="true" tabindex="-1"></a>  <span class="co">#on treatment</span></span>
@@ -1279,6 +1097,71 @@ pre code {
 <p>As with other covariate-adjusted models, it is important not to interpret the coefficients on covariates other than treatment to avoid committing the table 2 fallacy. Other causes of the outcome can be included in the outcome model even if they were not the focus of matching as long as they are not (even possibly) caused by the treatment.</p>
 <p>Alternative methods of estimating conditional effects include conditional logistic regression after matching and estimating stratum-specific effects after subclassification. We recommend using covariate-adjusted logistic regression models instead because the conditional effect is better defined (i.e., conditional on the specific covariates included in the model) and depends less on the estimand targeted <span class="citation">(<a href="#ref-forbes2008" role="doc-biblioref">Forbes and Shortreed 2008</a>)</span>.</p>
 </div>
+<div id="moderation-analysis" class="section level3">
+<h3>Moderation Analysis</h3>
+<p>Moderation analysis involves determining whether a treatment effect differs across levels of another variable. The use of matching with moderation analysis is described in Stuart and Green <span class="citation">(<a href="#ref-greenExaminingModerationAnalyses2014" role="doc-biblioref">2014</a>)</span>. The goal is to achieve balance within each subgroup of the potential moderating variable, and there are several ways of doing so. Broadly, one can either perform matching in the full dataset, perhaps requiring exact matching on the moderator, or one can perform completely separate analyses in each subgroup. We’ll demonstrate both approaches below. The chosen approach should be that which achieves the best balance, though we don’t demonstrate assessing balance here to maintain focus on effect estimation. We’ll consider the binary variable <code>X5</code> to be the potential moderator of the effect of <code>A</code> on <code>Y_C</code>.</p>
+<p>The first approach involves pooling information across subgroups. This could involve estimating propensity scores using a single model for both groups but exact matching on the potential moderator. The propensity score model could include moderator-by-covariate interactions to allow the propensity score model to vary across subgroups on some covariates. Below, we’ll estimate a propensity score using a single propensity score model with a few moderator-by-covariate interactions and exact matching on the moderator, <code>X5</code>. We’ll perform nearest neighbor matching on the propensity score.</p>
+<div class="sourceCode" id="cb99"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb99-1"><a href="#cb99-1" aria-hidden="true" tabindex="-1"></a>mP <span class="ot">&lt;-</span> <span class="fu">matchit</span>(A <span class="sc">~</span> X1 <span class="sc">+</span> X2 <span class="sc">+</span> X5<span class="sc">*</span>X3 <span class="sc">+</span> X4 <span class="sc">+</span> </span>
+<span id="cb99-2"><a href="#cb99-2" aria-hidden="true" tabindex="-1"></a>                X5<span class="sc">*</span>X6 <span class="sc">+</span> X7 <span class="sc">+</span> X5<span class="sc">*</span>X8 <span class="sc">+</span> X9, <span class="at">data =</span> d,</span>
+<span id="cb99-3"><a href="#cb99-3" aria-hidden="true" tabindex="-1"></a>              <span class="at">exact =</span> <span class="sc">~</span>X5, <span class="at">method =</span> <span class="st">&quot;nearest&quot;</span>)</span>
+<span id="cb99-4"><a href="#cb99-4" aria-hidden="true" tabindex="-1"></a>mP</span></code></pre></div>
+<pre><code>## A matchit object
+##  - method: 1:1 nearest neighbor matching without replacement
+##  - distance: Propensity score
+##              - estimated with logistic regression
+##  - number of obs.: 2000 (original), 882 (matched)
+##  - target estimand: ATT
+##  - covariates: X1, X2, X5, X3, X4, X6, X7, X8, X9</code></pre>
+<p>Although it is straightforward to assess balance overall using <code>summary()</code>, it is more challenging to assess balance within subgroups. The easiest way to check subgroup balance would be to use <code>cobalt::bal.tab()</code>, which has a <code>cluster</code> argument that can be used to assess balance within subgroups, e.g., by <code>cobalt::bal.tab(mP, cluster = &quot;X5&quot;)</code>. See the vignette “Appendix 2: Using cobalt with Clustered, Multiply Imputed, and Other Segmented Data” on the <code>cobalt</code> <a href="https://ngreifer.github.io/cobalt/index.html">website</a> for details.</p>
+<p>If we are satisfied with balance, we can then estimate the subgroup effects using an outcome model with an interaction between the treatment and the moderator.</p>
+<div class="sourceCode" id="cb101"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb101-1"><a href="#cb101-1" aria-hidden="true" tabindex="-1"></a>mdP <span class="ot">&lt;-</span> <span class="fu">match.data</span>(mP)</span>
+<span id="cb101-2"><a href="#cb101-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb101-3"><a href="#cb101-3" aria-hidden="true" tabindex="-1"></a>fitP <span class="ot">&lt;-</span> <span class="fu">lm</span>(Y_C <span class="sc">~</span> A <span class="sc">*</span> X5, <span class="at">data =</span> mdP, <span class="at">weights =</span> weights)</span>
+<span id="cb101-4"><a href="#cb101-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb101-5"><a href="#cb101-5" aria-hidden="true" tabindex="-1"></a><span class="fu">coeftest</span>(fitP, <span class="at">vcov. =</span> vcovCL, <span class="at">cluster =</span> <span class="sc">~</span>subclass)</span></code></pre></div>
+<pre><code>## 
+## t test of coefficients:
+## 
+##             Estimate Std. Error t value Pr(&gt;|t|)   
+## (Intercept)   0.7500     0.4515    1.66   0.0970 . 
+## A             2.2073     0.6703    3.29   0.0010 **
+## X5            1.7413     0.6070    2.87   0.0042 **
+## A:X5         -0.0275     0.8791   -0.03   0.9751   
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
+<p>A second approach is to perform the matching analyses separately and then combine the matched samples. We demonstrate this below. First, we split the data by levels of <code>X5</code>.</p>
+<div class="sourceCode" id="cb103"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb103-1"><a href="#cb103-1" aria-hidden="true" tabindex="-1"></a>d_X5_0 <span class="ot">&lt;-</span> <span class="fu">subset</span>(d, X5 <span class="sc">==</span> <span class="dv">0</span>)</span>
+<span id="cb103-2"><a href="#cb103-2" aria-hidden="true" tabindex="-1"></a>d_X5_1 <span class="ot">&lt;-</span> <span class="fu">subset</span>(d, X5 <span class="sc">==</span> <span class="dv">1</span>)</span></code></pre></div>
+<p>Next we perform separate matching analyses in each new dataset,</p>
+<div class="sourceCode" id="cb104"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb104-1"><a href="#cb104-1" aria-hidden="true" tabindex="-1"></a>mS0 <span class="ot">&lt;-</span> <span class="fu">matchit</span>(A <span class="sc">~</span> X1 <span class="sc">+</span> X2 <span class="sc">+</span> X3 <span class="sc">+</span> X4 <span class="sc">+</span> </span>
+<span id="cb104-2"><a href="#cb104-2" aria-hidden="true" tabindex="-1"></a>                 X6 <span class="sc">+</span> X7 <span class="sc">+</span> X8 <span class="sc">+</span> X9, <span class="at">data =</span> d_X5_0,</span>
+<span id="cb104-3"><a href="#cb104-3" aria-hidden="true" tabindex="-1"></a>               <span class="at">method =</span> <span class="st">&quot;nearest&quot;</span>)</span>
+<span id="cb104-4"><a href="#cb104-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb104-5"><a href="#cb104-5" aria-hidden="true" tabindex="-1"></a>mS1 <span class="ot">&lt;-</span> <span class="fu">matchit</span>(A <span class="sc">~</span> X1 <span class="sc">+</span> X2 <span class="sc">+</span> X3 <span class="sc">+</span> X4 <span class="sc">+</span> </span>
+<span id="cb104-6"><a href="#cb104-6" aria-hidden="true" tabindex="-1"></a>                 X6 <span class="sc">+</span> X7 <span class="sc">+</span> X8 <span class="sc">+</span> X9, <span class="at">data =</span> d_X5_1,</span>
+<span id="cb104-7"><a href="#cb104-7" aria-hidden="true" tabindex="-1"></a>               <span class="at">method =</span> <span class="st">&quot;nearest&quot;</span>)</span></code></pre></div>
+<p>It is straightforward to assess balance within each subgroup using <code>summary()</code>, and <code>cobalt</code> functions can be used as well. We omit this step here, but you should not!</p>
+<p>To estimate the subgroup effects, we need to combine the matched datasets, which we can do using <code>rbind.matchdata()</code> (a special <code>rbind()</code> method for <code>matchdata</code> objects). Then we estimate the moderation effect just as we did previously.</p>
+<div class="sourceCode" id="cb105"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb105-1"><a href="#cb105-1" aria-hidden="true" tabindex="-1"></a>mdS0 <span class="ot">&lt;-</span> <span class="fu">match.data</span>(mS0)</span>
+<span id="cb105-2"><a href="#cb105-2" aria-hidden="true" tabindex="-1"></a>mdS1 <span class="ot">&lt;-</span> <span class="fu">match.data</span>(mS1)</span>
+<span id="cb105-3"><a href="#cb105-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb105-4"><a href="#cb105-4" aria-hidden="true" tabindex="-1"></a>mdS <span class="ot">&lt;-</span> <span class="fu">rbind</span>(mdS0, mdS1)</span>
+<span id="cb105-5"><a href="#cb105-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb105-6"><a href="#cb105-6" aria-hidden="true" tabindex="-1"></a>fitS <span class="ot">&lt;-</span> <span class="fu">lm</span>(Y_C <span class="sc">~</span> A <span class="sc">*</span> X5, <span class="at">data =</span> mdS, <span class="at">weights =</span> weights)</span>
+<span id="cb105-7"><a href="#cb105-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb105-8"><a href="#cb105-8" aria-hidden="true" tabindex="-1"></a><span class="fu">coeftest</span>(fitS, <span class="at">vcov. =</span> vcovCL, <span class="at">cluster =</span> <span class="sc">~</span>subclass)</span></code></pre></div>
+<pre><code>## 
+## t test of coefficients:
+## 
+##             Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)    0.720      0.297    2.42    0.016 *  
+## A              2.237      0.453    4.94  8.4e-07 ***
+## X5             2.160      0.414    5.22  2.0e-07 ***
+## A:X5          -0.446      0.593   -0.75    0.452    
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
+<p>There are benefits to using either approach, and Stuart and Green <span class="citation">(<a href="#ref-greenExaminingModerationAnalyses2014" role="doc-biblioref">2014</a>)</span> find that either can be successful at balancing the subgroups. The first approach may be most effective with small samples, where separate propensity score models would be fit with greater uncertainty and an increased possibility of perfect prediction or failure to converge <span class="citation">(<a href="#ref-wangRelativePerformancePropensity2018" role="doc-biblioref">Wang et al. 2018</a>)</span>. The second approach may be more effective with larger samples or with matching methods that target balance in the matched sample, such as genetic matching <span class="citation">(<a href="#ref-kreifMethodsEstimatingSubgroup2012" role="doc-biblioref">Kreif et al. 2012</a>)</span>. With genetic matching, separate subgroup analyses ensure balance is optimized within each subgroup rather than just overall.</p>
+</div>
 <div id="reporting-results" class="section level3">
 <h3>Reporting Results</h3>
 <p>It is important to be as thorough and complete as possible when describing the methods of estimating the treatment effect and the results of the analysis. This improves transparency and replicability of the analysis. Results should at least include the following:</p>
@@ -1301,7 +1184,7 @@ pre code {
 </div>
 <div id="failing-to-use-robust-or-cluster-robust-standard-errors" class="section level3">
 <h3>2. Failing to use robust or cluster-robust standard errors</h3>
-<p>Robust standard errors are required when using weights to estimate the treatment effect. The model-based standard errors resulting from weighted least squares or maximum likelihood are inaccurate when using matching weights because they assume weights are frequency weights rather than probability weights. Cluster-robust standard errors account for both the matching weights and pair membership and should be used when appropriate (i.e., with all matching methods other than stratification matching). Sometimes, researchers use functions in the <code>survey</code> package to estimate robust standard errors, especially with inverse probability weighting; this is a valid way to compute robust standard errors and will give similar results to <code>vcovHC()</code>.</p>
+<p>Robust standard errors are required when using weights to estimate the treatment effect. The model-based standard errors resulting from weighted least squares or maximum likelihood are inaccurate when using matching weights because they assume weights are frequency weights rather than probability weights. Cluster-robust standard errors account for both the matching weights and pair membership and should be used when appropriate (i.e., with all matching methods other than stratification matching). Sometimes, researchers use functions in the <code>survey</code> package to estimate robust standard errors, especially with inverse probability weighting; this is a valid way to compute robust standard errors and will give similar results to <code>sandwich::vcovHC()</code>.</p>
 </div>
 <div id="interpreting-conditional-effects-as-marginal-effects" class="section level3">
 <h3>3. Interpreting conditional effects as marginal effects</h3>
@@ -1377,6 +1260,9 @@ Forbes, Andrew, and Susan Shortreed. 2008. <span>“Inverse Probability Weighted
 <div id="ref-gayat2012" class="csl-entry">
 Gayat, Etienne, Matthieu Resche-Rigon, Jean-Yves Mary, and Raphaël Porcher. 2012. <span>“Propensity Score Applied to Survival Data Analysis Through Proportional Hazards Models: A Monte Carlo Study.”</span> <em>Pharmaceutical Statistics</em> 11 (3): 222–29. <a href="https://doi.org/10.1002/pst.537">https://doi.org/10.1002/pst.537</a>.
 </div>
+<div id="ref-greenExaminingModerationAnalyses2014" class="csl-entry">
+Green, Kerry M., and Elizabeth A. Stuart. 2014. <span>“Examining Moderation Analyses in Propensity Score Methods: <span>Application</span> to Depression and Substance Use.”</span> <em>Journal of Consulting and Clinical Psychology</em>, Advances in <span>Data Analytic Methods</span>, 82 (5): 773–83. <a href="https://doi.org/10.1037/a0036515">https://doi.org/10.1037/a0036515</a>.
+</div>
 <div id="ref-hill2006" class="csl-entry">
 Hill, Jennifer, and Jerome P. Reiter. 2006. <span>“Interval Estimation for Treatment Effects Using Propensity Score Matching.”</span> <em>Statistics in Medicine</em> 25 (13): 2230–56. <a href="https://doi.org/10.1002/sim.2277">https://doi.org/10.1002/sim.2277</a>.
 </div>
@@ -1388,6 +1274,9 @@ Hong, Guanglei. 2010. <span>“Marginal Mean Weighting Through Stratification: A
 </div>
 <div id="ref-king2015" class="csl-entry">
 King, Gary, and Margaret E. Roberts. 2015. <span>“How Robust Standard Errors Expose Methodological Problems They Do Not Fix, and What to Do About It.”</span> <em>Political Analysis</em> 23 (2): 159–79. <a href="https://doi.org/10.1093/pan/mpu015">https://doi.org/10.1093/pan/mpu015</a>.
+</div>
+<div id="ref-kreifMethodsEstimatingSubgroup2012" class="csl-entry">
+Kreif, Noemi, Richard Grieve, Rosalba Radice, Zia Sadique, Roland Ramsahai, and Jasjeet S. Sekhon. 2012. <span>“Methods for Estimating Subgroup Effects in Cost-Effectiveness Analyses That Use Observational Data.”</span> <em>Medical Decision Making</em> 32 (6): 750–63. <a href="https://doi.org/10.1177/0272989X12448929">https://doi.org/10.1177/0272989X12448929</a>.
 </div>
 <div id="ref-liang1986" class="csl-entry">
 Liang, Kung-Yee, and Scott L. Zeger. 1986. <span>“Longitudinal Data Analysis Using Generalized Linear Models.”</span> <em>Biometrika</em> 73 (1): 13–22. <a href="https://doi.org/10.1093/biomet/73.1.13">https://doi.org/10.1093/biomet/73.1.13</a>.
@@ -1416,6 +1305,9 @@ Stampf, Susanne, Erika Graf, Claudia Schmoor, and Martin Schumacher. 2010. <span
 <div id="ref-wan2019" class="csl-entry">
 Wan, Fei. 2019. <span>“Matched or Unmatched Analyses with Propensity<span>-</span>Score<span><span></span></span>matched Data?”</span> <em>Statistics in Medicine</em> 38 (2): 289–300. <a href="https://doi.org/10.1002/sim.7976">https://doi.org/10.1002/sim.7976</a>.
 </div>
+<div id="ref-wangRelativePerformancePropensity2018" class="csl-entry">
+Wang, Shirley V., Yinzhu Jin, Bruce Fireman, Susan Gruber, Mengdong He, Richard Wyss, HoJin Shin, et al. 2018. <span>“Relative <span>Performance</span> of <span>Propensity Score Matching Strategies</span> for <span>Subgroup Analyses</span>.”</span> <em>American Journal of Epidemiology</em> 187 (8): 1799–1807. <a href="https://doi.org/10.1093/aje/kwy049">https://doi.org/10.1093/aje/kwy049</a>.
+</div>
 <div id="ref-westreich2013" class="csl-entry">
 Westreich, D., and S. Greenland. 2013. <span>“The Table 2 Fallacy: Presenting and Interpreting Confounder and Modifier Coefficients.”</span> <em>American Journal of Epidemiology</em> 177 (4): 292–98. <a href="https://doi.org/10.1093/aje/kws412">https://doi.org/10.1093/aje/kws412</a>.
 </div>
@@ -1423,68 +1315,68 @@ Westreich, D., and S. Greenland. 2013. <span>“The Table 2 Fallacy: Presenting 
 </div>
 <div id="code-to-generate-data-used-in-examples" class="section level2">
 <h2>Code to Generate Data used in Examples</h2>
-<div class="sourceCode" id="cb99"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb99-1"><a href="#cb99-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Generatng data similar to Austin (2009) for demonstrating treatment effect estimation</span></span>
-<span id="cb99-2"><a href="#cb99-2" aria-hidden="true" tabindex="-1"></a>gen_X <span class="ot">&lt;-</span> <span class="cf">function</span>(n) {</span>
-<span id="cb99-3"><a href="#cb99-3" aria-hidden="true" tabindex="-1"></a>  X <span class="ot">&lt;-</span> <span class="fu">matrix</span>(<span class="fu">rnorm</span>(<span class="dv">9</span> <span class="sc">*</span> n), <span class="at">nrow =</span> n, <span class="at">ncol =</span> <span class="dv">9</span>)</span>
-<span id="cb99-4"><a href="#cb99-4" aria-hidden="true" tabindex="-1"></a>  X[,<span class="dv">5</span>] <span class="ot">&lt;-</span> <span class="fu">as.numeric</span>(X[,<span class="dv">5</span>] <span class="sc">&lt;</span> .<span class="dv">5</span>)</span>
-<span id="cb99-5"><a href="#cb99-5" aria-hidden="true" tabindex="-1"></a>  X</span>
-<span id="cb99-6"><a href="#cb99-6" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb99-7"><a href="#cb99-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb99-8"><a href="#cb99-8" aria-hidden="true" tabindex="-1"></a><span class="co">#~20% treated</span></span>
-<span id="cb99-9"><a href="#cb99-9" aria-hidden="true" tabindex="-1"></a>gen_A <span class="ot">&lt;-</span> <span class="cf">function</span>(X) {</span>
-<span id="cb99-10"><a href="#cb99-10" aria-hidden="true" tabindex="-1"></a>  LP_A <span class="ot">&lt;-</span> <span class="sc">-</span> <span class="fl">1.2</span> <span class="sc">+</span> <span class="fu">log</span>(<span class="dv">2</span>)<span class="sc">*</span>X[,<span class="dv">1</span>] <span class="sc">-</span> <span class="fu">log</span>(<span class="fl">1.5</span>)<span class="sc">*</span>X[,<span class="dv">2</span>] <span class="sc">+</span> <span class="fu">log</span>(<span class="dv">2</span>)<span class="sc">*</span>X[,<span class="dv">4</span>] <span class="sc">-</span> <span class="fu">log</span>(<span class="fl">2.4</span>)<span class="sc">*</span>X[,<span class="dv">5</span>] <span class="sc">+</span> <span class="fu">log</span>(<span class="dv">2</span>)<span class="sc">*</span>X[,<span class="dv">7</span>] <span class="sc">-</span> <span class="fu">log</span>(<span class="fl">1.5</span>)<span class="sc">*</span>X[,<span class="dv">8</span>]</span>
-<span id="cb99-11"><a href="#cb99-11" aria-hidden="true" tabindex="-1"></a>  P_A <span class="ot">&lt;-</span> <span class="fu">plogis</span>(LP_A)</span>
-<span id="cb99-12"><a href="#cb99-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rbinom</span>(<span class="fu">nrow</span>(X), <span class="dv">1</span>, P_A)</span>
-<span id="cb99-13"><a href="#cb99-13" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb99-14"><a href="#cb99-14" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb99-15"><a href="#cb99-15" aria-hidden="true" tabindex="-1"></a><span class="co"># Continuous outcome</span></span>
-<span id="cb99-16"><a href="#cb99-16" aria-hidden="true" tabindex="-1"></a>gen_Y_C <span class="ot">&lt;-</span> <span class="cf">function</span>(A, X) {</span>
-<span id="cb99-17"><a href="#cb99-17" aria-hidden="true" tabindex="-1"></a>  <span class="dv">2</span><span class="sc">*</span>A <span class="sc">+</span> <span class="dv">2</span><span class="sc">*</span>X[,<span class="dv">1</span>] <span class="sc">+</span> <span class="dv">2</span><span class="sc">*</span>X[,<span class="dv">2</span>] <span class="sc">+</span> <span class="dv">2</span><span class="sc">*</span>X[,<span class="dv">3</span>] <span class="sc">+</span> <span class="dv">1</span><span class="sc">*</span>X[,<span class="dv">4</span>] <span class="sc">+</span> <span class="dv">2</span><span class="sc">*</span>X[,<span class="dv">5</span>] <span class="sc">+</span> <span class="dv">1</span><span class="sc">*</span>X[,<span class="dv">6</span>] <span class="sc">+</span> <span class="fu">rnorm</span>(<span class="fu">length</span>(A), <span class="dv">0</span>, <span class="dv">5</span>)</span>
-<span id="cb99-18"><a href="#cb99-18" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb99-19"><a href="#cb99-19" aria-hidden="true" tabindex="-1"></a><span class="co">#Conditional:</span></span>
-<span id="cb99-20"><a href="#cb99-20" aria-hidden="true" tabindex="-1"></a><span class="co">#  MD: 2</span></span>
-<span id="cb99-21"><a href="#cb99-21" aria-hidden="true" tabindex="-1"></a><span class="co">#Marginal:</span></span>
-<span id="cb99-22"><a href="#cb99-22" aria-hidden="true" tabindex="-1"></a><span class="co">#  MD: 2</span></span>
-<span id="cb99-23"><a href="#cb99-23" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb99-24"><a href="#cb99-24" aria-hidden="true" tabindex="-1"></a><span class="co"># Binary outcome</span></span>
-<span id="cb99-25"><a href="#cb99-25" aria-hidden="true" tabindex="-1"></a>gen_Y_B <span class="ot">&lt;-</span> <span class="cf">function</span>(A, X) {</span>
-<span id="cb99-26"><a href="#cb99-26" aria-hidden="true" tabindex="-1"></a>  LP_B <span class="ot">&lt;-</span> <span class="sc">-</span><span class="dv">2</span> <span class="sc">+</span> <span class="fu">log</span>(<span class="fl">2.4</span>)<span class="sc">*</span>A <span class="sc">+</span> <span class="fu">log</span>(<span class="dv">2</span>)<span class="sc">*</span>X[,<span class="dv">1</span>] <span class="sc">+</span> <span class="fu">log</span>(<span class="dv">2</span>)<span class="sc">*</span>X[,<span class="dv">2</span>] <span class="sc">+</span> <span class="fu">log</span>(<span class="dv">2</span>)<span class="sc">*</span>X[,<span class="dv">3</span>] <span class="sc">+</span> <span class="fu">log</span>(<span class="fl">1.5</span>)<span class="sc">*</span>X[,<span class="dv">4</span>] <span class="sc">+</span> <span class="fu">log</span>(<span class="fl">2.4</span>)<span class="sc">*</span>X[,<span class="dv">5</span>] <span class="sc">+</span> <span class="fu">log</span>(<span class="fl">1.5</span>)<span class="sc">*</span>X[,<span class="dv">6</span>]</span>
-<span id="cb99-27"><a href="#cb99-27" aria-hidden="true" tabindex="-1"></a>  P_B <span class="ot">&lt;-</span> <span class="fu">plogis</span>(LP_B)</span>
-<span id="cb99-28"><a href="#cb99-28" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rbinom</span>(<span class="fu">length</span>(A), <span class="dv">1</span>, P_B)</span>
-<span id="cb99-29"><a href="#cb99-29" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb99-30"><a href="#cb99-30" aria-hidden="true" tabindex="-1"></a><span class="co">#Conditional:</span></span>
-<span id="cb99-31"><a href="#cb99-31" aria-hidden="true" tabindex="-1"></a><span class="co">#  OR:   2.4</span></span>
-<span id="cb99-32"><a href="#cb99-32" aria-hidden="true" tabindex="-1"></a><span class="co">#  logOR: .875</span></span>
-<span id="cb99-33"><a href="#cb99-33" aria-hidden="true" tabindex="-1"></a><span class="co">#Marginal:</span></span>
-<span id="cb99-34"><a href="#cb99-34" aria-hidden="true" tabindex="-1"></a><span class="co">#  RD:    .144</span></span>
-<span id="cb99-35"><a href="#cb99-35" aria-hidden="true" tabindex="-1"></a><span class="co">#  RR:   1.54</span></span>
-<span id="cb99-36"><a href="#cb99-36" aria-hidden="true" tabindex="-1"></a><span class="co">#  logRR: .433</span></span>
-<span id="cb99-37"><a href="#cb99-37" aria-hidden="true" tabindex="-1"></a><span class="co">#  OR:   1.92</span></span>
-<span id="cb99-38"><a href="#cb99-38" aria-hidden="true" tabindex="-1"></a><span class="co">#  logOR  .655</span></span>
-<span id="cb99-39"><a href="#cb99-39" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb99-40"><a href="#cb99-40" aria-hidden="true" tabindex="-1"></a><span class="co"># Survival outcome</span></span>
-<span id="cb99-41"><a href="#cb99-41" aria-hidden="true" tabindex="-1"></a>gen_Y_S <span class="ot">&lt;-</span> <span class="cf">function</span>(A, X) {</span>
-<span id="cb99-42"><a href="#cb99-42" aria-hidden="true" tabindex="-1"></a>  LP_S <span class="ot">&lt;-</span> <span class="sc">-</span><span class="dv">2</span> <span class="sc">+</span> <span class="fu">log</span>(<span class="fl">2.4</span>)<span class="sc">*</span>A <span class="sc">+</span> <span class="fu">log</span>(<span class="dv">2</span>)<span class="sc">*</span>X[,<span class="dv">1</span>] <span class="sc">+</span> <span class="fu">log</span>(<span class="dv">2</span>)<span class="sc">*</span>X[,<span class="dv">2</span>] <span class="sc">+</span> <span class="fu">log</span>(<span class="dv">2</span>)<span class="sc">*</span>X[,<span class="dv">3</span>] <span class="sc">+</span> <span class="fu">log</span>(<span class="fl">1.5</span>)<span class="sc">*</span>X[,<span class="dv">4</span>] <span class="sc">+</span> <span class="fu">log</span>(<span class="fl">2.4</span>)<span class="sc">*</span>X[,<span class="dv">5</span>] <span class="sc">+</span> <span class="fu">log</span>(<span class="fl">1.5</span>)<span class="sc">*</span>X[,<span class="dv">6</span>]</span>
-<span id="cb99-43"><a href="#cb99-43" aria-hidden="true" tabindex="-1"></a>  <span class="fu">sqrt</span>(<span class="sc">-</span><span class="fu">log</span>(<span class="fu">runif</span>(<span class="fu">length</span>(A)))<span class="sc">*</span><span class="fl">2e4</span><span class="sc">*</span><span class="fu">exp</span>(<span class="sc">-</span>LP_S))</span>
-<span id="cb99-44"><a href="#cb99-44" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb99-45"><a href="#cb99-45" aria-hidden="true" tabindex="-1"></a><span class="co">#Conditional:</span></span>
-<span id="cb99-46"><a href="#cb99-46" aria-hidden="true" tabindex="-1"></a><span class="co">#  HR:   2.4</span></span>
-<span id="cb99-47"><a href="#cb99-47" aria-hidden="true" tabindex="-1"></a><span class="co">#  logHR: .875</span></span>
-<span id="cb99-48"><a href="#cb99-48" aria-hidden="true" tabindex="-1"></a><span class="co">#Marginal:</span></span>
-<span id="cb99-49"><a href="#cb99-49" aria-hidden="true" tabindex="-1"></a><span class="co">#  HR:   1.57</span></span>
-<span id="cb99-50"><a href="#cb99-50" aria-hidden="true" tabindex="-1"></a><span class="co">#  logHR: .452</span></span>
-<span id="cb99-51"><a href="#cb99-51" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb99-52"><a href="#cb99-52" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">19599</span>)</span>
-<span id="cb99-53"><a href="#cb99-53" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb99-54"><a href="#cb99-54" aria-hidden="true" tabindex="-1"></a>n <span class="ot">&lt;-</span> <span class="dv">2000</span></span>
-<span id="cb99-55"><a href="#cb99-55" aria-hidden="true" tabindex="-1"></a>X <span class="ot">&lt;-</span> <span class="fu">gen_X</span>(n)</span>
-<span id="cb99-56"><a href="#cb99-56" aria-hidden="true" tabindex="-1"></a>A <span class="ot">&lt;-</span> <span class="fu">gen_A</span>(X)</span>
-<span id="cb99-57"><a href="#cb99-57" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb99-58"><a href="#cb99-58" aria-hidden="true" tabindex="-1"></a>Y_C <span class="ot">&lt;-</span> <span class="fu">gen_Y_C</span>(A, X)</span>
-<span id="cb99-59"><a href="#cb99-59" aria-hidden="true" tabindex="-1"></a>Y_B <span class="ot">&lt;-</span> <span class="fu">gen_Y_B</span>(A, X)</span>
-<span id="cb99-60"><a href="#cb99-60" aria-hidden="true" tabindex="-1"></a>Y_S <span class="ot">&lt;-</span> <span class="fu">gen_Y_S</span>(A, X)</span>
-<span id="cb99-61"><a href="#cb99-61" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb99-62"><a href="#cb99-62" aria-hidden="true" tabindex="-1"></a>d <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(A, X, Y_C, Y_B, Y_S)</span></code></pre></div>
+<div class="sourceCode" id="cb107"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb107-1"><a href="#cb107-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Generatng data similar to Austin (2009) for demonstrating treatment effect estimation</span></span>
+<span id="cb107-2"><a href="#cb107-2" aria-hidden="true" tabindex="-1"></a>gen_X <span class="ot">&lt;-</span> <span class="cf">function</span>(n) {</span>
+<span id="cb107-3"><a href="#cb107-3" aria-hidden="true" tabindex="-1"></a>  X <span class="ot">&lt;-</span> <span class="fu">matrix</span>(<span class="fu">rnorm</span>(<span class="dv">9</span> <span class="sc">*</span> n), <span class="at">nrow =</span> n, <span class="at">ncol =</span> <span class="dv">9</span>)</span>
+<span id="cb107-4"><a href="#cb107-4" aria-hidden="true" tabindex="-1"></a>  X[,<span class="dv">5</span>] <span class="ot">&lt;-</span> <span class="fu">as.numeric</span>(X[,<span class="dv">5</span>] <span class="sc">&lt;</span> .<span class="dv">5</span>)</span>
+<span id="cb107-5"><a href="#cb107-5" aria-hidden="true" tabindex="-1"></a>  X</span>
+<span id="cb107-6"><a href="#cb107-6" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb107-7"><a href="#cb107-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb107-8"><a href="#cb107-8" aria-hidden="true" tabindex="-1"></a><span class="co">#~20% treated</span></span>
+<span id="cb107-9"><a href="#cb107-9" aria-hidden="true" tabindex="-1"></a>gen_A <span class="ot">&lt;-</span> <span class="cf">function</span>(X) {</span>
+<span id="cb107-10"><a href="#cb107-10" aria-hidden="true" tabindex="-1"></a>  LP_A <span class="ot">&lt;-</span> <span class="sc">-</span> <span class="fl">1.2</span> <span class="sc">+</span> <span class="fu">log</span>(<span class="dv">2</span>)<span class="sc">*</span>X[,<span class="dv">1</span>] <span class="sc">-</span> <span class="fu">log</span>(<span class="fl">1.5</span>)<span class="sc">*</span>X[,<span class="dv">2</span>] <span class="sc">+</span> <span class="fu">log</span>(<span class="dv">2</span>)<span class="sc">*</span>X[,<span class="dv">4</span>] <span class="sc">-</span> <span class="fu">log</span>(<span class="fl">2.4</span>)<span class="sc">*</span>X[,<span class="dv">5</span>] <span class="sc">+</span> <span class="fu">log</span>(<span class="dv">2</span>)<span class="sc">*</span>X[,<span class="dv">7</span>] <span class="sc">-</span> <span class="fu">log</span>(<span class="fl">1.5</span>)<span class="sc">*</span>X[,<span class="dv">8</span>]</span>
+<span id="cb107-11"><a href="#cb107-11" aria-hidden="true" tabindex="-1"></a>  P_A <span class="ot">&lt;-</span> <span class="fu">plogis</span>(LP_A)</span>
+<span id="cb107-12"><a href="#cb107-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rbinom</span>(<span class="fu">nrow</span>(X), <span class="dv">1</span>, P_A)</span>
+<span id="cb107-13"><a href="#cb107-13" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb107-14"><a href="#cb107-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb107-15"><a href="#cb107-15" aria-hidden="true" tabindex="-1"></a><span class="co"># Continuous outcome</span></span>
+<span id="cb107-16"><a href="#cb107-16" aria-hidden="true" tabindex="-1"></a>gen_Y_C <span class="ot">&lt;-</span> <span class="cf">function</span>(A, X) {</span>
+<span id="cb107-17"><a href="#cb107-17" aria-hidden="true" tabindex="-1"></a>  <span class="dv">2</span><span class="sc">*</span>A <span class="sc">+</span> <span class="dv">2</span><span class="sc">*</span>X[,<span class="dv">1</span>] <span class="sc">+</span> <span class="dv">2</span><span class="sc">*</span>X[,<span class="dv">2</span>] <span class="sc">+</span> <span class="dv">2</span><span class="sc">*</span>X[,<span class="dv">3</span>] <span class="sc">+</span> <span class="dv">1</span><span class="sc">*</span>X[,<span class="dv">4</span>] <span class="sc">+</span> <span class="dv">2</span><span class="sc">*</span>X[,<span class="dv">5</span>] <span class="sc">+</span> <span class="dv">1</span><span class="sc">*</span>X[,<span class="dv">6</span>] <span class="sc">+</span> <span class="fu">rnorm</span>(<span class="fu">length</span>(A), <span class="dv">0</span>, <span class="dv">5</span>)</span>
+<span id="cb107-18"><a href="#cb107-18" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb107-19"><a href="#cb107-19" aria-hidden="true" tabindex="-1"></a><span class="co">#Conditional:</span></span>
+<span id="cb107-20"><a href="#cb107-20" aria-hidden="true" tabindex="-1"></a><span class="co">#  MD: 2</span></span>
+<span id="cb107-21"><a href="#cb107-21" aria-hidden="true" tabindex="-1"></a><span class="co">#Marginal:</span></span>
+<span id="cb107-22"><a href="#cb107-22" aria-hidden="true" tabindex="-1"></a><span class="co">#  MD: 2</span></span>
+<span id="cb107-23"><a href="#cb107-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb107-24"><a href="#cb107-24" aria-hidden="true" tabindex="-1"></a><span class="co"># Binary outcome</span></span>
+<span id="cb107-25"><a href="#cb107-25" aria-hidden="true" tabindex="-1"></a>gen_Y_B <span class="ot">&lt;-</span> <span class="cf">function</span>(A, X) {</span>
+<span id="cb107-26"><a href="#cb107-26" aria-hidden="true" tabindex="-1"></a>  LP_B <span class="ot">&lt;-</span> <span class="sc">-</span><span class="dv">2</span> <span class="sc">+</span> <span class="fu">log</span>(<span class="fl">2.4</span>)<span class="sc">*</span>A <span class="sc">+</span> <span class="fu">log</span>(<span class="dv">2</span>)<span class="sc">*</span>X[,<span class="dv">1</span>] <span class="sc">+</span> <span class="fu">log</span>(<span class="dv">2</span>)<span class="sc">*</span>X[,<span class="dv">2</span>] <span class="sc">+</span> <span class="fu">log</span>(<span class="dv">2</span>)<span class="sc">*</span>X[,<span class="dv">3</span>] <span class="sc">+</span> <span class="fu">log</span>(<span class="fl">1.5</span>)<span class="sc">*</span>X[,<span class="dv">4</span>] <span class="sc">+</span> <span class="fu">log</span>(<span class="fl">2.4</span>)<span class="sc">*</span>X[,<span class="dv">5</span>] <span class="sc">+</span> <span class="fu">log</span>(<span class="fl">1.5</span>)<span class="sc">*</span>X[,<span class="dv">6</span>]</span>
+<span id="cb107-27"><a href="#cb107-27" aria-hidden="true" tabindex="-1"></a>  P_B <span class="ot">&lt;-</span> <span class="fu">plogis</span>(LP_B)</span>
+<span id="cb107-28"><a href="#cb107-28" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rbinom</span>(<span class="fu">length</span>(A), <span class="dv">1</span>, P_B)</span>
+<span id="cb107-29"><a href="#cb107-29" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb107-30"><a href="#cb107-30" aria-hidden="true" tabindex="-1"></a><span class="co">#Conditional:</span></span>
+<span id="cb107-31"><a href="#cb107-31" aria-hidden="true" tabindex="-1"></a><span class="co">#  OR:   2.4</span></span>
+<span id="cb107-32"><a href="#cb107-32" aria-hidden="true" tabindex="-1"></a><span class="co">#  logOR: .875</span></span>
+<span id="cb107-33"><a href="#cb107-33" aria-hidden="true" tabindex="-1"></a><span class="co">#Marginal:</span></span>
+<span id="cb107-34"><a href="#cb107-34" aria-hidden="true" tabindex="-1"></a><span class="co">#  RD:    .144</span></span>
+<span id="cb107-35"><a href="#cb107-35" aria-hidden="true" tabindex="-1"></a><span class="co">#  RR:   1.54</span></span>
+<span id="cb107-36"><a href="#cb107-36" aria-hidden="true" tabindex="-1"></a><span class="co">#  logRR: .433</span></span>
+<span id="cb107-37"><a href="#cb107-37" aria-hidden="true" tabindex="-1"></a><span class="co">#  OR:   1.92</span></span>
+<span id="cb107-38"><a href="#cb107-38" aria-hidden="true" tabindex="-1"></a><span class="co">#  logOR  .655</span></span>
+<span id="cb107-39"><a href="#cb107-39" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb107-40"><a href="#cb107-40" aria-hidden="true" tabindex="-1"></a><span class="co"># Survival outcome</span></span>
+<span id="cb107-41"><a href="#cb107-41" aria-hidden="true" tabindex="-1"></a>gen_Y_S <span class="ot">&lt;-</span> <span class="cf">function</span>(A, X) {</span>
+<span id="cb107-42"><a href="#cb107-42" aria-hidden="true" tabindex="-1"></a>  LP_S <span class="ot">&lt;-</span> <span class="sc">-</span><span class="dv">2</span> <span class="sc">+</span> <span class="fu">log</span>(<span class="fl">2.4</span>)<span class="sc">*</span>A <span class="sc">+</span> <span class="fu">log</span>(<span class="dv">2</span>)<span class="sc">*</span>X[,<span class="dv">1</span>] <span class="sc">+</span> <span class="fu">log</span>(<span class="dv">2</span>)<span class="sc">*</span>X[,<span class="dv">2</span>] <span class="sc">+</span> <span class="fu">log</span>(<span class="dv">2</span>)<span class="sc">*</span>X[,<span class="dv">3</span>] <span class="sc">+</span> <span class="fu">log</span>(<span class="fl">1.5</span>)<span class="sc">*</span>X[,<span class="dv">4</span>] <span class="sc">+</span> <span class="fu">log</span>(<span class="fl">2.4</span>)<span class="sc">*</span>X[,<span class="dv">5</span>] <span class="sc">+</span> <span class="fu">log</span>(<span class="fl">1.5</span>)<span class="sc">*</span>X[,<span class="dv">6</span>]</span>
+<span id="cb107-43"><a href="#cb107-43" aria-hidden="true" tabindex="-1"></a>  <span class="fu">sqrt</span>(<span class="sc">-</span><span class="fu">log</span>(<span class="fu">runif</span>(<span class="fu">length</span>(A)))<span class="sc">*</span><span class="fl">2e4</span><span class="sc">*</span><span class="fu">exp</span>(<span class="sc">-</span>LP_S))</span>
+<span id="cb107-44"><a href="#cb107-44" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb107-45"><a href="#cb107-45" aria-hidden="true" tabindex="-1"></a><span class="co">#Conditional:</span></span>
+<span id="cb107-46"><a href="#cb107-46" aria-hidden="true" tabindex="-1"></a><span class="co">#  HR:   2.4</span></span>
+<span id="cb107-47"><a href="#cb107-47" aria-hidden="true" tabindex="-1"></a><span class="co">#  logHR: .875</span></span>
+<span id="cb107-48"><a href="#cb107-48" aria-hidden="true" tabindex="-1"></a><span class="co">#Marginal:</span></span>
+<span id="cb107-49"><a href="#cb107-49" aria-hidden="true" tabindex="-1"></a><span class="co">#  HR:   1.57</span></span>
+<span id="cb107-50"><a href="#cb107-50" aria-hidden="true" tabindex="-1"></a><span class="co">#  logHR: .452</span></span>
+<span id="cb107-51"><a href="#cb107-51" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb107-52"><a href="#cb107-52" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">19599</span>)</span>
+<span id="cb107-53"><a href="#cb107-53" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb107-54"><a href="#cb107-54" aria-hidden="true" tabindex="-1"></a>n <span class="ot">&lt;-</span> <span class="dv">2000</span></span>
+<span id="cb107-55"><a href="#cb107-55" aria-hidden="true" tabindex="-1"></a>X <span class="ot">&lt;-</span> <span class="fu">gen_X</span>(n)</span>
+<span id="cb107-56"><a href="#cb107-56" aria-hidden="true" tabindex="-1"></a>A <span class="ot">&lt;-</span> <span class="fu">gen_A</span>(X)</span>
+<span id="cb107-57"><a href="#cb107-57" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb107-58"><a href="#cb107-58" aria-hidden="true" tabindex="-1"></a>Y_C <span class="ot">&lt;-</span> <span class="fu">gen_Y_C</span>(A, X)</span>
+<span id="cb107-59"><a href="#cb107-59" aria-hidden="true" tabindex="-1"></a>Y_B <span class="ot">&lt;-</span> <span class="fu">gen_Y_B</span>(A, X)</span>
+<span id="cb107-60"><a href="#cb107-60" aria-hidden="true" tabindex="-1"></a>Y_S <span class="ot">&lt;-</span> <span class="fu">gen_Y_S</span>(A, X)</span>
+<span id="cb107-61"><a href="#cb107-61" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb107-62"><a href="#cb107-62" aria-hidden="true" tabindex="-1"></a>d <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(A, X, Y_C, Y_B, Y_S)</span></code></pre></div>
 </div>
 <div class="footnotes">
 <hr />

@@ -12,23 +12,11 @@
 
 <meta name="author" content="Noah Greifer" />
 
-<meta name="date" content="2020-12-15" />
+<meta name="date" content="2021-05-26" />
 
 <title>Matching Methods</title>
 
-<script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
-// be compatible with the behavior of Pandoc < 2.8).
-document.addEventListener('DOMContentLoaded', function(e) {
-  var hs = document.querySelectorAll("div.section[class*='level'] > :first-child");
-  var i, h, a;
-  for (i = 0; i < hs.length; i++) {
-    h = hs[i];
-    if (!/^h[1-6]$/i.test(h.tagName)) continue;  // it should be a header h1-h6
-    a = h.attributes;
-    while (a.length > 0) h.removeAttribute(a[0].name);
-  }
-});
-</script>
+<script src="data:application/javascript;base64,Ly8gUGFuZG9jIDIuOSBhZGRzIGF0dHJpYnV0ZXMgb24gYm90aCBoZWFkZXIgYW5kIGRpdi4gV2UgcmVtb3ZlIHRoZSBmb3JtZXIgKHRvCi8vIGJlIGNvbXBhdGlibGUgd2l0aCB0aGUgYmVoYXZpb3Igb2YgUGFuZG9jIDwgMi44KS4KZG9jdW1lbnQuYWRkRXZlbnRMaXN0ZW5lcignRE9NQ29udGVudExvYWRlZCcsIGZ1bmN0aW9uKGUpIHsKICB2YXIgaHMgPSBkb2N1bWVudC5xdWVyeVNlbGVjdG9yQWxsKCJkaXYuc2VjdGlvbltjbGFzcyo9J2xldmVsJ10gPiA6Zmlyc3QtY2hpbGQiKTsKICB2YXIgaSwgaCwgYTsKICBmb3IgKGkgPSAwOyBpIDwgaHMubGVuZ3RoOyBpKyspIHsKICAgIGggPSBoc1tpXTsKICAgIGlmICghL15oWzEtNl0kL2kudGVzdChoLnRhZ05hbWUpKSBjb250aW51ZTsgIC8vIGl0IHNob3VsZCBiZSBhIGhlYWRlciBoMS1oNgogICAgYSA9IGguYXR0cmlidXRlczsKICAgIHdoaWxlIChhLmxlbmd0aCA+IDApIGgucmVtb3ZlQXR0cmlidXRlKGFbMF0ubmFtZSk7CiAgfQp9KTsK"></script>
 
 <style type="text/css">
   code{white-space: pre-wrap;}
@@ -66,187 +54,7 @@ div.csl-indent {
 }
 </style>
 
-<style type="text/css">body {
-background-color: #fff;
-margin: 1em auto;
-max-width: 700px;
-overflow: visible;
-padding-left: 2em;
-padding-right: 2em;
-font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
-font-size: 14px;
-line-height: 1.35;
-}
-#TOC {
-clear: both;
-margin: 0 0 10px 10px;
-padding: 4px;
-width: 400px;
-border: 1px solid #CCCCCC;
-border-radius: 5px;
-background-color: #f6f6f6;
-font-size: 13px;
-line-height: 1.3;
-}
-#TOC .toctitle {
-font-weight: bold;
-font-size: 15px;
-margin-left: 5px;
-}
-#TOC ul {
-padding-left: 40px;
-margin-left: -1.5em;
-margin-top: 5px;
-margin-bottom: 5px;
-}
-#TOC ul ul {
-margin-left: -2em;
-}
-#TOC li {
-line-height: 16px;
-}
-table {
-margin: 1em auto;
-border-width: 1px;
-border-color: #DDDDDD;
-border-style: outset;
-border-collapse: collapse;
-}
-table th {
-border-width: 2px;
-padding: 5px;
-border-style: inset;
-}
-table td {
-border-width: 1px;
-border-style: inset;
-line-height: 18px;
-padding: 5px 5px;
-}
-table, table th, table td {
-border-left-style: none;
-border-right-style: none;
-}
-table thead, table tr.even {
-background-color: #f7f7f7;
-}
-p {
-margin: 0.5em 0;
-}
-blockquote {
-background-color: #f6f6f6;
-padding: 0.25em 0.75em;
-}
-hr {
-border-style: solid;
-border: none;
-border-top: 1px solid #777;
-margin: 28px 0;
-}
-dl {
-margin-left: 0;
-}
-dl dd {
-margin-bottom: 13px;
-margin-left: 13px;
-}
-dl dt {
-font-weight: bold;
-}
-ul {
-margin-top: 0;
-}
-ul li {
-list-style: circle outside;
-}
-ul ul {
-margin-bottom: 0;
-}
-pre, code {
-background-color: #f7f7f7;
-border-radius: 3px;
-color: #333;
-white-space: pre-wrap; 
-}
-pre {
-border-radius: 3px;
-margin: 5px 0px 10px 0px;
-padding: 10px;
-}
-pre:not([class]) {
-background-color: #f7f7f7;
-}
-code {
-font-family: Consolas, Monaco, 'Courier New', monospace;
-font-size: 85%;
-}
-p > code, li > code {
-padding: 2px 0px;
-}
-div.figure {
-text-align: center;
-}
-img {
-background-color: #FFFFFF;
-padding: 2px;
-border: 1px solid #DDDDDD;
-border-radius: 3px;
-border: 1px solid #CCCCCC;
-margin: 0 5px;
-}
-h1 {
-margin-top: 0;
-font-size: 35px;
-line-height: 40px;
-}
-h2 {
-border-bottom: 4px solid #f7f7f7;
-padding-top: 10px;
-padding-bottom: 2px;
-font-size: 145%;
-}
-h3 {
-border-bottom: 2px solid #f7f7f7;
-padding-top: 10px;
-font-size: 120%;
-}
-h4 {
-border-bottom: 1px solid #f7f7f7;
-margin-left: 8px;
-font-size: 105%;
-}
-h5, h6 {
-border-bottom: 1px solid #ccc;
-font-size: 105%;
-}
-a {
-color: #0033dd;
-text-decoration: none;
-}
-a:hover {
-color: #6666ff; }
-a:visited {
-color: #800080; }
-a:visited:hover {
-color: #BB00BB; }
-a[href^="http:"] {
-text-decoration: underline; }
-a[href^="https:"] {
-text-decoration: underline; }
-
-code > span.kw { color: #555; font-weight: bold; } 
-code > span.dt { color: #902000; } 
-code > span.dv { color: #40a070; } 
-code > span.bn { color: #d14; } 
-code > span.fl { color: #d14; } 
-code > span.ch { color: #d14; } 
-code > span.st { color: #d14; } 
-code > span.co { color: #888888; font-style: italic; } 
-code > span.ot { color: #007020; } 
-code > span.al { color: #ff0000; font-weight: bold; } 
-code > span.fu { color: #900; font-weight: bold; } 
-code > span.er { color: #a61717; background-color: #e3d2d2; } 
-</style>
+<link rel="stylesheet" href="data:text/css,body%20%7B%0Abackground%2Dcolor%3A%20%23fff%3B%0Amargin%3A%201em%20auto%3B%0Amax%2Dwidth%3A%20700px%3B%0Aoverflow%3A%20visible%3B%0Apadding%2Dleft%3A%202em%3B%0Apadding%2Dright%3A%202em%3B%0Afont%2Dfamily%3A%20%22Open%20Sans%22%2C%20%22Helvetica%20Neue%22%2C%20Helvetica%2C%20Arial%2C%20sans%2Dserif%3B%0Afont%2Dsize%3A%2014px%3B%0Aline%2Dheight%3A%201%2E35%3B%0A%7D%0A%23TOC%20%7B%0Aclear%3A%20both%3B%0Amargin%3A%200%200%2010px%2010px%3B%0Apadding%3A%204px%3B%0Awidth%3A%20400px%3B%0Aborder%3A%201px%20solid%20%23CCCCCC%3B%0Aborder%2Dradius%3A%205px%3B%0Abackground%2Dcolor%3A%20%23f6f6f6%3B%0Afont%2Dsize%3A%2013px%3B%0Aline%2Dheight%3A%201%2E3%3B%0A%7D%0A%23TOC%20%2Etoctitle%20%7B%0Afont%2Dweight%3A%20bold%3B%0Afont%2Dsize%3A%2015px%3B%0Amargin%2Dleft%3A%205px%3B%0A%7D%0A%23TOC%20ul%20%7B%0Apadding%2Dleft%3A%2040px%3B%0Amargin%2Dleft%3A%20%2D1%2E5em%3B%0Amargin%2Dtop%3A%205px%3B%0Amargin%2Dbottom%3A%205px%3B%0A%7D%0A%23TOC%20ul%20ul%20%7B%0Amargin%2Dleft%3A%20%2D2em%3B%0A%7D%0A%23TOC%20li%20%7B%0Aline%2Dheight%3A%2016px%3B%0A%7D%0Atable%20%7B%0Amargin%3A%201em%20auto%3B%0Aborder%2Dwidth%3A%201px%3B%0Aborder%2Dcolor%3A%20%23DDDDDD%3B%0Aborder%2Dstyle%3A%20outset%3B%0Aborder%2Dcollapse%3A%20collapse%3B%0A%7D%0Atable%20th%20%7B%0Aborder%2Dwidth%3A%202px%3B%0Apadding%3A%205px%3B%0Aborder%2Dstyle%3A%20inset%3B%0A%7D%0Atable%20td%20%7B%0Aborder%2Dwidth%3A%201px%3B%0Aborder%2Dstyle%3A%20inset%3B%0Aline%2Dheight%3A%2018px%3B%0Apadding%3A%205px%205px%3B%0A%7D%0Atable%2C%20table%20th%2C%20table%20td%20%7B%0Aborder%2Dleft%2Dstyle%3A%20none%3B%0Aborder%2Dright%2Dstyle%3A%20none%3B%0A%7D%0Atable%20thead%2C%20table%20tr%2Eeven%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0A%7D%0Ap%20%7B%0Amargin%3A%200%2E5em%200%3B%0A%7D%0Ablockquote%20%7B%0Abackground%2Dcolor%3A%20%23f6f6f6%3B%0Apadding%3A%200%2E25em%200%2E75em%3B%0A%7D%0Ahr%20%7B%0Aborder%2Dstyle%3A%20solid%3B%0Aborder%3A%20none%3B%0Aborder%2Dtop%3A%201px%20solid%20%23777%3B%0Amargin%3A%2028px%200%3B%0A%7D%0Adl%20%7B%0Amargin%2Dleft%3A%200%3B%0A%7D%0Adl%20dd%20%7B%0Amargin%2Dbottom%3A%2013px%3B%0Amargin%2Dleft%3A%2013px%3B%0A%7D%0Adl%20dt%20%7B%0Afont%2Dweight%3A%20bold%3B%0A%7D%0Aul%20%7B%0Amargin%2Dtop%3A%200%3B%0A%7D%0Aul%20li%20%7B%0Alist%2Dstyle%3A%20circle%20outside%3B%0A%7D%0Aul%20ul%20%7B%0Amargin%2Dbottom%3A%200%3B%0A%7D%0Apre%2C%20code%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0Aborder%2Dradius%3A%203px%3B%0Acolor%3A%20%23333%3B%0Awhite%2Dspace%3A%20pre%2Dwrap%3B%20%0A%7D%0Apre%20%7B%0Aborder%2Dradius%3A%203px%3B%0Amargin%3A%205px%200px%2010px%200px%3B%0Apadding%3A%2010px%3B%0A%7D%0Apre%3Anot%28%5Bclass%5D%29%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0A%7D%0Acode%20%7B%0Afont%2Dfamily%3A%20Consolas%2C%20Monaco%2C%20%27Courier%20New%27%2C%20monospace%3B%0Afont%2Dsize%3A%2085%25%3B%0A%7D%0Ap%20%3E%20code%2C%20li%20%3E%20code%20%7B%0Apadding%3A%202px%200px%3B%0A%7D%0Adiv%2Efigure%20%7B%0Atext%2Dalign%3A%20center%3B%0A%7D%0Aimg%20%7B%0Abackground%2Dcolor%3A%20%23FFFFFF%3B%0Apadding%3A%202px%3B%0Aborder%3A%201px%20solid%20%23DDDDDD%3B%0Aborder%2Dradius%3A%203px%3B%0Aborder%3A%201px%20solid%20%23CCCCCC%3B%0Amargin%3A%200%205px%3B%0A%7D%0Ah1%20%7B%0Amargin%2Dtop%3A%200%3B%0Afont%2Dsize%3A%2035px%3B%0Aline%2Dheight%3A%2040px%3B%0A%7D%0Ah2%20%7B%0Aborder%2Dbottom%3A%204px%20solid%20%23f7f7f7%3B%0Apadding%2Dtop%3A%2010px%3B%0Apadding%2Dbottom%3A%202px%3B%0Afont%2Dsize%3A%20145%25%3B%0A%7D%0Ah3%20%7B%0Aborder%2Dbottom%3A%202px%20solid%20%23f7f7f7%3B%0Apadding%2Dtop%3A%2010px%3B%0Afont%2Dsize%3A%20120%25%3B%0A%7D%0Ah4%20%7B%0Aborder%2Dbottom%3A%201px%20solid%20%23f7f7f7%3B%0Amargin%2Dleft%3A%208px%3B%0Afont%2Dsize%3A%20105%25%3B%0A%7D%0Ah5%2C%20h6%20%7B%0Aborder%2Dbottom%3A%201px%20solid%20%23ccc%3B%0Afont%2Dsize%3A%20105%25%3B%0A%7D%0Aa%20%7B%0Acolor%3A%20%230033dd%3B%0Atext%2Ddecoration%3A%20none%3B%0A%7D%0Aa%3Ahover%20%7B%0Acolor%3A%20%236666ff%3B%20%7D%0Aa%3Avisited%20%7B%0Acolor%3A%20%23800080%3B%20%7D%0Aa%3Avisited%3Ahover%20%7B%0Acolor%3A%20%23BB00BB%3B%20%7D%0Aa%5Bhref%5E%3D%22http%3A%22%5D%20%7B%0Atext%2Ddecoration%3A%20underline%3B%20%7D%0Aa%5Bhref%5E%3D%22https%3A%22%5D%20%7B%0Atext%2Ddecoration%3A%20underline%3B%20%7D%0A%0Acode%20%3E%20span%2Ekw%20%7B%20color%3A%20%23555%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%0Acode%20%3E%20span%2Edt%20%7B%20color%3A%20%23902000%3B%20%7D%20%0Acode%20%3E%20span%2Edv%20%7B%20color%3A%20%2340a070%3B%20%7D%20%0Acode%20%3E%20span%2Ebn%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Efl%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Ech%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Est%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Eco%20%7B%20color%3A%20%23888888%3B%20font%2Dstyle%3A%20italic%3B%20%7D%20%0Acode%20%3E%20span%2Eot%20%7B%20color%3A%20%23007020%3B%20%7D%20%0Acode%20%3E%20span%2Eal%20%7B%20color%3A%20%23ff0000%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%0Acode%20%3E%20span%2Efu%20%7B%20color%3A%20%23900%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%0Acode%20%3E%20span%2Eer%20%7B%20color%3A%20%23a61717%3B%20background%2Dcolor%3A%20%23e3d2d2%3B%20%7D%20%0A" type="text/css" />
 
 
 
@@ -260,7 +68,7 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 
 <h1 class="title toc-ignore">Matching Methods</h1>
 <h4 class="author">Noah Greifer</h4>
-<h4 class="date">2020-12-15</h4>
+<h4 class="date">2021-05-26</h4>
 
 
 <div id="TOC">
@@ -284,6 +92,7 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <li><a href="#caliper-matching-caliper">Caliper matching (<code>caliper</code>)</a></li>
 <li><a href="#mahalanobis-distance-matching-mahvars">Mahalanobis distance matching (<code>mahvars</code>)</a></li>
 <li><a href="#exact-matching-exact">Exact matching (<code>exact</code>)</a></li>
+<li><a href="#anti-exact-matching-antiexact">Anti-exact matching (<code>antiexact</code>)</a></li>
 <li><a href="#matching-with-replacement-replace">Matching with replacement (<code>replace</code>)</a></li>
 <li><a href="#k1-matching-ratio"><span class="math inline">\(k\)</span>:1 matching (<code>ratio</code>)</a></li>
 </ul></li>
@@ -358,7 +167,7 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <p>Propensity score subclassification can be thought of as a form of coarsened exact matching with the propensity score as the sole covariate to be coarsened and matched on. The bins are usually based on specified quantiles of the propensity score distribution either in the treated group, control group, or overall, depending on the desired estimand. Propensity score subclassification is an old and well-studied method, though it can perform poorly compared to other, more modern propensity score methods such as full matching and weighting <span class="citation">(<a href="#ref-austin2010" role="doc-biblioref">Austin 2010a</a>)</span>. See <code>?method_subclass</code> for the documentation for <code>matchit()</code> with <code>method = &quot;subclass&quot;</code>.</p>
 <p>The binning of the propensity scores is typically based on dividing the distribution of covariates into approximately equally sized bins. The user specifies the number of subclasses using the <code>subclass</code> argument and which group should be used to compute the boundaries of the bins using the <code>estimand</code> argument. Sometimes, subclasses can end up with no units from one of the treatment groups; by default, <code>matchit()</code> moves a unit from an adjacent subclass into the lacking one to ensure that each subclass has at least one unit from each treatment group. The minimum number of units required in each subclass can be chosen by the <code>min.n</code> argument to <code>matchit()</code>. If set to 0, an error will be thrown if any subclass lacks units from one of the treatment groups. Moving units from one subclass to another generally decreases the balance in the subclasses but can increase precision.</p>
 <p>The default number of subclasses is 6, which is arbitrary and should not be taken as a recommended value. Although early theory has recommended the use of 5 subclasses, in general there is an optimal number of subclasses that is typically much larger than 5 but that varies among datasets <span class="citation">(<a href="#ref-orihara2021" role="doc-biblioref">Orihara and Hamada 2021</a>)</span>. Rather than trying to figure this out for oneself, one can use optimal full matching (i.e., with <code>method = &quot;full&quot;</code>) to optimally create subclasses with one treated or one control unit that optimize a within-subclass distance criterion.</p>
-<p>The output of propensity score subclassification includes the assigned subclasses and the subclassification weights. Effects can be estimated either within each subclass and then averaged across them, or a single marginal effect can be estimated using the subclassification weights. This latter method has been called marginal mean weighting through subclassification <span class="citation">(MMWS; <a href="#ref-hong2010" role="doc-biblioref">Hong 2010</a>)</span> and fine stratification weighting <span class="citation">(<a href="#ref-desai2017" role="doc-biblioref">Desai et al. 2017</a>)</span>. It is also implemented in the <code>WeightIt</code> package.</p>
+<p>The output of propensity score subclassification includes the assigned subclasses and the subclassification weights. Effects can be estimated either within each subclass and then averaged across them, or a single marginal effect can be estimated using the subclassification weights. This latter method has been called marginal mean weighting through subclassification [MMWS; <span class="citation"><a href="#ref-hong2010" role="doc-biblioref">Hong</a> (<a href="#ref-hong2010" role="doc-biblioref">2010</a>)</span>] and fine stratification weighting <span class="citation">(<a href="#ref-desai2017" role="doc-biblioref">Desai et al. 2017</a>)</span>. It is also implemented in the <code>WeightIt</code> package.</p>
 </div>
 </div>
 <div id="customizing-the-matching-specification" class="section level2">
@@ -370,6 +179,7 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <p>The default <code>distance</code> argument is <code>&quot;glm&quot;</code>, which estimates propensity scores using logistic regression or another generalized linear model. The <code>link</code> and <code>distance.options</code> arguments can be supplied to further specify the options for the propensity score models, including whether to use the raw propensity score or a linearized version of it (e.g., the logit of a logistic regression propensity score, which has been commonly referred to and recommended in the propensity score literature <span class="citation">(<a href="#ref-austin2011a" role="doc-biblioref">Austin 2011</a>; <a href="#ref-stuart2010" role="doc-biblioref">Stuart 2010</a>)</span>). Allowable options for the propensity score model include parametric and machine learning-based models, each of which have their strengths and limitations and may perform differently depending on the unique qualities of each dataset. We recommend multiple types of models be tried to find one that yields the best balance, as there is no way to make a single recommendation that will work for all cases.</p>
 <p>The <code>distance</code> argument can also be specified as <code>&quot;mahalanobis&quot;</code>. For nearest neighbor and optimal (full or pair) matching, this triggers <code>matchit()</code> not to estimate propensity scores but rather to use just the Mahalanobis distance, which is defined for a treated unit <span class="math inline">\(i\)</span> and a control unit <span class="math inline">\(j\)</span> as <span class="math display">\[\delta_{MD}(\mathbf{x}_i,\mathbf{x}_j)=\sqrt{(\mathbf{x}_i - \mathbf{x}_j)&#39;S^{-1}(\mathbf{x}_i - \mathbf{x}_j)}\]</span></p>
 <p>where <span class="math inline">\(\mathbf{x}\)</span> is a <span class="math inline">\(p \times 1\)</span> vector containing the value of each of the <span class="math inline">\(p\)</span> included covariates for that unit, <span class="math inline">\(S\)</span> is the covariance matrix among all the covariates, and <span class="math inline">\(S^{-1}\)</span> is the (generalized) inverse of <span class="math inline">\(S\)</span>. The R function <code>mahalanobis()</code> is used to compute this. Mahalanobis distance matching tends to work better with continuous covariates than with categorical covariates. For creating close pairs, Mahalanobis distance matching tends work better than propensity score matching because Mahalanobis distance-paired units will have close values on all of the covariates, whereas propensity score-paired units may be close on the propensity score but not on any of the covariates themselves. This feature was the basis of King and Nielsen’s <span class="citation">(<a href="#ref-king2019" role="doc-biblioref">2019</a>)</span> warning against using propensity scores for matching.</p>
+<p><code>distance</code> can also be supplied as a matrix of distance values between units. This makes it possible to use handcrafted distance matrices or distances created outside <code>MatchIt</code>, e.g., using <code>optmatch::match_on()</code>. Only nearest neighbor, optimal pair, and optimal full matching allow this specification.</p>
 <p>The propensity score can have uses other than as the basis for matching. It can be used to define a region of common support, outside which units are dropped prior to matching; this is implemented by the <code>discard</code> option. It can also be used to define a caliper, the maximum distance two units can be before they are prohibited from being paired with each other; this is implemented by the <code>caliper</code> argument. To estimate or supply a propensity score for one of these purposes but not use it as the distance measure for matching (e.g., to perform Mahalanobis distance matching instead), the <code>mahvars</code> argument can be specified. These options are described below.</p>
 </div>
 <div id="implementing-common-support-restrictions-discard" class="section level3">
@@ -387,6 +197,10 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <div id="exact-matching-exact" class="section level3">
 <h3>Exact matching (<code>exact</code>)</h3>
 <p>To perform exact matching on all supplied covariates, the <code>method</code> argument can be set to <code>&quot;exact&quot;</code>. To perform exact matching only on some covariates and some other form of matching within exact matching strata on other covariates, the <code>exact</code> argument can be used. Covariates supplied to the <code>exact</code> argument will be matched exactly, and the form of matching specified by <code>method</code> (e.g., <code>&quot;nearest&quot;</code> for nearest neighbor matching) will take place within each exact matching stratum. This can be a good way to gain some of the benefits of exact matching without completely succumbing to the curse of dimensionality. As with exact matching performed with <code>method = &quot;exact&quot;</code>, any units in strata lacking members of one of the treatment groups will be left unmatched. Note that although matching occurs within each exact matching stratum, propensity score estimation and computation of the Mahalanobis distance occur in the full sample. <strong>If units from the treated group are unmatched due to an exact matching restriction, the estimand no longer corresponds to the ATT.</strong></p>
+</div>
+<div id="anti-exact-matching-antiexact" class="section level3">
+<h3>Anti-exact matching (<code>antiexact</code>)</h3>
+<p>Anti-exact matching adds a restriction such that a treated and control unit with same values of any of the specified anti-exact matching variables cannot be paired. This can be useful when finding comparison units outside of a unit’s group, such as when matching units in one group to units in another when units within the same group might otherwise be close matches. See examples <a href="https://stackoverflow.com/questions/66526115/propensity-score-matching-with-panel-data">here</a> and <a href="https://stackoverflow.com/questions/61120201/avoiding-duplicates-from-propensity-score-matching?rq=1">here</a>.</p>
 </div>
 <div id="matching-with-replacement-replace" class="section level3">
 <h3>Matching with replacement (<code>replace</code>)</h3>
@@ -425,7 +239,7 @@ Abadie, Alberto, and Guido W. Imbens. 2006. <span>“Large Sample Properties of 
 Austin, Peter C. 2009. <span>“The Relative Ability of Different Propensity Score Methods to Balance Measured Covariates Between Treated and Untreated Subjects in Observational Studies.”</span> <em>Medical Decision Making</em> 29 (6): 661–77. <a href="https://doi.org/10.1177/0272989x09341755">https://doi.org/10.1177/0272989x09341755</a>.
 </div>
 <div id="ref-austin2010" class="csl-entry">
-———. 2010a. <span>“The Performance of Different Propensity-Score Methods for Estimating Differences in Proportions (risk Differences or Absolute Risk Reductions) in Observational Studies.”</span> <em>Statistics in Medicine</em> 29 (20): 2137–48. <a href="https://doi.org/10.1002/sim.3854">https://doi.org/10.1002/sim.3854</a>.
+———. 2010a. <span>“The Performance of Different Propensity-Score Methods for Estimating Differences in Proportions (Risk Differences or Absolute Risk Reductions) in Observational Studies.”</span> <em>Statistics in Medicine</em> 29 (20): 2137–48. <a href="https://doi.org/10.1002/sim.3854">https://doi.org/10.1002/sim.3854</a>.
 </div>
 <div id="ref-austin2010a" class="csl-entry">
 ———. 2010b. <span>“Statistical Criteria for Selecting the Optimal Number of Untreated Subjects Matched to Each Treated Subject When Using Many-to-One Matching on the Propensity Score.”</span> <em>American Journal of Epidemiology</em> 172 (9): 1092–97. <a href="https://doi.org/10.1093/aje/kwq224">https://doi.org/10.1093/aje/kwq224</a>.
