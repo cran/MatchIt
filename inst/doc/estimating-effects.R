@@ -2,7 +2,7 @@
 knitr::opts_chunk$set(echo = TRUE, eval=T)
 options(width = 200, digits= 4)
 
-#Generatng data similar to Austin (2009) for demonstrating treatment effect estimation
+#Generating data similar to Austin (2009) for demonstrating treatment effect estimation
 gen_X <- function(n) {
   X <- matrix(rnorm(9 * n), nrow = n, ncol = 9)
   X[,5] <- as.numeric(X[,5] < .5)
@@ -567,7 +567,7 @@ fitS <- lm(Y_C ~ A * X5, data = mdS, weights = weights)
 coeftest(fitS, vcov. = vcovCL, cluster = ~subclass)
 
 ## ---- eval = FALSE------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-#  #Generatng data similar to Austin (2009) for demonstrating treatment effect estimation
+#  #Generating data similar to Austin (2009) for demonstrating treatment effect estimation
 #  gen_X <- function(n) {
 #    X <- matrix(rnorm(9 * n), nrow = n, ncol = 9)
 #    X[,5] <- as.numeric(X[,5] < .5)

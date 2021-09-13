@@ -1,12 +1,15 @@
 Package: MatchIt
-Version: 4.2.0
+Version: 4.3.0
 Title: Nonparametric Preprocessing for Parametric Causal Inference
 Description: Selects matched samples of the original treated and
     control groups with similar covariate distributions -- can be
     used to match exactly on covariates, to match on propensity
     scores, or perform a variety of other matching procedures.  The
     package also implements a series of recommendations offered in
-    Ho, Imai, King, and Stuart (2007) <DOI:10.1093/pan/mpl013>.
+    Ho, Imai, King, and Stuart (2007) <DOI:10.1093/pan/mpl013>. (The 
+    'gurobi' package, which is not on CRAN, is optional and comes with 
+    an installation of the Gurobi Optimizer, available at 
+    <https://www.gurobi.com>.)
 Authors@R: c(
   person("Daniel", "Ho", email = "daniel.e.ho@gmail.com", role = c("aut"),
          comment = c(ORCID = "0000-0002-2195-5469")),
@@ -22,10 +25,11 @@ Authors@R: c(
 	       comment = c(ORCID="0000-0003-3067-7154"))
   )
 Depends: R (>= 3.1.0)
-Imports: backports (>= 1.1.9), Rcpp (>= 1.0.5)
+Imports: backports (>= 1.1.9), Rcpp (>= 1.0.7)
 Suggests: optmatch, Matching, rgenoud, nnet, rpart, mgcv, CBPS (>=
-        0.17), dbarts, randomForest, cobalt (>= 4.2.3), boot, lmtest,
-        sandwich (>= 2.5-1), survival, RcppProgress (>= 0.4.2), knitr,
+        0.17), dbarts, randomForest, glmnet (>= 4.0), gbm (>= 2.1.7),
+        cobalt (>= 4.2.3), boot, lmtest, sandwich (>= 2.5-1), survival,
+        RcppProgress (>= 0.4.2), Rglpk, Rsymphony, gurobi, knitr,
         rmarkdown
 LinkingTo: Rcpp, RcppProgress
 SystemRequirements: C++11
@@ -37,7 +41,7 @@ URL: https://kosukeimai.github.io/MatchIt/,
 BugReports: https://github.com/kosukeimai/MatchIt/issues
 VignetteBuilder: knitr
 NeedsCompilation: yes
-Packaged: 2021-05-26 05:54:03 UTC; NoahGreifer
+Packaged: 2021-09-13 04:12:17 UTC; NoahGreifer
 Author: Daniel Ho [aut] (<https://orcid.org/0000-0002-2195-5469>),
   Kosuke Imai [aut] (<https://orcid.org/0000-0002-2748-1022>),
   Gary King [aut] (<https://orcid.org/0000-0002-5327-7631>),
@@ -46,4 +50,4 @@ Author: Daniel Ho [aut] (<https://orcid.org/0000-0002-2195-5469>),
   Noah Greifer [ctb, cre, aut] (<https://orcid.org/0000-0003-3067-7154>)
 Maintainer: Noah Greifer <noah.greifer@gmail.com>
 Repository: CRAN
-Date/Publication: 2021-05-26 13:30:05 UTC
+Date/Publication: 2021-09-13 07:00:02 UTC

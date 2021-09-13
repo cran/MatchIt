@@ -98,7 +98,7 @@ ignored.
 }
 }
 \section{Outputs}{
-All outputs described in \fun{matchit} are returned with \code{method = "nearest"}. When \code{replace = TRUE}, the \code{subclass} component is omitted.
+All outputs described in \fun{matchit} are returned with \code{method = "nearest"}. When \code{replace = TRUE}, the \code{subclass} component is omitted. \code{include.obj} is ignored.
 }
 \details{
 \subsection{Mahalanobis Distance Matching}{
@@ -138,6 +138,9 @@ Variable ratio matching cannot be used with Mahalanobis distance matching or whe
 }
 
 }
+\note{
+Sometimes an error will be produced by \emph{Rcpp} along the lines of \code{"function 'Rcpp_precious_remove' not provided by package 'Rcpp'"}. It is not immediately clear why this happens, though \href{https://lists.r-forge.r-project.org/pipermail/rcpp-devel/2021-July/010648.html}{this} thread appears to provide some insight. In a fresh \R session, run \code{remove.packages(c("MatchIt", "Rcpp")); install.packages("MatchIt")}. This should sync \emph{MatchIt} and \emph{Rcpp} and ensure they work correctly.
+}
 \references{
 In a manuscript, you don't need to cite another package when using \code{method = "nearest"} because the matching is performed completely within \emph{MatchIt}. For example, a sentence might read:
 
@@ -167,7 +170,7 @@ m.out2 <- matchit(treat ~ age + educ + race + nodegree +
                   mahvars = ~ age + educ + re74 + re75,
                   ratio = 3, caliper = .02)
 m.out2
-summary(m.out2)
+summary(m.out2, un = FALSE)
 
 # 1:1 NN Mahalanobis distance matching within calipers
 # on re74 and re75 and exact matching on married and race
@@ -176,7 +179,7 @@ m.out3 <- matchit(treat ~ age + educ + re74 + re75, data = lalonde,
                   exact = ~ married + race,
                   caliper = c(re74 = .2, re75 = .15))
 m.out3
-summary(m.out3)
+summary(m.out3, un = FALSE)
 
 # 2:1 variable ratio NN matching on the PS
 m.out4 <- matchit(treat ~ age + educ + race + nodegree +
@@ -184,7 +187,7 @@ m.out4 <- matchit(treat ~ age + educ + race + nodegree +
                   method = "nearest", ratio = 2,
                   min.controls = 1, max.controls = 12)
 m.out4
-summary(m.out4)
+summary(m.out4, un = FALSE)
 
 # Some units received 1 match and some received 12
 table(table(m.out4$subclass[m.out4$treat == 0]))

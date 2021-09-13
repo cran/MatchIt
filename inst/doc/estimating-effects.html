@@ -12,7 +12,7 @@
 
 <meta name="author" content="Noah Greifer" />
 
-<meta name="date" content="2021-05-26" />
+<meta name="date" content="2021-09-13" />
 
 <title>Estimating Effects After Matching</title>
 
@@ -40,6 +40,7 @@
 pre > code.sourceCode { white-space: pre; position: relative; }
 pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
 pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
 code.sourceCode > span { color: inherit; text-decoration: inherit; }
 div.sourceCode { margin: 1em 0; }
 pre.sourceCode { margin: 0; }
@@ -162,7 +163,7 @@ div.csl-indent {
 
 <h1 class="title toc-ignore">Estimating Effects After Matching</h1>
 <h4 class="author">Noah Greifer</h4>
-<h4 class="date">2021-05-26</h4>
+<h4 class="date">2021-09-13</h4>
 
 
 <div id="TOC">
@@ -210,7 +211,7 @@ pre code {
 <div id="identifying-the-estimand" class="section level3">
 <h3>Identifying the estimand</h3>
 <p>Before an effect is estimated, the estimand must be specified and clarified. Although some aspects of the estimand depend not only on how the effect is estimated after matching but also on the matching method itself, other aspects must be considered at the tine of effect estimation and interpretation. Here, we consider three aspects of the estimand: the population the effect is meant to generalize to (the target population), the effect measure, and whether the effect is marginal or conditional.</p>
-<p><strong>The target population.</strong> Different matching methods allow you to estimate effects that can generalize to different target populations. The most common estimand in matching the average treatment effect in the treated (ATT), which is the average effect of treatment for those who receive treatment. This estimand is estimable for matching methods that do not change the treated units (i.e., by weighting or discarding units) and is requested in <code>matchit()</code> by setting <code>estimand = &quot;ATT&quot;</code> (which is the default). The average treatment effect in the population (ATE) is the average effect of treatment for the population from which the sample is a random sample. This estimand is estimable only for methods that allow the ATE and do not discard units from the sample, which in <code>MatchIt</code> is limited to full matching and subclassification when setting <code>estimand = &quot;ATE&quot;</code>. When treated units are discarded (e.g., through the use of common support restrictions, calipers, or [coarsened] exact matching), the estimand corresponds to neither the population ATT nor the population ATE, but rather to an average treatment effect in the remaining matched sample (ATM), which may not correspond to any specific target population.</p>
+<p><strong>The target population.</strong> Different matching methods allow you to estimate effects that can generalize to different target populations. The most common estimand in matching the average treatment effect in the treated (ATT), which is the average effect of treatment for those who receive treatment. This estimand is estimable for matching methods that do not change the treated units (i.e., by weighting or discarding units) and is requested in <code>matchit()</code> by setting <code>estimand = &quot;ATT&quot;</code> (which is the default). The average treatment effect in the population (ATE) is the average effect of treatment for the population from which the sample is a random sample. This estimand is estimable only for methods that allow the ATE and either do not discard units from the sample or explicit target full sample balance, which in <code>MatchIt</code> is limited to full matching, subclassification, and template matching when setting <code>estimand = &quot;ATE&quot;</code>. When treated units are discarded (e.g., through the use of common support restrictions, calipers, cardinality matching, or [coarsened] exact matching), the estimand corresponds to neither the population ATT nor the population ATE, but rather to an average treatment effect in the remaining matched sample (ATM), which may not correspond to any specific target population.</p>
 <p><strong>Marginal and conditional effects.</strong> A marginal effect is a comparison between the expected potential outcome under treatment and the expected potential outcome under control. This is the same quantity estimated in randomized trials without blocking or covariate adjustment and is particularly useful for quantifying the overall effect of a policy or population-wide intervention. A conditional effect is the comparison between the expected potential outcomes in the treatment groups within strata. This is useful for identifying the effect of a treatment for an individual patient or a subset of the population.</p>
 <p><strong>Effect measures.</strong> The outcome types we consider here are continuous, with the effect measured by the mean difference; binary, with the effect measured by the risk difference (RD), risk ratio (RR), or odds ratio (OR); and time-to-event (i.e., survival), with the effect measured by the hazard ratio (HR). The RR, OR, and HR are <em>noncollapsible</em> effect measures, which means the marginal effect on that scale is not a (possibly) weighted average of the conditional effects within strata, even if the stratum-specific effects are of the same magnitude. For these effect measures, it is critical to distinguish between marginal and conditional effects because different statistical methods target different types of effects. The mean difference and RD are <em>collapsible</em> effect measures, so the same methods can be used to estimate marginal and conditional effects.</p>
 <p>In this guide, we will provide examples for estimating the ATT, ATE, and ATM for each of the three outcomes types. Our primary focus will be on marginal effects, which are appropriate for all effect measures, easily interpretable, and require few modeling assumptions. We will include a short section on estimating the conditional OR. The “Common Mistakes” section includes examples of commonly used methods that estimate conditional rather than marginal effects and should not be used when marginal effects are desired.</p>
@@ -269,8 +270,8 @@ pre code {
 <p>Because different matching methods require different treatments, instructions for each method are organized in the following sections, as designated by the table below. It is important to ensure the right methods are used with the matching specification used in order for the estimated effects and standard errors to be valid.</p>
 <table>
 <colgroup>
-<col width="58%" />
-<col width="41%" />
+<col width="59%" />
+<col width="40%" />
 </colgroup>
 <thead>
 <tr class="header">
@@ -308,14 +309,18 @@ pre code {
 <td>Full matching</td>
 </tr>
 <tr class="even">
+<td></td>
+<td>Cardinality and template matching</td>
+</tr>
+<tr class="odd">
 <td><a href="#after-stratum-matching">After Stratum Matching</a></td>
 <td>Propensity score subclassification</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>-</td>
 <td>Exact matching</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>-</td>
 <td>Coarsened exact matching with <code>k2k = FALSE</code> (the default)</td>
 </tr>
@@ -330,7 +335,7 @@ pre code {
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>mNN</span></code></pre></div>
 <pre><code>## A matchit object
-##  - method: 1:1 nearest neighbor matching without replacement
+##  - method: Variable ratio 1:1 nearest neighbor matching without replacement
 ##  - distance: Propensity score
 ##              - estimated with logistic regression
 ##  - number of obs.: 2000 (original), 882 (matched)
@@ -583,7 +588,7 @@ pre code {
 <span id="cb29-5"><a href="#cb29-5" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb29-6"><a href="#cb29-6" aria-hidden="true" tabindex="-1"></a>mNNr</span></code></pre></div>
 <pre><code>## A matchit object
-##  - method: 3:1 nearest neighbor matching with replacement
+##  - method: Variable ratio 3:1 nearest neighbor matching with replacement
 ##  - distance: Propensity score [caliper]
 ##              - estimated with logistic regression and linearized
 ##  - caliper: &lt;distance&gt; (0.13)
@@ -810,7 +815,7 @@ pre code {
 <div id="after-full-matching" class="section level3">
 <h3>After Full Matching</h3>
 <p>Full matching presents fairly straightforward methods of effect and standard error estimation. The most common and recommended way to estimate effects after full matching is to use the computed matching weights to estimate weighted effects. These matching weights function essentially like inverse probability weights and can be treated as such in all analyses, including with respect to standard error estimation. For empirical comparisons between full matching and propensity score weighting, see Austin and Stuart <span class="citation">(<a href="#ref-austin2015b" role="doc-biblioref">2015b</a>, <a href="#ref-austin2017" role="doc-biblioref">2017</a>, <a href="#ref-austin2015a" role="doc-biblioref">2015a</a>)</span>.</p>
-<p>Standard error estimation involves using a cluster-robust standard error as recommended by Austin and Stuart <span class="citation">(<a href="#ref-austin2017" role="doc-biblioref">2017</a>)</span>. Including covariates can improve precision and add robustness when valid. Note that the methods described here also work for other estimators that rely on matching weights, including matching without replacement. The main difference is that full matching can be used to estimate the ATE, which we demonstrate below.</p>
+<p>Standard error estimation involves using a cluster-robust standard error as recommended by Austin and Stuart <span class="citation">(<a href="#ref-austin2017" role="doc-biblioref">2017</a>)</span>. Including covariates can improve precision and add robustness when valid. Note that the methods described here also work for other estimators that rely on matching weights, including cardinality and template matching and matching without replacement. The main difference is that full matching can be used to estimate the ATE, which we demonstrate below.</p>
 <p>Below, we perform optimal full propensity score matching. Here we use full matching to estimate the ATE, but the procedure is nearly identical when estimating the ATT, and we point out any differences.</p>
 <div class="sourceCode" id="cb60"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb60-1"><a href="#cb60-1" aria-hidden="true" tabindex="-1"></a>mF <span class="ot">&lt;-</span> <span class="fu">matchit</span>(A <span class="sc">~</span> X1 <span class="sc">+</span> X2 <span class="sc">+</span> X3 <span class="sc">+</span> X4 <span class="sc">+</span> X5 <span class="sc">+</span> </span>
 <span id="cb60-2"><a href="#cb60-2" aria-hidden="true" tabindex="-1"></a>                 X6 <span class="sc">+</span> X7 <span class="sc">+</span> X8 <span class="sc">+</span> X9, <span class="at">data =</span> d,</span>
@@ -828,16 +833,16 @@ pre code {
 <span id="cb62-2"><a href="#cb62-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb62-3"><a href="#cb62-3" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(md)</span></code></pre></div>
 <pre><code>##   A      X1      X2      X3       X4 X5      X6      X7      X8       X9      Y_C Y_B     Y_S distance weights subclass
-## 1 0  0.1725 -1.4283 -0.4103 -2.36059  1 -1.1199  0.6398 -0.4840 -0.59385  0.07104   0  278.46  0.08461  0.8166       58
-## 2 0 -1.0959  0.8463  0.2456 -0.12333  1 -2.2687 -1.4491 -0.5514 -0.31439  0.15619   0  330.63  0.01855  0.7899      132
-## 3 0  0.1768  0.7905 -0.8436  0.82366  1 -0.2221  0.2971 -0.6966 -0.69516 -0.85180   1  369.94  0.22210  1.0393       97
-## 4 0 -0.4595  0.1726  1.9542 -0.62661  1 -0.4019 -0.8294 -0.5384  0.20729 -2.35184   0   91.06  0.04180  0.8445      136
-## 5 1  0.3563 -1.8121  0.8135 -0.67189  1 -0.8297  1.7297 -0.6439 -0.02648  0.68058   0  182.73  0.43291  0.3307      204
-## 6 0 -2.4313 -1.7984 -1.2940  0.04609  1 -1.2419 -1.1252 -1.8659 -0.56513 -5.62260   0 2563.73  0.04998  0.7990      168</code></pre>
+## 1 0  0.1725 -1.4283 -0.4103 -2.36059  1 -1.1199  0.6398 -0.4840 -0.59385  0.07104   0  278.46  0.08461  0.8166       56
+## 2 0 -1.0959  0.8463  0.2456 -0.12333  1 -2.2687 -1.4491 -0.5514 -0.31439  0.15619   0  330.63  0.01855  0.7899      140
+## 3 0  0.1768  0.7905 -0.8436  0.82366  1 -0.2221  0.2971 -0.6966 -0.69516 -0.85180   1  369.94  0.22210  1.0393       96
+## 4 0 -0.4595  0.1726  1.9542 -0.62661  1 -0.4019 -0.8294 -0.5384  0.20729 -2.35184   0   91.06  0.04180  0.8445      135
+## 5 1  0.3563 -1.8121  0.8135 -0.67189  1 -0.8297  1.7297 -0.6439 -0.02648  0.68058   0  182.73  0.43291  0.3307      202
+## 6 0 -2.4313 -1.7984 -1.2940  0.04609  1 -1.2419 -1.1252 -1.8659 -0.56513 -5.62260   0 2563.73  0.04998  0.7990      167</code></pre>
 <p>A benefit of full matching is that no units are discarded, which has the potential to improve precision and prevent bias due to incomplete matching. However, the “effective” sample size implied by the matching weights is lower than the actual remaining sample size, so one should not always expect full matching to yield more precise estimates than other forms of matching.</p>
 <div id="for-continuous-outcomes-2" class="section level4">
 <h4>For continuous outcomes</h4>
-<p><strong>Without covariate adjustment.</strong> Estimating effects and standard errors for continuous outcomes after full matching involves including the matching weights in the outcome model and using a cluster-robust standard error.</p>
+<p><strong>Without covariate adjustment.</strong> Estimating effects and standard errors for continuous outcomes after full matching involves including the matching weights in the outcome model and using a cluster-robust standard error. For cardinality or template matching, a regular robust standard error can be requested using <code>vcovHC</code> and omitting the <code>cluster</code> argument in the code below.</p>
 <div class="sourceCode" id="cb64"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb64-1"><a href="#cb64-1" aria-hidden="true" tabindex="-1"></a>fit1 <span class="ot">&lt;-</span> <span class="fu">lm</span>(Y_C <span class="sc">~</span> A, <span class="at">data =</span> md, <span class="at">weights =</span> weights)</span>
 <span id="cb64-2"><a href="#cb64-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb64-3"><a href="#cb64-3" aria-hidden="true" tabindex="-1"></a><span class="fu">coeftest</span>(fit1, <span class="at">vcov. =</span> vcovCL, <span class="at">cluster =</span> <span class="sc">~</span>subclass)</span></code></pre></div>
@@ -1106,7 +1111,7 @@ pre code {
 <span id="cb99-3"><a href="#cb99-3" aria-hidden="true" tabindex="-1"></a>              <span class="at">exact =</span> <span class="sc">~</span>X5, <span class="at">method =</span> <span class="st">&quot;nearest&quot;</span>)</span>
 <span id="cb99-4"><a href="#cb99-4" aria-hidden="true" tabindex="-1"></a>mP</span></code></pre></div>
 <pre><code>## A matchit object
-##  - method: 1:1 nearest neighbor matching without replacement
+##  - method: Variable ratio 1:1 nearest neighbor matching without replacement
 ##  - distance: Propensity score
 ##              - estimated with logistic regression
 ##  - number of obs.: 2000 (original), 882 (matched)
@@ -1315,7 +1320,7 @@ Westreich, D., and S. Greenland. 2013. <span>“The Table 2 Fallacy: Presenting 
 </div>
 <div id="code-to-generate-data-used-in-examples" class="section level2">
 <h2>Code to Generate Data used in Examples</h2>
-<div class="sourceCode" id="cb107"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb107-1"><a href="#cb107-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Generatng data similar to Austin (2009) for demonstrating treatment effect estimation</span></span>
+<div class="sourceCode" id="cb107"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb107-1"><a href="#cb107-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Generating data similar to Austin (2009) for demonstrating treatment effect estimation</span></span>
 <span id="cb107-2"><a href="#cb107-2" aria-hidden="true" tabindex="-1"></a>gen_X <span class="ot">&lt;-</span> <span class="cf">function</span>(n) {</span>
 <span id="cb107-3"><a href="#cb107-3" aria-hidden="true" tabindex="-1"></a>  X <span class="ot">&lt;-</span> <span class="fu">matrix</span>(<span class="fu">rnorm</span>(<span class="dv">9</span> <span class="sc">*</span> n), <span class="at">nrow =</span> n, <span class="at">ncol =</span> <span class="dv">9</span>)</span>
 <span id="cb107-4"><a href="#cb107-4" aria-hidden="true" tabindex="-1"></a>  X[,<span class="dv">5</span>] <span class="ot">&lt;-</span> <span class="fu">as.numeric</span>(X[,<span class="dv">5</span>] <span class="sc">&lt;</span> .<span class="dv">5</span>)</span>

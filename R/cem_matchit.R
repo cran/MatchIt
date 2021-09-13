@@ -13,7 +13,7 @@ cem_matchit <- function(treat, X, cutpoints = "sturges", grouping = list(), k2k 
     k2k.method <- match_arg(k2k.method, c("mahalanobis", "euclidean", "maximum", "manhattan", "canberra", "binary", "minkowski"))
     if (k2k.method == "mahalanobis") mahSigma_inv <- generalized_inverse(cov(X.match))
   }
-  is.numeric.cov <- setNames(sapply(X, is.numeric), names(X))
+  is.numeric.cov <- setNames(vapply(X, is.numeric, logical(1L)), names(X))
 
   #Process cutpoints
   if (!is.list(cutpoints)) {
@@ -110,7 +110,7 @@ cem_matchit <- function(treat, X, cutpoints = "sturges", grouping = list(), k2k 
 
   #Exact match
   xx <- exactify(X, names(treat))
-  cc <- intersect(xx[treat==1], xx[treat==0])
+  cc <- do.call("intersect", unname(split(xx, treat)))
 
   if (length(cc) == 0) {
     stop("No units were matched. Try coarsening the variables further or decrease the number of variables to match on.", call. = FALSE)
