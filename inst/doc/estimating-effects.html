@@ -12,7 +12,7 @@
 
 <meta name="author" content="Noah Greifer" />
 
-<meta name="date" content="2021-11-11" />
+<meta name="date" content="2021-11-23" />
 
 <title>Estimating Effects After Matching</title>
 
@@ -163,7 +163,7 @@ div.csl-indent {
 
 <h1 class="title toc-ignore">Estimating Effects After Matching</h1>
 <h4 class="author">Noah Greifer</h4>
-<h4 class="date">2021-11-11</h4>
+<h4 class="date">2021-11-23</h4>
 
 
 <div id="TOC">
@@ -270,8 +270,8 @@ pre code {
 <p>Because different matching methods require different treatments, instructions for each method are organized in the following sections, as designated by the table below. It is important to ensure the right methods are used with the matching specification used in order for the estimated effects and standard errors to be valid.</p>
 <table>
 <colgroup>
-<col width="59%" />
-<col width="40%" />
+<col width="58%" />
+<col width="41%" />
 </colgroup>
 <thead>
 <tr class="header">
@@ -1174,7 +1174,7 @@ pre code {
 <li>a description of the outcome model used (e.g., logistic regression, a linear model with treatment-covariate interactions and mean-centered covariates, a Cox proportional hazards model with the matching weights applied)</li>
 <li>the way the effect was estimated (e.g., as the coefficient on treatment in the outcome model, as the result of a marginal effects procedure)</li>
 <li>the way standard errors and confidence intervals were estimated (e.g., using robust standard errors, using cluster-robust standard errors with pair membership as the cluster, using the BCa bootstrap with 4999 bootstrap replications and the entire process of matching and effect estimation included in each replication)</li>
-<li>R packages and functions used in estimating the effect and its standard error (e.g., <code>glm()</code> in base R, <code>vcovCL()</code> in <code>sandwich</code>, <code>boot</code> and <code>boot.ci</code> in <code>boot</code>)</li>
+<li>R packages and functions used in estimating the effect and its standard error (e.g., <code>glm()</code> in base R, <code>vcovCL()</code> in <code>sandwich</code>, <code>boot()</code> and <code>boot.ci()</code> in <code>boot</code>)</li>
 <li>The effect and its standard error and confidence interval</li>
 </ul>
 <p>All this is in addition to information about the matching method, propensity score estimation procedure (if used), balance assessment, etc. mentioned in the other vignettes.</p>
