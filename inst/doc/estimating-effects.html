@@ -12,7 +12,7 @@
 
 <meta name="author" content="Noah Greifer" />
 
-<meta name="date" content="2021-11-23" />
+<meta name="date" content="2022-01-16" />
 
 <title>Estimating Effects After Matching</title>
 
@@ -163,7 +163,7 @@ div.csl-indent {
 
 <h1 class="title toc-ignore">Estimating Effects After Matching</h1>
 <h4 class="author">Noah Greifer</h4>
-<h4 class="date">2021-11-23</h4>
+<h4 class="date">2022-01-16</h4>
 
 
 <div id="TOC">
@@ -270,8 +270,8 @@ pre code {
 <p>Because different matching methods require different treatments, instructions for each method are organized in the following sections, as designated by the table below. It is important to ensure the right methods are used with the matching specification used in order for the estimated effects and standard errors to be valid.</p>
 <table>
 <colgroup>
-<col width="58%" />
-<col width="41%" />
+<col width="59%" />
+<col width="40%" />
 </colgroup>
 <thead>
 <tr class="header">
@@ -1159,10 +1159,10 @@ pre code {
 ## t test of coefficients:
 ## 
 ##             Estimate Std. Error t value Pr(&gt;|t|)    
-## (Intercept)    0.720      0.297    2.42    0.016 *  
-## A              2.237      0.453    4.94  8.4e-07 ***
-## X5             2.160      0.414    5.22  2.0e-07 ***
-## A:X5          -0.446      0.593   -0.75    0.452    
+## (Intercept)    0.720      0.421    1.71  0.08766 .  
+## A              2.237      0.641    3.49  0.00051 ***
+## X5             2.160      0.576    3.75  0.00019 ***
+## A:X5          -0.446      0.842   -0.53  0.59670    
 ## ---
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
 <p>There are benefits to using either approach, and <span class="citation"><a href="#ref-greenExaminingModerationAnalyses2014" role="doc-biblioref">Green and Stuart</a> (<a href="#ref-greenExaminingModerationAnalyses2014" role="doc-biblioref">2014</a>)</span> find that either can be successful at balancing the subgroups. The first approach may be most effective with small samples, where separate propensity score models would be fit with greater uncertainty and an increased possibility of perfect prediction or failure to converge <span class="citation">(<a href="#ref-wangRelativePerformancePropensity2018" role="doc-biblioref">Wang et al. 2018</a>)</span>. The second approach may be more effective with larger samples or with matching methods that target balance in the matched sample, such as genetic matching <span class="citation">(<a href="#ref-kreifMethodsEstimatingSubgroup2012" role="doc-biblioref">Kreif et al. 2012</a>)</span>. With genetic matching, separate subgroup analyses ensure balance is optimized within each subgroup rather than just overall.</p>
