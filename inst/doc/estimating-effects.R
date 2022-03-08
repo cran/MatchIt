@@ -519,13 +519,13 @@ coxph(Surv(Y_S) ~ A, data = md, robust = TRUE,
 ## -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 mF <- matchit(A ~ X1 + X2 + X3 + X4 + X5 + 
                  X6 + X7 + X8 + X9, data = d,
-              method = "full", estimand = "ATT")
+              method = "nearest")
 
 md <- match.data(mF)
 
-fitcond <- lm(Y_B ~ A + X1 + X2 + X3 + X4 + X5 + 
+fitcond <- glm(Y_B ~ A + X1 + X2 + X3 + X4 + X5 + 
                  X6 + X7 + X8 + X9, data = md, 
-             weights = weights)
+             weights = weights, family = binomial)
 
 coeftest(fitcond, vcov. = vcovCL, cluster = ~subclass)["A",,drop = FALSE]
 exp(coef(fitcond)["A"])

@@ -7,10 +7,10 @@ options(width = 200, digits = 4)
 library("MatchIt")
 data("lalonde", package = "MatchIt")
 
-#Full matching on a logistic regression PS
+#1:1 NN matching w/ replacement on a logistic regression PS
 m.out <- matchit(treat ~ age + educ + race + married + 
                    nodegree + re74 + re75, data = lalonde,
-                 method = "full")
+                 replace = TRUE)
 m.out
 
 ## -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -19,7 +19,7 @@ summary(m.out, addlvariables = ~ I(age^2) + I(re74==0) +
 
 ## -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 m.sum <- summary(m.out, addlvariables = ~ I(age^2) + I(re74==0) + 
-          I(re75==0) + educ:race)
+                   I(re75==0) + educ:race)
 plot(m.sum, var.order = "unmatched")
 
 ## -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
