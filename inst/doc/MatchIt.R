@@ -3,6 +3,16 @@ knitr::opts_chunk$set(echo = TRUE, message = FALSE,
                       fig.width=7, fig.height=5)
 options(width = 200)
 
+notice <- "Note: if the `optmatch` package is not available, the subsequent lines will not run."
+use <- {
+  if (requireNamespace("optmatch", quietly = TRUE)) "full"
+  else if (requireNamespace("quickmatch", quietly = TRUE)) "quick"
+  else "none"
+}
+
+me_ok <- requireNamespace("marginaleffects", quietly = TRUE) &&
+  requireNamespace("sandwich", quietly = TRUE)
+
 ## -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 library("MatchIt")
 data("lalonde")
@@ -25,7 +35,6 @@ m.out1 <- matchit(treat ~ age + educ + race + married +
                    nodegree + re74 + re75, data = lalonde,
                  method = "nearest", distance = "glm")
 
-
 ## -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 m.out1
 
@@ -37,56 +46,54 @@ summary(m.out1, un = FALSE)
 plot(m.out1, type = "jitter", interactive = FALSE)
 
 ## -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-plot(m.out1, type = "qq", interactive = FALSE,
-     which.xs = c("age", "married", "re75"))
+plot(m.out1, type = "density", interactive = FALSE,
+     which.xs = ~age + married + re75)
 
-## ---- include=FALSE-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-#In case optmatch goes offline, don't run lines below
-if (!requireNamespace("optmatch", quietly = TRUE)) knitr::opts_chunk$set(eval = FALSE)
-
-## -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+## ---- eval = (use == "full"), include= (use %in% c("full", "none"))-----------------------------------------------------------------------------------------------------------------------------------
 # Full matching on a probit PS
 m.out2 <- matchit(treat ~ age + educ + race + married + 
                    nodegree + re74 + re75, data = lalonde,
                  method = "full", distance = "glm", link = "probit")
 m.out2
 
-## -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+## ---- eval = (use == "quick"), include = (use == "quick")---------------------------------------------------------------------------------------------------------------------------------------------
+#  # Full matching on a probit PS
+#  m.out2 <- matchit(treat ~ age + educ + race + married +
+#                     nodegree + re74 + re75, data = lalonde,
+#                   method = "quick", distance = "glm", link = "probit")
+#  m.out2
+
+## ---- eval = (use != "none")--------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 # Checking balance after full matching
 summary(m.out2, un = FALSE)
 
-## -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+## ---- eval = (use != "none")--------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 plot(summary(m.out2))
 
-## ---- include=FALSE, eval=TRUE------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-knitr::opts_chunk$set(eval = TRUE)
+## ---- eval = (use != "none")--------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+m.data <- match.data(m.out2)
 
-## -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-m.data1 <- match.data(m.out1)
+head(m.data)
 
-head(m.data1)
+## ---- eval = (use != "none" && me_ok)-----------------------------------------------------------------------------------------------------------------------------------------------------------------
+library("marginaleffects")
 
-## -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-library("lmtest") #coeftest
-library("sandwich") #vcovCL
+fit <- lm(re78 ~ treat * (age + educ + race + married + nodegree + 
+             re74 + re75), data = m.data, weights = weights)
 
-fit1 <- lm(re78 ~ treat + age + educ + race + married + nodegree + 
-             re74 + re75, data = m.data1, weights = weights)
+comp <- comparisons(fit,
+                     variables = "treat",
+                     vcov = ~subclass,
+                     newdata = subset(m.data, treat == 1),
+                     wts = "weights")
+summary(comp)
 
-coeftest(fit1, vcov. = vcovCL, cluster = ~subclass)
-
-## ---- include=FALSE-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-#In case optmatch goes offline, don't run lines below
-if (!requireNamespace("optmatch", quietly = TRUE)) knitr::opts_chunk$set(eval = FALSE)
-
-## ---- message = FALSE---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-m.data2 <- match.data(m.out2)
-
-fit2 <- lm(re78 ~ treat + age + educ + race + married + nodegree + 
-             re74 + re75, data = m.data2, weights = weights)
-
-coeftest(fit2, vcov. = vcovCL, cluster = ~subclass)
-
-## ---- include=FALSE, eval=TRUE------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-knitr::opts_chunk$set(eval = TRUE)
+## ---- include = FALSE---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+est <- {
+  if (use != "none" && me_ok) summary(comp)
+  else data.frame(type = "response", term = "1 - 0", estimate = 2114, 
+                  std.error = 646, statistic = 3.27, 
+                  p.value = 0.0011, conf.low = 848, 
+                  conf.high = 3380)
+}
 

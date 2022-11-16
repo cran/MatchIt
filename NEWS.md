@@ -6,6 +6,42 @@ output:
 `MatchIt` News and Updates
 ======
 
+# MatchIt 4.5.0
+
+* Generalized full matching, as described by [Sävje, Higgins, and Sekhon (2021)](https://doi.org/10.1017/pan.2020.32), can now be implemented by setting `method = "quick"` in `matchit()`. It is a dramatically faster alternative to optimal full matching that can support much larger datasets and otherwise has similar balancing performance. See `?method_quick` and `vignette("matching-methods")` for more information. This functionality relies on the `quickmatch` package.
+
+* The package structure has been updated, include with the use of Roxygen for documentation. This should not affect use, but the source code will look different from that of previous versions.
+
+* When `method = "subclass"` and `min.n = 0` (which is not the default), any units not placed into a subclass are now considered "unmatched" and given weights of 0. Previously they were left in.
+
+* When `method = "genetic"`, the default `distance.tolerance` is now 0. In previous versions, this argument was ignored; now it is not.
+
+* For `plot.matchit()`, the `which.xs` argument can be specified as a one-sided formula. A new `data` argument is allowed if the variables in that formula are not among the original covariates.
+
+* When a factor variable is supplied to `plot.matchit()` with `type = "density"`, the plot now displays all factor levels in the same plot instead of in separate plots for each level, similar to `cobalt::bal.plot()`.
+
+* The "Estimating Effects" vignette (`vignette("estimating-effects")`) has been rewritten to be much shorter (and hopefully clearer) and to use the `marginaleffects` package, which is now a Suggested package. The new vignette focuses on using g-computation to estimate treatment effects using a single workflow with slight modifications for different situations.
+
+* The error message when covariates have missing or non-finite values is now clearer, identifying which variables are afflicted. This fixes a bug mentioned in #115.
+
+* Fixed a bug when using `matchit()` with `method = "cem"`, `k2k = TRUE`, and `k2k.method = NULL`. Thanks to Florian B. Mayr.
+
+* Fixed a bug when using `method = "optimal"` and `method = "full"` with `exact` and `antiexact` specified, wherein a warning would occur about the `drop` argument in subsetting.
+
+* Fixed a bug where `antiexact` would not work correctly with `method = "nearest"`. Thanks to @gli-1. (#119)
+
+* Fixed typos in the documentation and vignettes.
+
+* Calculating pair distances in `summary()` with `pair.dist = TRUE` is now faster.
+
+* Improved printing of balance results when no covariates are supplied.
+
+* Updates to the Estimating Effects vignette that dramatically increase the speed of the cluster bootstrap for average marginal effects after matching. Thanks to Yohei Hashimoto for pointing out the inefficiency.
+
+* Updates to the Assessing Balance vignette to fix errors
+
+* All vignettes and help files are better protected against Suggested packages not available on CRAN.
+
 # MatchIt 4.4.0
 
 * `optmatch` has returned to CRAN, now with an open-source license! A new `solver` argument can be passed to `matchit()` with `method = "full"` and `method = "optimal"` to control the solver used to perform the optimization used in the matching. Note that using the default (open source) solver LEMON may yield results different from those obtained prior to `optmatch` 0.10.0. For reproducibility questions, please contact the `optmatch` maintainers.

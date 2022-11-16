@@ -2,7 +2,7 @@
 knitr::opts_chunk$set(echo = TRUE, eval=T)
 options(width = 200, digits = 4)
 
-#Generatng data similar to Austin (2009) for demonstrating treatment effect estimation with sampling weights
+#Generating data similar to Austin (2009) for demonstrating treatment effect estimation with sampling weights
 gen_X <- function(n) {
   X <- matrix(rnorm(9 * n), nrow = n, ncol = 9)
   X[,5] <- as.numeric(X[,5] < .5)
@@ -46,12 +46,12 @@ d <- data.frame(A, X, Y_C, SW)
 head(d)
 
 library("MatchIt")
-library("lmtest")
-library("sandwich")
 
 ## ---- include=FALSE-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-#In case optmatch goes offline, don't run lines below
-if (!requireNamespace("optmatch", quietly = TRUE)) knitr::opts_chunk$set(eval = FALSE)
+#In case packages goes offline, don't run lines below
+if (!requireNamespace("optmatch", quietly = TRUE) ||
+    !requireNamespace("marginaleffects", quietly = TRUE) ||
+    !requireNamespace("sandwich", quietly = TRUE)) knitr::opts_chunk$set(eval = FALSE)
 
 ## -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 mF_s <- matchit(A ~ X1 + X2 + X3 + X4 + X5 + 
@@ -74,7 +74,7 @@ mF
 
 ## -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 #Balance before matching and for the SW propensity score full matching
-summary(mF_s, improvement = FALSE)
+summary(mF_s)
 
 #Balance for the non-SW propensity score full matching
 summary(mF, un = FALSE)
@@ -82,20 +82,17 @@ summary(mF, un = FALSE)
 ## -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 md_F_s <- match.data(mF_s)
 
-fit <- lm(Y_C ~ A + X1 + X2 + X3 + X4 + X5 + 
-             X6 + X7 + X8 + X9, data = md_F_s,
+fit <- lm(Y_C ~ A * (X1 + X2 + X3 + X4 + X5 + 
+             X6 + X7 + X8 + X9), data = md_F_s,
           weights = weights)
 
-coeftest(fit, vcov. = vcovCL, cluster = ~subclass)["A",,drop=FALSE]
-
-## -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-md_F_s <- match.data(mF_s, include.s.weights = FALSE)
-
-fit <- lm(Y_C ~ A + X1 + X2 + X3 + X4 + X5 + 
-             X6 + X7 + X8 + X9, data = md_F_s,
-          weights = weights * SW)
-
-coeftest(fit, vcov. = vcovCL, cluster = ~subclass)["A",,drop=FALSE]
+library("marginaleffects")
+comp <- comparisons(fit,
+                     variables = "A",
+                     vcov = ~subclass,
+                     newdata = subset(md_F_s, A == 1),
+                     wts = "weights")
+summary(comp)
 
 ## ---- include=FALSE, eval=TRUE------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 knitr::opts_chunk$set(eval = TRUE)

@@ -12,7 +12,7 @@
 
 <meta name="author" content="Noah Greifer" />
 
-<meta name="date" content="2022-05-18" />
+<meta name="date" content="2022-11-15" />
 
 <title>Matching Methods</title>
 
@@ -31,13 +31,13 @@ document.addEventListener('DOMContentLoaded', function(e) {
 </script>
 
 <style type="text/css">
-  code{white-space: pre-wrap;}
-  span.smallcaps{font-variant: small-caps;}
-  span.underline{text-decoration: underline;}
-  div.column{display: inline-block; vertical-align: top; width: 50%;}
-  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
-  ul.task-list{list-style: none;}
-    </style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+span.underline{text-decoration: underline;}
+div.column{display: inline-block; vertical-align: top; width: 50%;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+</style>
 
 
 
@@ -45,25 +45,25 @@ document.addEventListener('DOMContentLoaded', function(e) {
 
 
 <style type="text/css">
-/* for pandoc --citeproc since 2.11 */
+
 div.csl-bib-body { }
 div.csl-entry {
-  clear: both;
+clear: both;
 }
 .hanging div.csl-entry {
-  margin-left:2em;
-  text-indent:-2em;
+margin-left:2em;
+text-indent:-2em;
 }
 div.csl-left-margin {
-  min-width:2em;
-  float:left;
+min-width:2em;
+float:left;
 }
 div.csl-right-inline {
-  margin-left:2em;
-  padding-left:1em;
+margin-left:2em;
+padding-left:1em;
 }
 div.csl-indent {
-  margin-left: 2em;
+margin-left: 2em;
 }
 </style>
 
@@ -261,58 +261,60 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 
 <h1 class="title toc-ignore">Matching Methods</h1>
 <h4 class="author">Noah Greifer</h4>
-<h4 class="date">2022-05-18</h4>
+<h4 class="date">2022-11-15</h4>
 
 
 <div id="TOC">
 <ul>
-<li><a href="#introduction">Introduction</a></li>
-<li><a href="#matching">Matching</a></li>
-<li><a href="#matching-methods">Matching Methods</a>
+<li><a href="#introduction" id="toc-introduction">Introduction</a></li>
+<li><a href="#matching" id="toc-matching">Matching</a></li>
+<li><a href="#matching-methods" id="toc-matching-methods">Matching
+Methods</a>
 <ul>
-<li><a href="#nearest-neighbor-matching-method-nearest">Nearest Neighbor
+<li><a href="#nearest-neighbor-matching-method-nearest" id="toc-nearest-neighbor-matching-method-nearest">Nearest Neighbor
 Matching (<code>method = &quot;nearest&quot;</code>)</a></li>
-<li><a href="#optimal-pair-matching-method-optimal">Optimal Pair
-Matching (<code>method = &quot;optimal&quot;</code>)</a></li>
-<li><a href="#optimal-full-matching-method-full">Optimal Full Matching
+<li><a href="#optimal-pair-matching-method-optimal" id="toc-optimal-pair-matching-method-optimal">Optimal Pair Matching
+(<code>method = &quot;optimal&quot;</code>)</a></li>
+<li><a href="#optimal-full-matching-method-full" id="toc-optimal-full-matching-method-full">Optimal Full Matching
 (<code>method = &quot;full&quot;</code>)</a></li>
-<li><a href="#genetic-matching-method-genetic">Genetic Matching
+<li><a href="#generalized-full-matching-method-quick" id="toc-generalized-full-matching-method-quick">Generalized Full
+Matching (<code>method = &quot;quick&quot;</code>)</a></li>
+<li><a href="#genetic-matching-method-genetic" id="toc-genetic-matching-method-genetic">Genetic Matching
 (<code>method = &quot;genetic&quot;</code>)</a></li>
-<li><a href="#exact-matching-method-exact">Exact Matching
+<li><a href="#exact-matching-method-exact" id="toc-exact-matching-method-exact">Exact Matching
 (<code>method = &quot;exact&quot;</code>)</a></li>
-<li><a href="#coarsened-exact-matching-method-cem">Coarsened Exact
-Matching (<code>method = &quot;cem&quot;</code>)</a></li>
-<li><a href="#subclassification-method-subclass">Subclassification
+<li><a href="#coarsened-exact-matching-method-cem" id="toc-coarsened-exact-matching-method-cem">Coarsened Exact Matching
+(<code>method = &quot;cem&quot;</code>)</a></li>
+<li><a href="#subclassification-method-subclass" id="toc-subclassification-method-subclass">Subclassification
 (<code>method = &quot;subclass&quot;</code>)</a></li>
-<li><a href="#cardinality-and-template-matching-method-cardinality">Cardinality
+<li><a href="#cardinality-and-template-matching-method-cardinality" id="toc-cardinality-and-template-matching-method-cardinality">Cardinality
 and Template Matching (<code>method = &quot;cardinality&quot;</code>)</a></li>
 </ul></li>
-<li><a href="#customizing-the-matching-specification">Customizing the
-Matching Specification</a>
+<li><a href="#customizing-the-matching-specification" id="toc-customizing-the-matching-specification">Customizing the Matching
+Specification</a>
 <ul>
-<li><a href="#specifying-the-propensity-score-or-other-distance-measure-distance">Specifying
+<li><a href="#specifying-the-propensity-score-or-other-distance-measure-distance" id="toc-specifying-the-propensity-score-or-other-distance-measure-distance">Specifying
 the propensity score or other distance measure
 (<code>distance</code>)</a></li>
-<li><a href="#implementing-common-support-restrictions-discard">Implementing
+<li><a href="#implementing-common-support-restrictions-discard" id="toc-implementing-common-support-restrictions-discard">Implementing
 common support restrictions (<code>discard</code>)</a></li>
-<li><a href="#caliper-matching-caliper">Caliper matching
+<li><a href="#caliper-matching-caliper" id="toc-caliper-matching-caliper">Caliper matching
 (<code>caliper</code>)</a></li>
-<li><a href="#mahalanobis-distance-matching-mahvars">Mahalanobis
-distance matching (<code>mahvars</code>)</a></li>
-<li><a href="#exact-matching-exact">Exact matching
-(<code>exact</code>)</a></li>
-<li><a href="#anti-exact-matching-antiexact">Anti-exact matching
+<li><a href="#mahalanobis-distance-matching-mahvars" id="toc-mahalanobis-distance-matching-mahvars">Mahalanobis distance
+matching (<code>mahvars</code>)</a></li>
+<li><a href="#exact-matching-exact" id="toc-exact-matching-exact">Exact
+matching (<code>exact</code>)</a></li>
+<li><a href="#anti-exact-matching-antiexact" id="toc-anti-exact-matching-antiexact">Anti-exact matching
 (<code>antiexact</code>)</a></li>
-<li><a href="#matching-with-replacement-replace">Matching with
-replacement (<code>replace</code>)</a></li>
-<li><a href="#k1-matching-ratio"><span class="math inline">\(k\)</span>:1 matching
+<li><a href="#matching-with-replacement-replace" id="toc-matching-with-replacement-replace">Matching with replacement
+(<code>replace</code>)</a></li>
+<li><a href="#k1-matching-ratio" id="toc-k1-matching-ratio"><span class="math inline">\(k\)</span>:1 matching
 (<code>ratio</code>)</a></li>
 </ul></li>
-<li><a href="#choosing-a-matching-method">Choosing a Matching
-Method</a></li>
-<li><a href="#reporting-the-matching-specification">Reporting the
-Matching Specification</a></li>
-<li><a href="#references">References</a></li>
+<li><a href="#choosing-a-matching-method" id="toc-choosing-a-matching-method">Choosing a Matching Method</a></li>
+<li><a href="#reporting-the-matching-specification" id="toc-reporting-the-matching-specification">Reporting the Matching
+Specification</a></li>
+<li><a href="#references" id="toc-references">References</a></li>
 </ul>
 </div>
 
@@ -416,9 +418,11 @@ the treated group) and selecting members of the non-focal group (i.e.,
 the control group) to pair with each member of the focal group based on
 the <em>distance</em> between units, which can be computed in one of
 several ways. Members of either group that are not paired are dropped
-from the sample. Nearest neighbor (<code>method = &quot;nearest&quot;</code>),
-optimal pair (<code>method = &quot;optimal&quot;</code>), optimal full
-(<code>method = &quot;full&quot;</code>), and genetic matching
+from the sample. Nearest neighbor matching
+(<code>method = &quot;nearest&quot;</code>), optimal pair matching
+(<code>method = &quot;optimal&quot;</code>), optimal full matching
+(<code>method = &quot;full&quot;</code>), generalized full matching
+(<code>method = &quot;quick&quot;</code>), and genetic matching
 (<code>method = &quot;genetic&quot;</code>) are the methods of distance matching
 implemented in <code>MatchIt</code>. Typically, only the average
 treatment in the treated (ATT) or average treatment in the control
@@ -560,7 +564,7 @@ ATE. Full matching can also be seen as a form of propensity score
 weighting that is less sensitive to the form of the propensity score
 model because the original propensity scores are used just to create the
 subclasses, not to form the weights directly <span class="citation">(<a href="#ref-austin2015a" role="doc-biblioref">Austin and Stuart
-2015</a>)</span>. In addition, full matching does not have to rely on
+2015a</a>)</span>. In addition, full matching does not have to rely on
 estimated propensity scores to form the subclasses and weights; other
 distance measures are allowed as well.</p>
 <p>Although full matching uses all available units, there is a loss in
@@ -579,6 +583,41 @@ customized by supplying additional arguments that are passed to
 tolerance value can be set much lower than the default with small
 problems by setting, e.g., <code>tol = 1e-7</code>.</p>
 </div>
+<div id="generalized-full-matching-method-quick" class="section level3">
+<h3>Generalized Full Matching (<code>method = &quot;quick&quot;</code>)</h3>
+<p>Generalized full matching is a variant of full matching that uses a
+special fast clustering algorithm to dramatically speed up the matching,
+even for large datasets <span class="citation">(<a href="#ref-savjeGeneralizedFullMatching2021" role="doc-biblioref">Sävje,
+Higgins, and Sekhon 2021</a>)</span>. Like with optimal full matching,
+generalized full matching assigns every unit to a subclass. What makes
+generalized full match “generalized” is that the user can customize the
+matching in a number of ways, such as by specifying an arbitrary minimum
+number of units from each treatment group or total number of units per
+subclass, or by allowing not all units from a treatment group to have to
+be matched. Generalized full matching minimizes the largest
+within-subclass distances in the matched sample, but it does so in a way
+that is not completely optimal (though the solution is often very close
+to the optimal solution). Matching weights are computed based on
+subclass membership, and these weights then function like propensity
+score weights and can be used to estimate a weighted treatment effect,
+ideally free of confounding by the measured covariates. See
+<code>?method_quick</code> for the documentation for
+<code>matchit()</code> with <code>method = &quot;quick&quot;</code>. Generalized
+full matching in <code>MatchIt</code> depends on the
+<code>quickmatch()</code> function in the <code>quickmatch</code>
+package <span class="citation">(<a href="#ref-savjeQuickmatchQuickGeneralized2018" role="doc-biblioref">Savje, Sekhon, and Higgins 2018</a>)</span>.</p>
+<p>Generalized full matching includes different options for
+customization than optimal full matching. The user cannot supply their
+own distance matrix, but propensity scores and distance metrics that are
+computed from the supplied covariates (e.g., Mahalanobis distance) are
+allowed. Calipers can only be placed on the propensity score, if
+supplied. As with optimal full matching, generalized full matching can
+target the ATE. Matching performance tends to be similar between the two
+methods, but generalized full matching will be much quicker and can
+accommodate larger datasets, making it a good substitute. Generalized
+full matching is often faster than even nearest neighbor matching,
+especially for large datasets.</p>
+</div>
 <div id="genetic-matching-method-genetic" class="section level3">
 <h3>Genetic Matching (<code>method = &quot;genetic&quot;</code>)</h3>
 <p>Genetic matching is less a specific form of matching and more a way
@@ -595,8 +634,8 @@ on the scaled generalized Mahalanobis distance. See
 <code>matchit()</code> with <code>method = &quot;genetic&quot;</code>. Genetic
 matching in <code>MatchIt</code> depends on the <code>GenMatch()</code>
 function in the <code>Matching</code> package <span class="citation">(<a href="#ref-sekhon2011" role="doc-biblioref">Sekhon 2011</a>)</span> to
-perform the genetic search and uses the <code>Matching</code> function
-to perform the nearest neighbor match using the scaled generalized
+perform the genetic search and uses the <code>Match()</code> function to
+perform the nearest neighbor match using the scaled generalized
 Mahalanobis distance.</p>
 <p>Genetic matching considers the generalized Mahalanobis distance
 between a treated unit <span class="math inline">\(i\)</span> and a
@@ -726,9 +765,9 @@ recommended the use of 5 subclasses, in general there is an optimal
 number of subclasses that is typically much larger than 5 but that
 varies among datasets <span class="citation">(<a href="#ref-orihara2021" role="doc-biblioref">Orihara and Hamada 2021</a>)</span>. Rather than
 trying to figure this out for oneself, one can use optimal full matching
-(i.e., with <code>method = &quot;full&quot;</code>) to optimally create subclasses
-with one treated or one control unit that optimize a within-subclass
-distance criterion.</p>
+(i.e., with <code>method = &quot;full&quot;</code>) or generalized full matching
+(<code>method = &quot;quick&quot;</code>) to optimally create subclasses that
+optimize a within-subclass distance criterion.</p>
 <p>The output of propensity score subclassification includes the
 assigned subclasses and the subclassification weights. Effects can be
 estimated either within each subclass and then averaged across them, or
@@ -1022,10 +1061,10 @@ the treated unit, so increasing <span class="math inline">\(k\)</span>
 can also worsen balance. <span class="citation">Austin (<a href="#ref-austin2010a" role="doc-biblioref">2010b</a>)</span> found
 that 1:1 or 1:2 matching generally performed best in terms of mean
 squared error. In general, it makes sense to use higher values of <span class="math inline">\(k\)</span> while ensuring that balance is
-satisfactory. With nearest neighbor and optimal pair matching, variable
-<span class="math inline">\(k\)</span>:1 matching, in which the number
-of controls matched to each treated unit varies, can also be used; this
-can have improved performance over “fixed” <span class="math inline">\(k\)</span>:1 matching <span class="citation">(<a href="#ref-ming2000" role="doc-biblioref">Ming and Rosenbaum
+satisfactory.</p>
+<p>With nearest neighbor and optimal pair matching, variable <span class="math inline">\(k\)</span>:1 matching, in which the number of
+controls matched to each treated unit varies, can also be used; this can
+have improved performance over “fixed” <span class="math inline">\(k\)</span>:1 matching <span class="citation">(<a href="#ref-ming2000" role="doc-biblioref">Ming and Rosenbaum
 2000</a>)</span>. See <code>?method_nearest</code> and
 <code>?method_optimal</code> for information on implementing variable
 <span class="math inline">\(k\)</span>:1 matching.</p>
@@ -1058,15 +1097,15 @@ should attempt to come as close as possible to perfect balance <span class="cita
 successful at reducing imbalance, there may be another specification
 that could reduce it even further, thereby increasing the robustness of
 the inference and the plausibility of an unbiased effect estimate.</p>
-<p>If the target of inference is the ATE, full matching,
-subclassification, and template matching can be used. If the target of
-inference is the ATT or ATC, any matching method may be used. When
-retaining the target estimand is not so important, additional options
-become available that involve discarding units in such a way that the
-original estimand is distorted. These include matching with a caliper,
-matching within a region of common support, cardinality matching, or
-exact or coarsened exact matching, perhaps on a subset of the
-covariates.</p>
+<p>If the target of inference is the ATE, optimal or generalized full
+matching, subclassification, or template matching can be used. If the
+target of inference is the ATT or ATC, any matching method may be used.
+When retaining the target estimand is not so important, additional
+options become available that involve discarding units in such a way
+that the original estimand is distorted. These include matching with a
+caliper, matching within a region of common support, cardinality
+matching, or exact or coarsened exact matching, perhaps on a subset of
+the covariates.</p>
 <p>Because exact and coarsened exact matching aim to balance the entire
 joint distribution of covariates, they are the most powerful methods. If
 it is possible to perform exact matching, this method should be used. If
@@ -1082,19 +1121,20 @@ combine exact or coarsened exact matching on some covariates with
 another form of matching on the others (i.e., by using the
 <code>exact</code> argument).</p>
 <p>When estimating the ATE, either subclassification, full matching, or
-template matching can be used. Full matching can be effective because it
-optimizes a balance criterion, often leading to better balance. With
-full matching, it’s also possible to exact match on some variables and
-match using the Mahalanobis distance, eliminating the need to estimate
-propensity scores. Template matching also ensures good balance, but
-because units are only given weights of zero or one, a solution may not
-be feasible and many units may have to be discarded. For large datasets,
-neither full matching nor template matching may be possible, in which
-case subclassification is a faster solution. When using
-subclassification, the number of subclasses should be varied. With large
-samples, higher numbers of subclasses tend to yield better performance;
-one should not immediately settle for the default (6) or the often-cited
-recommendation of 5 without trying several other numbers.</p>
+template matching can be used. Optimal and generalized full matching can
+be effective because they optimize a balance criterion, often leading to
+better balance. With full matching, it’s also possible to exact match on
+some variables and match using the Mahalanobis distance, eliminating the
+need to estimate propensity scores. Template matching also ensures good
+balance, but because units are only given weights of zero or one, a
+solution may not be feasible and many units may have to be discarded.
+For large datasets, neither optimal full matching nor template matching
+may be possible, in which case generalized full matching and
+subclassification are faster solutions. When using subclassification,
+the number of subclasses should be varied. With large samples, higher
+numbers of subclasses tend to yield better performance; one should not
+immediately settle for the default (6) or the often-cited recommendation
+of 5 without trying several other numbers.</p>
 <p>When estimating the ATT, a variety of methods can be tried. Genetic
 matching can perform well at achieving good balance because it directly
 optimizes covariate balance. With larger datasets, it may take a long
@@ -1130,7 +1170,7 @@ score or on the covariates themselves), cardinality matching, and more
 restrictive forms of matching like exact and coarsened exact matching,
 either on all covariates or just a subset, that are prone to discard
 units from the sample in such a way that the target population is
-changed. <span class="citation">Austin (<a href="#ref-austin2013b" role="doc-biblioref">2013</a>)</span> and Austin and Stuart <span class="citation">(<a href="#ref-austin2015c" role="doc-biblioref">2015</a>, <a href="#ref-austin2015a" role="doc-biblioref">2015</a>)</span> have found that caliper matching
+changed. <span class="citation">Austin (<a href="#ref-austin2013b" role="doc-biblioref">2013</a>)</span> and Austin and Stuart <span class="citation">(<a href="#ref-austin2015c" role="doc-biblioref">2015b</a>, <a href="#ref-austin2015a" role="doc-biblioref">2015a</a>)</span> have found that caliper matching
 can be a particularly effective modification to nearest neighbor
 matching for eliminating imbalance and reducing bias when the target
 population is less relevant, but when inference to a specific target
@@ -1152,6 +1192,11 @@ propensity score, this does not imply that caliper will be optimal in
 all scenarios, and other widths should be tried, though it should be
 noted that tightening the caliper on the propensity score can sometimes
 degrade performance <span class="citation">(<a href="#ref-king2019" role="doc-biblioref">King and Nielsen 2019</a>)</span>.</p>
+<p>For large datasets (i.e., in 10,000s to millions), some matching
+methods will be too slow to be used at scale. Instead, users should
+consider generalized full matching, subclassification, or coarsened
+exact matching, which are all very fast and designed to work with large
+datasets.</p>
 </div>
 <div id="reporting-the-matching-specification" class="section level2">
 <h2>Reporting the Matching Specification</h2>
@@ -1227,14 +1272,14 @@ Replacement: A Simulation Study.”</span> <em>Statistics in Medicine</em>
 33 (24): 4306–19. <a href="https://doi.org/10.1002/sim.6276">https://doi.org/10.1002/sim.6276</a>.
 </div>
 <div id="ref-austin2015a" class="csl-entry">
-Austin, Peter C., and Elizabeth A. Stuart. 2015. <span>“The Performance
+Austin, Peter C., and Elizabeth A. Stuart. 2015a. <span>“The Performance
 of Inverse Probability of Treatment Weighting and Full Matching on the
 Propensity Score in the Presence of Model Misspecification When
 Estimating the Effect of Treatment on Survival Outcomes.”</span>
 <em>Statistical Methods in Medical Research</em> 26 (4): 1654–70. <a href="https://doi.org/10.1177/0962280215584401">https://doi.org/10.1177/0962280215584401</a>.
 </div>
 <div id="ref-austin2015c" class="csl-entry">
-———. 2015. <span>“Estimating the Effect of Treatment on Binary Outcomes
+———. 2015b. <span>“Estimating the Effect of Treatment on Binary Outcomes
 Using Full Matching on the Propensity Score.”</span> <em>Statistical
 Methods in Medical Research</em> 26 (6): 2505–25. <a href="https://doi.org/10.1177/0962280215601134">https://doi.org/10.1177/0962280215601134</a>.
 </div>
@@ -1356,6 +1401,15 @@ Studies.”</span> <em>Biometrics</em> 29 (1): 159. <a href="https://doi.org/10.
 <div id="ref-rubinBiasReductionUsing1980" class="csl-entry">
 ———. 1980. <span>“Bias <span>Reduction Using Mahalanobis-Metric
 Matching</span>.”</span> <em>Biometrics</em> 36 (2): 293–98. <a href="https://doi.org/10.2307/2529981">https://doi.org/10.2307/2529981</a>.
+</div>
+<div id="ref-savjeQuickmatchQuickGeneralized2018" class="csl-entry">
+Savje, Fredrik, Jasjeet Sekhon, and Michael Higgins. 2018.
+<em>Quickmatch: Quick Generalized Full Matching</em>. <a href="https://CRAN.R-project.org/package=quickmatch">https://CRAN.R-project.org/package=quickmatch</a>.
+</div>
+<div id="ref-savjeGeneralizedFullMatching2021" class="csl-entry">
+Sävje, Fredrik, Michael J. Higgins, and Jasjeet S. Sekhon. 2021.
+<span>“Generalized Full Matching.”</span> <em>Political Analysis</em> 29
+(4): 423–47. <a href="https://doi.org/10.1017/pan.2020.32">https://doi.org/10.1017/pan.2020.32</a>.
 </div>
 <div id="ref-schafer2008" class="csl-entry">
 Schafer, Joseph L., and Joseph Kang. 2008. <span>“Average Causal Effects
