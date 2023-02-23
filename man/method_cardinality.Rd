@@ -20,6 +20,8 @@ include \code{"ATT"}, \code{"ATC"}, and \code{"ATE"}. See Details.}
 optimization will occur within each subgroup of the exact matching
 variables.}
 
+\item{mahvars}{which variables should be used for pairing after subset selection. Can only be set when \code{ratio} is a whole number. See Details.}
+
 \item{s.weights}{the variable containing sampling weights to be incorporated
 into the optimization. The balance constraints refer to the product of the
 sampling weights and the matching weights, and the sum of the product of the
@@ -64,7 +66,7 @@ time before the optimization routine aborts, in seconds. Default is 120 (2
 minutes). For large problems, this should be set much higher.  }
 }
 
-The arguments \code{distance} (and related arguments), \code{mahvars}, \code{replace}, \code{m.order}, and \code{caliper} (and related arguments) are ignored with a warning.}
+The arguments \code{distance} (and related arguments), \code{replace}, \code{m.order}, and \code{caliper} (and related arguments) are ignored with a warning.}
 }
 \description{
 In \code{\link[=matchit]{matchit()}}, setting \code{method = "cardinality"} performs cardinality
@@ -87,6 +89,7 @@ matchit(formula,
         method = "cardinality",
         estimand = "ATT",
         exact = NULL,
+        mahvars = NULL,
         s.weights = NULL,
         ratio = 1,
         verbose = FALSE,
@@ -96,11 +99,11 @@ matchit(formula,
         ...) }
 }
 \details{
-\subsection{Cardinality and Template Matching}{
+\subsection{Cardinality and Profile Matching}{
 
 Two types of matching are
 available with \code{method = "cardinality"}: cardinality matching and
-template matching.
+profile matching.
 
 \strong{Cardinality matching} finds the largest matched set that satisfies the
 balance constraints between treatment groups, with the additional constraint
@@ -113,36 +116,35 @@ retaining the ATT is desired. To request cardinality matching,
 \code{ratio} should be set to a positive integer. 1:1 cardinality matching
 is the default method when no arguments are specified.
 
-\strong{Template matching} finds the largest matched set that satisfies balance
+\strong{Profile matching} finds the largest matched set that satisfies balance
 constraints between each treatment group and a specified target sample. When
 \code{estimand = "ATT"}, it will find the largest subset of the control
 units that satisfies the balance constraints with respect to the treated
 group, which is left intact. When \code{estimand = "ATE"}, it will find the
 largest subsets of the treated group and of the control group that are
-balanced to the overall sample. To request template matching for the ATT,
+balanced to the overall sample. To request profile matching for the ATT,
 \code{estimand} should be set to \code{"ATT"} and \code{ratio} to \code{NA}.
-To request template matching for the ATE, \code{estimand} should be set to
+To request profile matching for the ATE, \code{estimand} should be set to
 \code{"ATE"} and \code{ratio} can be set either to \code{NA} to maximize the
 size of each sample independently or to a positive integer to ensure that
 the ratio of matched control units to matched treated treats is fixed,
-mimicking k:1 matching. Unlike cardinality matching, template matching
+mimicking k:1 matching. Unlike cardinality matching, profile matching
 retains the requested estimand if a solution is found.
 
 Neither method involves creating pairs in the matched set, but it is
 possible to perform an additional round of pairing within the matched sample
-after cardinality matching or template matching for the ATE with a fixed
-sample size ratio. See Examples for an example of optimal pair matching
-after cardinality matching. The balance will not change, but additional
+after cardinality matching or profile matching for the ATE with a fixed whole number
+sample size ratio by supplying the desired pairing variables to \code{mahvars}. Doing so will trigger \link[=method_optimal]{optimal matching} using \code{optmatch::pairmatch()} on the Mahalanobis distance computed using the variables supplied to \code{mahvars}. The balance or composition of the matched sample will not change, but additional
 precision and robustness can be gained by forming the pairs.
 
 The weights are scaled so that the sum of the weights in each group is equal
 to the number of matched units in the smaller group when cardinality
-matching or template matching for the ATE, and scaled so that the sum of the
+matching or profile matching for the ATE, and scaled so that the sum of the
 weights in the control group is equal to the number of treated units when
-template matching for the ATT. When the sample sizes of the matched groups
+profile matching for the ATT. When the sample sizes of the matched groups
 is the same (i.e., when \code{ratio = 1}), no scaling is done. Robust
 standard errors should be used in effect estimation after cardinality or
-template matching (and cluster-robust standard errors if additional pairing
+profile matching (and cluster-robust standard errors if additional pairing
 is done in the matched sample). See \code{vignette("estimating-effects")}
 for more information.
 }
@@ -201,7 +203,7 @@ solvers cannot.
 
 
 Most outputs described in \code{\link[=matchit]{matchit()}} are returned with
-\code{method = "cardinality"}. The \code{match.matrix} and \code{subclass}
+\code{method = "cardinality"}. Unless \code{mahvars} is specified, the \code{match.matrix} and \code{subclass}
 components are omitted because no pairing or subclassification is done. When
 \code{include.obj = TRUE} in the call to \code{matchit()}, the output of the
 optimization function will be included in the output. When \code{exact} is
@@ -225,7 +227,7 @@ m.out1 <- matchit(treat ~ age + educ + re74,
 m.out1
 summary(m.out1)
 
-# Template matching for the ATT
+# Profile matching for the ATT
 m.out2 <- matchit(treat ~ age + educ + re74,
                   data = lalonde, method = "cardinality",
                   estimand = "ATT", ratio = NA,
@@ -233,23 +235,25 @@ m.out2 <- matchit(treat ~ age + educ + re74,
 m.out2
 summary(m.out2, un = FALSE)
 
-# Template matching for the ATE
+# Profile matching for the ATE
 m.out3 <- matchit(treat ~ age + educ + re74,
                   data = lalonde, method = "cardinality",
                   estimand = "ATE", ratio = NA,
                   tols = .15, solver = solver)
 m.out3
 summary(m.out3, un = FALSE)
-
+\dontshow{\}) # examplesIf}
+\dontshow{if ((requireNamespace("Rglpk", quietly = TRUE) && requireNamespace("optmatch", quietly = TRUE))) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
 # Pairing after 1:1 cardinality matching:
-m.out4 <- matchit(treat ~ age + educ + re74,
-                  data = lalonde, method = "nearest",
-                  distance = "mahalanobis",
-                  discard = m.out1$weights == 0)
+m.out1b <- matchit(treat ~ age + educ + re74,
+                   data = lalonde, method = "cardinality",
+                   estimand = "ATT", ratio = 1,
+                   tols = .15, solver = solver,
+                   mahvars = ~ age + educ + re74)
 
 # Note that balance doesn't change but pair distances
 # are lower for the paired-upon variables
-summary(m.out4, un = FALSE)
+summary(m.out1b, un = FALSE)
 summary(m.out1, un = FALSE)
 
 # In these examples, a high tol was used and
@@ -272,7 +276,7 @@ matching.
 \code{\link[=matchit]{matchit()}} for a detailed explanation of the inputs and outputs of
 a call to \code{matchit()}.
 
-\emph{\CRANpkg{designmatch}}, which performs cardinality and template matching with many more options and
+\emph{\CRANpkg{designmatch}}, which performs cardinality and profile matching with many more options and
 more flexibility. The implementations of cardinality matching differ between
 \emph{MatchIt} and \emph{designmatch}, so their results might differ.
 

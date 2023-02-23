@@ -98,22 +98,17 @@ fit1 <- lm(Y_C ~ A * (X1 + X2 + X3 + X4 + X5 +
            data = md, weights = weights)
 
 ## ---- eval=me_ok--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-comp1 <- comparisons(fit1,
-                     variables = "A",
-                     vcov = ~subclass,
-                     newdata = subset(md, A == 1),
-                     wts = "weights")
-summary(comp1)
+avg_comparisons(fit1, variables = "A",
+                vcov = ~subclass,
+                newdata = subset(md, A == 1),
+                wts = "weights")
 
-## ---- eval=me_ok--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-pred1 <- predictions(fit1,
-                     variables = "A",
-                     vcov = ~subclass,
-                     newdata = subset(md, A == 1),
-                     wts = "weights",
-                     by = "A")
-
-summary(pred1)
+## ---- eval=me_ok && packageVersion("marginaleffects") > "0.10.0"--------------------------------------------------------------------------------------------------------------------------------------
+#  avg_predictions(fit1, variables = "A",
+#                  vcov = ~subclass,
+#                  newdata = subset(md, A == 1),
+#                  wts = "weights",
+#                  by = "A")
 
 ## ---- eval=me_ok--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 #Subclassification on the PS for the ATT
@@ -128,11 +123,10 @@ fitS <- lm(Y_C ~ subclass * (A * (X1 + X2 + X3 + X4 + X5 +
                                     X6 + X7 + X8 + X9)),
            data = md)
 
-compS <- comparisons(fitS,
-                     variables = "A",
-                     vcov = "HC3",
-                     newdata = subset(md, A == 1))
-summary(compS)
+avg_comparisons(fitS,
+                variables = "A",
+                vcov = "HC3",
+                newdata = subset(md, A == 1))
 
 ## ---- eval=me_ok--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 #Logistic regression model with covariates
@@ -141,19 +135,14 @@ fit2 <- glm(Y_B ~ A * (X1 + X2 + X3 + X4 + X5 +
             data = md, weights = weights,
             family = quasibinomial())
 
-#Compute effects
-comp2 <- comparisons(fit2,
-                     variables = "A",
-                     vcov = ~subclass,
-                     newdata = subset(md, A == 1),
-                     wts = "weights",
-                     transform_pre = "lnratioavg")
-
-#Log RR, standard error, and Z value
-summary(comp2)
-
-#RR and confidence interval
-summary(comp2, transform_avg = exp)
+#Compute effects; RR and confidence interval
+avg_comparisons(fit2,
+                variables = "A",
+                vcov = ~subclass,
+                newdata = subset(md, A == 1),
+                wts = "weights",
+                transform_pre = "lnratioavg",
+                transform_post = "exp")
 
 ## ---- eval=su_ok--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 library("survival")
@@ -311,21 +300,19 @@ mdP <- match.data(mP)
 fitP <- lm(Y_C ~ A * X5, data = mdP, weights = weights)
 
 ## ---- eval=me_ok--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-comp <- comparisons(fitP, variables = "A",
-                    vcov = ~subclass,
-                    newdata = subset(md, A == 1),
-                    wts = "weights",
-                    by = "X5")
-summary(comp)
+avg_comparisons(fitP, variables = "A",
+                vcov = ~subclass,
+                newdata = subset(md, A == 1),
+                wts = "weights",
+                by = "X5")
 
 ## ---- eval=me_ok--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-comp <- comparisons(fitP, variables = "A",
-                    vcov = ~subclass,
-                    newdata = subset(md, A == 1),
-                    wts = "weights",
-                    by = "X5",
-                    hypothesis = "pairwise")
-summary(comp)
+avg_comparisons(fitP, variables = "A",
+                vcov = ~subclass,
+                newdata = subset(md, A == 1),
+                wts = "weights",
+                by = "X5",
+                hypothesis = "pairwise")
 
 ## ---- eval = FALSE------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 #  #Generating data similar to Austin (2009) for demonstrating treatment effect estimation

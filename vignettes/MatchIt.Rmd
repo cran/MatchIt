@@ -137,13 +137,13 @@ At the top is a summary of covariate balance after matching. Although balance ha
 
 Next is a table of the sample sizes before and after matching. The matching procedure left 244 control units unmatched. Ideally, unmatched units would be those far from the treated units and would require greater extrapolation were they to have been retained. We can visualize the distribution of propensity scores of those who were matched using `plot()` with `type = "jitter"`:
 
-```{r}
+```{r, fig.alt="Jitter plot of the propensity scores, which shows that no treated unit were dropped, and a large number of control units with low propensity scores were dropped."}
 plot(m.out1, type = "jitter", interactive = FALSE)
 ```
 
 We can visually examine balance on the covariates using `plot()` with `type = "density"`:
 
-```{r}
+```{r, fig.alt="Density plots of age, married and re75 in the unmatched and matched samples."}
 plot(m.out1, type = "density", interactive = FALSE,
      which.xs = ~age + married + re75)
 ```
@@ -178,7 +178,7 @@ summary(m.out2, un = FALSE)
 
 Balance is far better, as determined by the lower standardized mean differences and eCDF statistics. The balance should be reported when publishing the results of a matching analysis. This can be done either in a table, using the values resulting from `summary()`, or in a plot, such as a Love plot, which we can make by calling `plot()` on the `summary()` output:
 
-```{r, eval = (use != "none")}
+```{r, eval = (use != "none"), fig.alt = "A love plot with matched dots below the threshold lines, indicaitng good balance after matching, in contrast to the unmatched dots far from the treshold lines, indicating poor balance before matching."}
 plot(summary(m.out2))
 ```
 
@@ -198,7 +198,7 @@ m.data <- match.data(m.out2)
 head(m.data)
 ```
 
-We can then model the outcome in this dataset using the standard regression functions in R, like `lm()` or `glm()`, being sure to include the matching weights (stored in the `weights` variable of the `match.data()` output) in the estimation[^3]. Finally, we use `marginaleffects::comparisons()` to perform g-computation to estimate the ATT. We recommend using cluster-robust standard errors for most analyses, with pair membership as the clustering variable; `comparisons()` makes this straightforward.
+We can then model the outcome in this dataset using the standard regression functions in R, like `lm()` or `glm()`, being sure to include the matching weights (stored in the `weights` variable of the `match.data()` output) in the estimation[^3]. Finally, we use `marginaleffects::avg_comparisons()` to perform g-computation to estimate the ATT. We recommend using cluster-robust standard errors for most analyses, with pair membership as the clustering variable; `avg_comparisons()` makes this straightforward.
 
 [^3]: With 1:1 nearest neighbor matching without replacement, excluding the matching weights does not change the estimates. For all other forms of matching, they are required, so we recommend always including them for consistency.
 
@@ -208,16 +208,21 @@ library("marginaleffects")
 fit <- lm(re78 ~ treat * (age + educ + race + married + nodegree + 
              re74 + re75), data = m.data, weights = weights)
 
-comp <- comparisons(fit,
-                     variables = "treat",
-                     vcov = ~subclass,
-                     newdata = subset(m.data, treat == 1),
-                     wts = "weights")
-summary(comp)
+avg_comparisons(fit,
+                variables = "treat",
+                vcov = ~subclass,
+                newdata = subset(m.data, treat == 1),
+                wts = "weights")
 ```
 ```{r, include = FALSE}
 est <- {
-  if (use != "none" && me_ok) summary(comp)
+  if (use != "none" && me_ok) {
+    avg_comparisons(fit,
+                variables = "treat",
+                vcov = ~subclass,
+                newdata = subset(m.data, treat == 1),
+                wts = "weights")
+  }
   else data.frame(type = "response", term = "1 - 0", estimate = 2114, 
                   std.error = 646, statistic = 3.27, 
                   p.value = 0.0011, conf.low = 848, 

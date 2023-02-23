@@ -87,12 +87,11 @@ fit <- lm(Y_C ~ A * (X1 + X2 + X3 + X4 + X5 +
           weights = weights)
 
 library("marginaleffects")
-comp <- comparisons(fit,
-                     variables = "A",
-                     vcov = ~subclass,
-                     newdata = subset(md_F_s, A == 1),
-                     wts = "weights")
-summary(comp)
+avg_comparisons(fit,
+                variables = "A",
+                vcov = ~subclass,
+                newdata = subset(md_F_s, A == 1),
+                wts = "weights")
 
 ## ---- include=FALSE, eval=TRUE------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 knitr::opts_chunk$set(eval = TRUE)

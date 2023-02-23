@@ -12,7 +12,7 @@
 
 <meta name="author" content="Noah Greifer" />
 
-<meta name="date" content="2022-11-15" />
+<meta name="date" content="2023-02-22" />
 
 <title>Estimating Effects After Matching</title>
 
@@ -362,7 +362,7 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 
 <h1 class="title toc-ignore">Estimating Effects After Matching</h1>
 <h4 class="author">Noah Greifer</h4>
-<h4 class="date">2022-11-15</h4>
+<h4 class="date">2023-02-22</h4>
 
 
 <div id="TOC">
@@ -753,9 +753,9 @@ estimating the effect in the matched dataset is straightforward and
 involves fitting a model for the outcome that incorporates the matching
 weights<a href="#fn3" class="footnote-ref" id="fnref3"><sup>3</sup></a>,
 then estimating the treatment effect using g-computation (i.e., using
-<code>marginaleffects::comparisons()</code>) with a cluster-robust SE to
-account for pair membership. This procedure is the same for continuous
-and binary outcomes with and without covariates.</p>
+<code>marginaleffects::avg_comparisons()</code>) with a cluster-robust
+SE to account for pair membership. This procedure is the same for
+continuous and binary outcomes with and without covariates.</p>
 <p>There are a few adjustments that need to be made for certain
 scenarios, which we describe in the section “Adjustments to the Standard
 Case”. These adjustments include for the following cases: when matching
@@ -790,12 +790,12 @@ matching method.</p>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(md)</span></code></pre></div>
 <pre><code>##   A      X1      X2      X3       X4 X5      X6      X7      X8       X9      Y_C Y_B     Y_S distance weights subclass
-## 1 0  0.1725 -1.4283 -0.4103 -2.36059  1 -1.1199  0.6398 -0.4840 -0.59385  0.07104   0  278.46  0.08461 0.23568       55
-## 2 0 -1.0959  0.8463  0.2456 -0.12333  1 -2.2687 -1.4491 -0.5514 -0.31439  0.15619   0  330.63  0.01855 0.04714      140
-## 3 0  0.1768  0.7905 -0.8436  0.82366  1 -0.2221  0.2971 -0.6966 -0.69516 -0.85180   1  369.94  0.22210 0.58919       96
-## 4 0 -0.4595  0.1726  1.9542 -0.62661  1 -0.4019 -0.8294 -0.5384  0.20729 -2.35184   0   91.06  0.04180 0.16834      135
-## 5 1  0.3563 -1.8121  0.8135 -0.67189  1 -0.8297  1.7297 -0.6439 -0.02648  0.68058   0  182.73  0.43291 1.00000      203
-## 6 0 -2.4313 -1.7984 -1.2940  0.04609  1 -1.2419 -1.1252 -1.8659 -0.56513 -5.62260   0 2563.73  0.04998 0.08221      168</code></pre>
+## 1 0  0.1725 -1.4283 -0.4103 -2.36059  1 -1.1199  0.6398 -0.4840 -0.59385  0.07104   0  278.46  0.08461 0.35351      222
+## 2 0 -1.0959  0.8463  0.2456 -0.12333  1 -2.2687 -1.4491 -0.5514 -0.31439  0.15619   0  330.63  0.01855 0.04652      112
+## 3 0  0.1768  0.7905 -0.8436  0.82366  1 -0.2221  0.2971 -0.6966 -0.69516 -0.85180   1  369.94  0.22210 0.88379      276
+## 4 0 -0.4595  0.1726  1.9542 -0.62661  1 -0.4019 -0.8294 -0.5384  0.20729 -2.35184   0   91.06  0.04180 0.18606      291
+## 5 1  0.3563 -1.8121  0.8135 -0.67189  1 -0.8297  1.7297 -0.6439 -0.02648  0.68058   0  182.73  0.43291 1.00000       81
+## 6 0 -2.4313 -1.7984 -1.2940  0.04609  1 -1.2419 -1.1252 -1.8659 -0.56513 -5.62260   0 2563.73  0.04998 0.08417      323</code></pre>
 <p>Typically one would assess balance and ensure that this matching
 specification works, but we will skip that step here to focus on effect
 estimation. See <code>vignette(&quot;MatchIt&quot;)</code> and
@@ -820,19 +820,18 @@ example.</p>
 <span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>           <span class="at">data =</span> md, <span class="at">weights =</span> weights)</span></code></pre></div>
 <p>Next, we use <code>marginaleffects::comparisons()</code> to estimate
 the ATT.</p>
-<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>comp1 <span class="ot">&lt;-</span> <span class="fu">comparisons</span>(fit1,</span>
-<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>                     <span class="at">variables =</span> <span class="st">&quot;A&quot;</span>,</span>
-<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>                     <span class="at">vcov =</span> <span class="sc">~</span>subclass,</span>
-<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>                     <span class="at">newdata =</span> <span class="fu">subset</span>(md, A <span class="sc">==</span> <span class="dv">1</span>),</span>
-<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>                     <span class="at">wts =</span> <span class="st">&quot;weights&quot;</span>)</span>
-<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(comp1)</span></code></pre></div>
-<pre><code>##   Term Contrast Effect Std. Error z value Pr(&gt;|z|) 2.5 % 97.5 %
-## 1    A    1 - 0   1.74      0.494    3.52  0.00044 0.768    2.7
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="fu">avg_comparisons</span>(fit1, <span class="at">variables =</span> <span class="st">&quot;A&quot;</span>,</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>                <span class="at">vcov =</span> <span class="sc">~</span>subclass,</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>                <span class="at">newdata =</span> <span class="fu">subset</span>(md, A <span class="sc">==</span> <span class="dv">1</span>),</span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>                <span class="at">wts =</span> <span class="st">&quot;weights&quot;</span>)</span></code></pre></div>
+<pre><code>## 
+##  Term Contrast Estimate Std. Error    z Pr(&gt;|z|) 2.5 % 97.5 %
+##     A    1 - 0     1.71      0.496 3.44  0.00057 0.735   2.68
 ## 
-## Model type:  lm 
-## Prediction type:  response</code></pre>
-<p>Let’s break down the call to <code>comparisons()</code>: to the first
-argument, we supply the model fit, <code>fit</code>; to the
+## Prediction type:  response 
+## Columns: type, term, contrast, estimate, std.error, statistic, p.value, conf.low, conf.high</code></pre>
+<p>Let’s break down the call to <code>avg_comparisons()</code>: to the
+first argument, we supply the model fit, <code>fit</code>; to the
 <code>variables</code> argument, the name of the treatment
 (<code>&quot;A&quot;</code>); to the <code>vcov</code> argument, a formula with
 subclass membership (<code>~subclass</code>) to request cluster-robust
@@ -846,47 +845,44 @@ on the specifics of the matching method and outcome type; see the
 sections below for information.</p>
 <p>If, in addition to the effect estimate, we want the average estimated
 potential outcomes, we can use
-<code>marginaleffects::predictions()</code>, which we demonstrate below.
-Note the interpretation of the resulting estimates as the expected
-potential outcomes is only valid if all covariates present in the
-outcome model (if any) are interacted with the treatment.</p>
-<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>pred1 <span class="ot">&lt;-</span> <span class="fu">predictions</span>(fit1,</span>
-<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>                     <span class="at">variables =</span> <span class="st">&quot;A&quot;</span>,</span>
-<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>                     <span class="at">vcov =</span> <span class="sc">~</span>subclass,</span>
-<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>                     <span class="at">newdata =</span> <span class="fu">subset</span>(md, A <span class="sc">==</span> <span class="dv">1</span>),</span>
-<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>                     <span class="at">wts =</span> <span class="st">&quot;weights&quot;</span>,</span>
-<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>                     <span class="at">by =</span> <span class="st">&quot;A&quot;</span>)</span>
-<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(pred1)</span></code></pre></div>
-<pre><code>##   A Predicted Std. Error z value Pr(&gt;|z|) CI low CI high
-## 1 0      2.16      0.371    5.82    6e-09   1.43    2.89
-## 2 1      3.89      0.233   16.72   &lt;2e-16   3.44    4.35
-## 
-## Model type:  lm 
-## Prediction type:  response</code></pre>
+<code>marginaleffects::avg_predictions()</code>, which we demonstrate
+below. Note the interpretation of the resulting estimates as the
+expected potential outcomes is only valid if all covariates present in
+the outcome model (if any) are interacted with the treatment.</p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="fu">avg_predictions</span>(fit1, <span class="at">variables =</span> <span class="st">&quot;A&quot;</span>,</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>                <span class="at">vcov =</span> <span class="sc">~</span>subclass,</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>                <span class="at">newdata =</span> <span class="fu">subset</span>(md, A <span class="sc">==</span> <span class="dv">1</span>),</span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>                <span class="at">wts =</span> <span class="st">&quot;weights&quot;</span>,</span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>                <span class="at">by =</span> <span class="st">&quot;A&quot;</span>)</span></code></pre></div>
 <p>We can see that the difference in potential outcome means is equal to
 the average treatment effect computed previously<a href="#fn4" class="footnote-ref" id="fnref4"><sup>4</sup></a>. Almost all of the
-arguments to <code>predictions()</code> are the same as those to
-<code>comparisons()</code>; the only difference is that the
-<code>by</code> argument needs to be specified naming the treatment.</p>
+arguments to <code>avg_predictions()</code> are the same as those to
+<code>avg_comparisons()</code>; the only difference is that the
+<code>by</code> argument needs to be specified naming the treatment.
+(Note: due to a bug, the above code will not evaluate unless
+<code>marginaleffects</code> is a version greater than 0.10.0.)</p>
 </div>
 <div id="adjustments-to-the-standard-case" class="section level3">
 <h3>Adjustments to the Standard Case</h3>
 <p>This section explains how the procedure might differ if any of the
 following special circumstances occur.</p>
-<p><strong>Matching for the ATE.</strong> When matching for the ATE
-(including [coarsened] exact matching, full matching, subclassification,
-and cardinality matching), everything is identical to the Standard Case
-except that in the calls to <code>comparisons()</code> and
-<code>predictions()</code>, the <code>newdata</code> argument is omitted
-(or can be replaced with <code>newdata = md</code>). This is because the
-estimated potential outcomes are computed for the full matched sample
-rather than just the treated units.</p>
-<p><strong>Matching with replacement.</strong> When matching with
-replacement (i.e., nearest neighbor or genetic matching with
-<code>replace = TRUE</code>), effect and SE estimation need to account
-for control unit multiplicity (i.e., repeated use) and within-pair
-correlations <span class="citation">(<a href="#ref-hill2006" role="doc-biblioref">Hill and Reiter 2006</a>; <a href="#ref-austin2020a" role="doc-biblioref">Austin and Cafri
+<div id="matching-for-the-ate" class="section level4">
+<h4>Matching for the ATE</h4>
+<p>When matching for the ATE (including [coarsened] exact matching, full
+matching, subclassification, and cardinality matching), everything is
+identical to the Standard Case except that in the calls to
+<code>avg_comparisons()</code> and <code>avg_predictions()</code>, the
+<code>newdata</code> argument is omitted (or can be replaced with
+<code>newdata = md</code>). This is because the estimated potential
+outcomes are computed for the full matched sample rather than just the
+treated units.</p>
+</div>
+<div id="matching-with-replacement" class="section level4">
+<h4>Matching with replacement</h4>
+<p>When matching with replacement (i.e., nearest neighbor or genetic
+matching with <code>replace = TRUE</code>), effect and SE estimation
+need to account for control unit multiplicity (i.e., repeated use) and
+within-pair correlations <span class="citation">(<a href="#ref-hill2006" role="doc-biblioref">Hill and Reiter 2006</a>; <a href="#ref-austin2020a" role="doc-biblioref">Austin and Cafri
 2020</a>)</span>. Although <span class="citation">Abadie and Imbens (<a href="#ref-abadie2008" role="doc-biblioref">2008</a>)</span>
 demonstrated analytically that bootstrap SEs may be invalid for matching
 with replacement, simulation work by <span class="citation">Hill and
@@ -911,145 +907,145 @@ with <code>get_matches()</code>, which produces a dataset with a row per
 unit per pair, meaning control units matched to multiple treated units
 will appear multiple times in the dataset; 2) set
 <code>vcov = ~subclass + id</code> in the calls to
-<code>comparisons()</code> and <code>predictions()</code>. For survival
-outcomes, a special procedure must be used; see the section on survival
-outcomes below.</p>
-<p><strong>Matching without pairing.</strong> Some matching methods do
-not involve creating pairs; these include cardinality and template
-matching, exact matching, and coarsened exact matching with
+<code>avg_comparisons()</code> and <code>avg_predictions()</code>. For
+survival outcomes, a special procedure must be used; see the section on
+survival outcomes below.</p>
+</div>
+<div id="matching-without-pairing" class="section level4">
+<h4>Matching without pairing</h4>
+<p>Some matching methods do not involve creating pairs; these include
+cardinality and template matching with <code>mahvars = NULL</code> (the
+default), exact matching, and coarsened exact matching with
 <code>k2k = FALSE</code> (the default). The only change that needs to be
 made to the Standard Case is that one should change
 <code>vcov = ~subclass</code> to <code>vcov = &quot;HC3&quot;</code> in the calls
-to <code>comparisons()</code> and <code>predictions()</code> to use
-robust SEs instead of cluster-robust SEs. Remember that if matching is
-done for the ATE (even if units are dropped), the <code>newdata</code>
-argument should be dropped.</p>
-<p><strong>Propensity score subclassification.</strong> There are two
-natural ways to estimate marginal effects after subclassification: the
-first is to estimate subclass-specific treatment effects and pool them
-using an average marginal effects procedure, and the second is to use
-the stratum weights to estimate a single average marginal effect. This
-latter approach is also known as marginal mean weighting through
-stratification (MMWS), and is described in detail by <span class="citation">Hong (<a href="#ref-hong2010" role="doc-biblioref">2010</a>)</span><a href="#fn5" class="footnote-ref" id="fnref5"><sup>5</sup></a>. When done properly, both methods should
+to <code>avg_comparisons()</code> and <code>avg_predictions()</code> to
+use robust SEs instead of cluster-robust SEs. Remember that if matching
+is done for the ATE (even if units are dropped), the
+<code>newdata</code> argument should be dropped.</p>
+</div>
+<div id="propensity-score-subclassification" class="section level4">
+<h4>Propensity score subclassification</h4>
+<p>There are two natural ways to estimate marginal effects after
+subclassification: the first is to estimate subclass-specific treatment
+effects and pool them using an average marginal effects procedure, and
+the second is to use the stratum weights to estimate a single average
+marginal effect. This latter approach is also known as marginal mean
+weighting through stratification (MMWS), and is described in detail by
+<span class="citation">Hong (<a href="#ref-hong2010" role="doc-biblioref">2010</a>)</span><a href="#fn5" class="footnote-ref" id="fnref5"><sup>5</sup></a>. When done properly, both methods should
 yield similar or identical estimates of the treatment effect.</p>
 <p>All of the methods described above for the Standard Case also work
 with MMWS because the formation of the weights is the same; the only
 difference is that it is not appropriate to use cluster-robust SEs with
 MMWS because of how few clusters are present, so one should change
 <code>vcov = ~subclass</code> to <code>vcov = &quot;HC3&quot;</code> in the calls
-to <code>comparisons()</code> and <code>predictions()</code> to use
-robust SEs instead of cluster-robust SEs. The subclasses can optionally
-be included in the outcome model (optionally interacting with treatment)
-as an alternative to including the propensity score.</p>
+to <code>avg_comparisons()</code> and <code>avg_predictions()</code> to
+use robust SEs instead of cluster-robust SEs. The subclasses can
+optionally be included in the outcome model (optionally interacting with
+treatment) as an alternative to including the propensity score.</p>
 <p>The subclass-specific approach omits the weights and uses the
 subclasses directly. It is only appropriate when there are a small
 number of subclasses relative to the sample size. In the outcome model,
 <code>subclass</code> should interact with all other predictors in the
 model (including the treatment, covariates, and interactions, if any),
 and the <code>weights</code> argument should be omitted. In the calls to
-<code>comparisons()</code> and <code>predictions()</code>, the
+<code>avg_comparisons()</code> and <code>avg_predictions()</code>, the
 <code>wts</code> argument should be omitted. As with MMWS, one should
 change <code>vcov = ~subclass</code> to <code>vcov = &quot;HC3&quot;</code> in the
-calls to <code>comparisons()</code> and <code>predictions()</code>. See
-an example below:</p>
-<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Subclassification on the PS for the ATT</span></span>
-<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>mS <span class="ot">&lt;-</span> <span class="fu">matchit</span>(A <span class="sc">~</span> X1 <span class="sc">+</span> X2 <span class="sc">+</span> X3 <span class="sc">+</span> X4 <span class="sc">+</span> X5 <span class="sc">+</span> </span>
-<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>                 X6 <span class="sc">+</span> X7 <span class="sc">+</span> X8 <span class="sc">+</span> X9, <span class="at">data =</span> d,</span>
-<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>               <span class="at">method =</span> <span class="st">&quot;subclass&quot;</span>, <span class="at">estimand =</span> <span class="st">&quot;ATT&quot;</span>)</span>
-<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a><span class="co">#Extract matched data</span></span>
-<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>md <span class="ot">&lt;-</span> <span class="fu">match.data</span>(mS)</span>
-<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a>fitS <span class="ot">&lt;-</span> <span class="fu">lm</span>(Y_C <span class="sc">~</span> subclass <span class="sc">*</span> (A <span class="sc">*</span> (X1 <span class="sc">+</span> X2 <span class="sc">+</span> X3 <span class="sc">+</span> X4 <span class="sc">+</span> X5 <span class="sc">+</span> </span>
-<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a>                                    X6 <span class="sc">+</span> X7 <span class="sc">+</span> X8 <span class="sc">+</span> X9)),</span>
-<span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a>           <span class="at">data =</span> md)</span>
-<span id="cb14-12"><a href="#cb14-12" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-13"><a href="#cb14-13" aria-hidden="true" tabindex="-1"></a>compS <span class="ot">&lt;-</span> <span class="fu">comparisons</span>(fitS,</span>
-<span id="cb14-14"><a href="#cb14-14" aria-hidden="true" tabindex="-1"></a>                     <span class="at">variables =</span> <span class="st">&quot;A&quot;</span>,</span>
-<span id="cb14-15"><a href="#cb14-15" aria-hidden="true" tabindex="-1"></a>                     <span class="at">vcov =</span> <span class="st">&quot;HC3&quot;</span>,</span>
-<span id="cb14-16"><a href="#cb14-16" aria-hidden="true" tabindex="-1"></a>                     <span class="at">newdata =</span> <span class="fu">subset</span>(md, A <span class="sc">==</span> <span class="dv">1</span>))</span>
-<span id="cb14-17"><a href="#cb14-17" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(compS)</span></code></pre></div>
-<pre><code>##   Term Contrast Effect Std. Error z value Pr(&gt;|z|) 2.5 % 97.5 %
-## 1    A    1 - 0   1.65      0.364    4.54  5.6e-06  0.94   2.37
+calls to <code>avg_comparisons()</code> and
+<code>avg_predictions()</code>. See an example below:</p>
+<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Subclassification on the PS for the ATT</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>mS <span class="ot">&lt;-</span> <span class="fu">matchit</span>(A <span class="sc">~</span> X1 <span class="sc">+</span> X2 <span class="sc">+</span> X3 <span class="sc">+</span> X4 <span class="sc">+</span> X5 <span class="sc">+</span> </span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>                 X6 <span class="sc">+</span> X7 <span class="sc">+</span> X8 <span class="sc">+</span> X9, <span class="at">data =</span> d,</span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>               <span class="at">method =</span> <span class="st">&quot;subclass&quot;</span>, <span class="at">estimand =</span> <span class="st">&quot;ATT&quot;</span>)</span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a><span class="co">#Extract matched data</span></span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>md <span class="ot">&lt;-</span> <span class="fu">match.data</span>(mS)</span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a>fitS <span class="ot">&lt;-</span> <span class="fu">lm</span>(Y_C <span class="sc">~</span> subclass <span class="sc">*</span> (A <span class="sc">*</span> (X1 <span class="sc">+</span> X2 <span class="sc">+</span> X3 <span class="sc">+</span> X4 <span class="sc">+</span> X5 <span class="sc">+</span> </span>
+<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a>                                    X6 <span class="sc">+</span> X7 <span class="sc">+</span> X8 <span class="sc">+</span> X9)),</span>
+<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a>           <span class="at">data =</span> md)</span>
+<span id="cb13-12"><a href="#cb13-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-13"><a href="#cb13-13" aria-hidden="true" tabindex="-1"></a><span class="fu">avg_comparisons</span>(fitS,</span>
+<span id="cb13-14"><a href="#cb13-14" aria-hidden="true" tabindex="-1"></a>                <span class="at">variables =</span> <span class="st">&quot;A&quot;</span>,</span>
+<span id="cb13-15"><a href="#cb13-15" aria-hidden="true" tabindex="-1"></a>                <span class="at">vcov =</span> <span class="st">&quot;HC3&quot;</span>,</span>
+<span id="cb13-16"><a href="#cb13-16" aria-hidden="true" tabindex="-1"></a>                <span class="at">newdata =</span> <span class="fu">subset</span>(md, A <span class="sc">==</span> <span class="dv">1</span>))</span></code></pre></div>
+<pre><code>## 
+##  Term Contrast Estimate Std. Error    z Pr(&gt;|z|) 2.5 % 97.5 %
+##     A    1 - 0     1.65      0.364 4.54  5.6e-06  0.94   2.37
 ## 
-## Model type:  lm 
-## Prediction type:  response</code></pre>
+## Prediction type:  response 
+## Columns: type, term, contrast, estimate, std.error, statistic, p.value, conf.low, conf.high</code></pre>
 <p>A model with fewer terms may be required when subclasses are small;
 removing covariates or their interactions with treatment may be required
 and can increase precision in smaller datasets. Remember that if
 subclassification is done for the ATE (even if units are dropped), the
 <code>newdata</code> argument should be dropped.</p>
-<p><strong>Binary outcomes.</strong> Estimating effects on binary
-outcomes is essentially the same as for continuous outcomes. The main
-difference is that there are several measures of the effect one can
-consider, which include the odds ratio (OR), risk ratio/relative risk
-(RR), and risk difference (RD), and the syntax to
-<code>comparisons()</code> depends on which one is desired. The outcome
-model should be one appropriate for binary outcomes (e.g., logistic
-regression) but is unrelated to the desired effect measure because we
-can compute any of the above effect measures using
-<code>comparisons()</code> after the logistic regression.</p>
+</div>
+<div id="binary-outcomes" class="section level4">
+<h4>Binary outcomes</h4>
+<p>Estimating effects on binary outcomes is essentially the same as for
+continuous outcomes. The main difference is that there are several
+measures of the effect one can consider, which include the odds ratio
+(OR), risk ratio/relative risk (RR), and risk difference (RD), and the
+syntax to <code>avg_comparisons()</code> depends on which one is
+desired. The outcome model should be one appropriate for binary outcomes
+(e.g., logistic regression) but is unrelated to the desired effect
+measure because we can compute any of the above effect measures using
+<code>avg_comparisons()</code> after the logistic regression.</p>
 <p>To fit a logistic regression model, change <code>lm()</code> to
 <code>glm()</code> and set <code>family = quasibinomial()</code><a href="#fn6" class="footnote-ref" id="fnref6"><sup>6</sup></a>. To
 compute the marginal RD, we can use exactly the same syntax as in the
 Standard Case; nothing needs to change<a href="#fn7" class="footnote-ref" id="fnref7"><sup>7</sup></a>.</p>
 <p>To compute the marginal RR, we need to add
-<code>transform_pre = &quot;lnratioavg&quot;</code> to <code>comparisons()</code>;
-this computes the marginal log RR. To get the marginal RR, we need to
-add <code>transform_avg = exp</code> to <code>summary()</code>, which
-exponentiates the marginal log RR. It is important that inference (i.e.,
-computing SEs and p-values) be done using the marginal log RR, but we
-typically want to interpret our effects and confidence intervals using
-the marginal RR. The code below computes the effects and displays the
-statistics of interest:</p>
-<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Logistic regression model with covariates</span></span>
-<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>fit2 <span class="ot">&lt;-</span> <span class="fu">glm</span>(Y_B <span class="sc">~</span> A <span class="sc">*</span> (X1 <span class="sc">+</span> X2 <span class="sc">+</span> X3 <span class="sc">+</span> X4 <span class="sc">+</span> X5 <span class="sc">+</span> </span>
-<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>                        X6 <span class="sc">+</span> X7 <span class="sc">+</span> X8 <span class="sc">+</span> X9),</span>
-<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>            <span class="at">data =</span> md, <span class="at">weights =</span> weights,</span>
-<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>            <span class="at">family =</span> <span class="fu">quasibinomial</span>())</span>
-<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a><span class="co">#Compute effects</span></span>
-<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a>comp2 <span class="ot">&lt;-</span> <span class="fu">comparisons</span>(fit2,</span>
-<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a>                     <span class="at">variables =</span> <span class="st">&quot;A&quot;</span>,</span>
-<span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a>                     <span class="at">vcov =</span> <span class="sc">~</span>subclass,</span>
-<span id="cb16-11"><a href="#cb16-11" aria-hidden="true" tabindex="-1"></a>                     <span class="at">newdata =</span> <span class="fu">subset</span>(md, A <span class="sc">==</span> <span class="dv">1</span>),</span>
-<span id="cb16-12"><a href="#cb16-12" aria-hidden="true" tabindex="-1"></a>                     <span class="at">wts =</span> <span class="st">&quot;weights&quot;</span>,</span>
-<span id="cb16-13"><a href="#cb16-13" aria-hidden="true" tabindex="-1"></a>                     <span class="at">transform_pre =</span> <span class="st">&quot;lnratioavg&quot;</span>)</span>
-<span id="cb16-14"><a href="#cb16-14" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb16-15"><a href="#cb16-15" aria-hidden="true" tabindex="-1"></a><span class="co">#Log RR, standard error, and Z value</span></span>
-<span id="cb16-16"><a href="#cb16-16" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(comp2)</span></code></pre></div>
-<pre><code>##   Term              Contrast Effect Std. Error z value Pr(&gt;|z|) 2.5 % 97.5 %
-## 1    A ln(mean(1) / mean(0))  0.452     0.0551    8.21   &lt;2e-16 0.344   0.56
+<code>transform_pre = &quot;lnratioavg&quot;</code> to
+<code>avg_comparisons()</code>; this computes the marginal log RR. To
+get the marginal RR, we need to add <code>transform_post = &quot;exp&quot;</code>
+to <code>avg_comparisons()</code>, which exponentiates the marginal log
+RR and its confidence interval. The code below computes the effects and
+displays the statistics of interest:</p>
+<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Logistic regression model with covariates</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>fit2 <span class="ot">&lt;-</span> <span class="fu">glm</span>(Y_B <span class="sc">~</span> A <span class="sc">*</span> (X1 <span class="sc">+</span> X2 <span class="sc">+</span> X3 <span class="sc">+</span> X4 <span class="sc">+</span> X5 <span class="sc">+</span> </span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>                        X6 <span class="sc">+</span> X7 <span class="sc">+</span> X8 <span class="sc">+</span> X9),</span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>            <span class="at">data =</span> md, <span class="at">weights =</span> weights,</span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>            <span class="at">family =</span> <span class="fu">quasibinomial</span>())</span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a><span class="co">#Compute effects; RR and confidence interval</span></span>
+<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a><span class="fu">avg_comparisons</span>(fit2,</span>
+<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a>                <span class="at">variables =</span> <span class="st">&quot;A&quot;</span>,</span>
+<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a>                <span class="at">vcov =</span> <span class="sc">~</span>subclass,</span>
+<span id="cb15-11"><a href="#cb15-11" aria-hidden="true" tabindex="-1"></a>                <span class="at">newdata =</span> <span class="fu">subset</span>(md, A <span class="sc">==</span> <span class="dv">1</span>),</span>
+<span id="cb15-12"><a href="#cb15-12" aria-hidden="true" tabindex="-1"></a>                <span class="at">wts =</span> <span class="st">&quot;weights&quot;</span>,</span>
+<span id="cb15-13"><a href="#cb15-13" aria-hidden="true" tabindex="-1"></a>                <span class="at">transform_pre =</span> <span class="st">&quot;lnratioavg&quot;</span>,</span>
+<span id="cb15-14"><a href="#cb15-14" aria-hidden="true" tabindex="-1"></a>                <span class="at">transform_post =</span> <span class="st">&quot;exp&quot;</span>)</span></code></pre></div>
+<pre><code>## 
+##  Term              Contrast Estimate Pr(&gt;|z|) 2.5 % 97.5 %
+##     A ln(mean(1) / mean(0))     1.57   &lt;2e-16  1.41   1.75
 ## 
-## Model type:  glm 
-## Prediction type:  response</code></pre>
-<div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="co">#RR and confidence interval</span></span>
-<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(comp2, <span class="at">transform_avg =</span> exp)</span></code></pre></div>
-<pre><code>##   Term              Contrast Effect Pr(&gt;|z|) 2.5 % 97.5 %
-## 1    A ln(mean(1) / mean(0))   1.57   &lt;2e-16  1.41   1.75
-## 
-## Model type:  glm 
 ## Prediction type:  response 
-## Average-transformation:</code></pre>
-<p>The first <code>summary()</code> output displays the marginal log RR,
-its SE, Z-value, the p-value for the Z-test against 0, and its
-confidence interval. The second <code>summary()</code> output displays
-the marginal RR, the p-value for the above test, and the confidence
-interval for the RR. (Note that even though the <code>Contrast</code>
-label still suggests the log risk ratio, the risk ratio is actually
-displayed. You can confirm this by manually exponentiating the log risk
-ratio computed just before.)</p>
+## Post-transformation:  exp 
+## Columns: type, term, contrast, estimate, p.value, conf.low, conf.high, predicted, predicted_hi, predicted_lo</code></pre>
+<p>The output displays the marginal RR, its Z-value, the p-value for the
+Z-test against 0, and its confidence interval. (Note that even though
+the <code>Contrast</code> label still suggests the log risk ratio, the
+risk ratio is actually displayed. You can confirm this by manually
+exponentiating the log risk ratio computed just before.) To view the log
+RR and its standard error, omit the <code>transform_post</code>
+argument.</p>
 <p>For the marginal OR, the only thing that needs to change is that
 <code>transform_pre</code> should be set to <code>&quot;lnoravg&quot;</code>.</p>
-<p><strong>For survival outcomes.</strong> There are several measures of
-effect size for survival outcomes. When using the Cox proportional
-hazards model, the quantity of interest is the hazard ratio (HR) between
-the treated and control groups. As with the OR, the HR is
-non-collapsible, which means the estimated HR will only be a valid
-estimate of the marginal HR when no other covariates are included in the
-model. Other effect measures, such as the difference in mean survival
-times or probability of survival after a given time, can be treated just
-like continuous and binary outcomes as previously described.</p>
+</div>
+<div id="survival-outcomes" class="section level4">
+<h4>Survival outcomes</h4>
+<p>There are several measures of effect size for survival outcomes. When
+using the Cox proportional hazards model, the quantity of interest is
+the hazard ratio (HR) between the treated and control groups. As with
+the OR, the HR is non-collapsible, which means the estimated HR will
+only be a valid estimate of the marginal HR when no other covariates are
+included in the model. Other effect measures, such as the difference in
+mean survival times or probability of survival after a given time, can
+be treated just like continuous and binary outcomes as previously
+described.</p>
 <p>For the HR, we cannot compute average marginal effects and must use
 the coefficient on treatment in a Cox model fit without covariates<a href="#fn8" class="footnote-ref" id="fnref8"><sup>8</sup></a>. This
 means that we cannot use the procedures from the Standard Case. Here we
@@ -1063,11 +1059,11 @@ membership (stored in the <code>subclass</code> column of
 pairing (e.g., cardinality and template matching and [coarsened] exact
 matching), we can omit the <code>cluster</code> argument (but keep
 <code>robust = TRUE</code>)<a href="#fn9" class="footnote-ref" id="fnref9"><sup>9</sup></a>.</p>
-<div class="sourceCode" id="cb20"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(<span class="st">&quot;survival&quot;</span>)</span>
-<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a><span class="co">#Cox Regression for marginal HR</span></span>
-<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a><span class="fu">coxph</span>(<span class="fu">Surv</span>(Y_S) <span class="sc">~</span> A, <span class="at">data =</span> md, <span class="at">robust =</span> <span class="cn">TRUE</span>, </span>
-<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a>      <span class="at">weights =</span> weights, <span class="at">cluster =</span> subclass)</span></code></pre></div>
+<div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(<span class="st">&quot;survival&quot;</span>)</span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a><span class="co">#Cox Regression for marginal HR</span></span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a><span class="fu">coxph</span>(<span class="fu">Surv</span>(Y_S) <span class="sc">~</span> A, <span class="at">data =</span> md, <span class="at">robust =</span> <span class="cn">TRUE</span>, </span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>      <span class="at">weights =</span> weights, <span class="at">cluster =</span> subclass)</span></code></pre></div>
 <pre><code>## Call:
 ## coxph(formula = Surv(Y_S) ~ A, data = md, weights = weights, 
 ##     robust = TRUE, cluster = subclass)
@@ -1094,32 +1090,33 @@ multiplicity and pairing.</p>
 demonstrated in the appendix of <span class="citation">Austin and Cafri
 (<a href="#ref-austin2020a" role="doc-biblioref">2020</a>)</span>. We
 demonstrate this below:</p>
-<div class="sourceCode" id="cb22"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="co">#get_matches() after matching with replacement</span></span>
-<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>gm <span class="ot">&lt;-</span> <span class="fu">get_matches</span>(mR)</span>
-<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a><span class="co">#Austin &amp; Cafri&#39;s (2020) SE estimator</span></span>
-<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a>fs <span class="ot">&lt;-</span> <span class="fu">coxph</span>(<span class="fu">Surv</span>(Y_S) <span class="sc">~</span> A, <span class="at">data =</span> gm, <span class="at">robust =</span> <span class="cn">TRUE</span>, </span>
-<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a>      <span class="at">weights =</span> weights, <span class="at">cluster =</span> subclass)</span>
-<span id="cb22-7"><a href="#cb22-7" aria-hidden="true" tabindex="-1"></a>Vs <span class="ot">&lt;-</span> fs<span class="sc">$</span>var</span>
-<span id="cb22-8"><a href="#cb22-8" aria-hidden="true" tabindex="-1"></a>ks <span class="ot">&lt;-</span> <span class="fu">nlevels</span>(gm<span class="sc">$</span>subclass)</span>
-<span id="cb22-9"><a href="#cb22-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb22-10"><a href="#cb22-10" aria-hidden="true" tabindex="-1"></a>fi <span class="ot">&lt;-</span> <span class="fu">coxph</span>(<span class="fu">Surv</span>(Y_S) <span class="sc">~</span> A, <span class="at">data =</span> gm, <span class="at">robust =</span> <span class="cn">TRUE</span>, </span>
-<span id="cb22-11"><a href="#cb22-11" aria-hidden="true" tabindex="-1"></a>      <span class="at">weights =</span> weights, <span class="at">cluster =</span> id)</span>
-<span id="cb22-12"><a href="#cb22-12" aria-hidden="true" tabindex="-1"></a>Vi <span class="ot">&lt;-</span> fi<span class="sc">$</span>var</span>
-<span id="cb22-13"><a href="#cb22-13" aria-hidden="true" tabindex="-1"></a>ki <span class="ot">&lt;-</span> <span class="fu">length</span>(<span class="fu">unique</span>(gm<span class="sc">$</span>id))</span>
-<span id="cb22-14"><a href="#cb22-14" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb22-15"><a href="#cb22-15" aria-hidden="true" tabindex="-1"></a>fc <span class="ot">&lt;-</span> <span class="fu">coxph</span>(<span class="fu">Surv</span>(Y_S) <span class="sc">~</span> A, <span class="at">data =</span> gm, <span class="at">robust =</span> <span class="cn">TRUE</span>, </span>
-<span id="cb22-16"><a href="#cb22-16" aria-hidden="true" tabindex="-1"></a>      <span class="at">weights =</span> weights)</span>
-<span id="cb22-17"><a href="#cb22-17" aria-hidden="true" tabindex="-1"></a>Vc <span class="ot">&lt;-</span> fc<span class="sc">$</span>var</span>
-<span id="cb22-18"><a href="#cb22-18" aria-hidden="true" tabindex="-1"></a>kc <span class="ot">&lt;-</span> <span class="fu">nrow</span>(gm)</span>
-<span id="cb22-19"><a href="#cb22-19" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb22-20"><a href="#cb22-20" aria-hidden="true" tabindex="-1"></a><span class="co">#Compute the variance and sneak it back into the fit object</span></span>
-<span id="cb22-21"><a href="#cb22-21" aria-hidden="true" tabindex="-1"></a>fc<span class="sc">$</span>var <span class="ot">&lt;-</span> (ks<span class="sc">/</span>(ks<span class="dv">-1</span>))<span class="sc">*</span>Vs <span class="sc">+</span> (ki<span class="sc">/</span>(ki<span class="dv">-1</span>))<span class="sc">*</span>Vi <span class="sc">-</span> (kc<span class="sc">/</span>(kc<span class="dv">-1</span>))<span class="sc">*</span>Vc</span>
-<span id="cb22-22"><a href="#cb22-22" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb22-23"><a href="#cb22-23" aria-hidden="true" tabindex="-1"></a>fc</span></code></pre></div>
+<div class="sourceCode" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="co">#get_matches() after matching with replacement</span></span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>gm <span class="ot">&lt;-</span> <span class="fu">get_matches</span>(mR)</span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a><span class="co">#Austin &amp; Cafri&#39;s (2020) SE estimator</span></span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>fs <span class="ot">&lt;-</span> <span class="fu">coxph</span>(<span class="fu">Surv</span>(Y_S) <span class="sc">~</span> A, <span class="at">data =</span> gm, <span class="at">robust =</span> <span class="cn">TRUE</span>, </span>
+<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a>      <span class="at">weights =</span> weights, <span class="at">cluster =</span> subclass)</span>
+<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a>Vs <span class="ot">&lt;-</span> fs<span class="sc">$</span>var</span>
+<span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a>ks <span class="ot">&lt;-</span> <span class="fu">nlevels</span>(gm<span class="sc">$</span>subclass)</span>
+<span id="cb19-9"><a href="#cb19-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-10"><a href="#cb19-10" aria-hidden="true" tabindex="-1"></a>fi <span class="ot">&lt;-</span> <span class="fu">coxph</span>(<span class="fu">Surv</span>(Y_S) <span class="sc">~</span> A, <span class="at">data =</span> gm, <span class="at">robust =</span> <span class="cn">TRUE</span>, </span>
+<span id="cb19-11"><a href="#cb19-11" aria-hidden="true" tabindex="-1"></a>      <span class="at">weights =</span> weights, <span class="at">cluster =</span> id)</span>
+<span id="cb19-12"><a href="#cb19-12" aria-hidden="true" tabindex="-1"></a>Vi <span class="ot">&lt;-</span> fi<span class="sc">$</span>var</span>
+<span id="cb19-13"><a href="#cb19-13" aria-hidden="true" tabindex="-1"></a>ki <span class="ot">&lt;-</span> <span class="fu">length</span>(<span class="fu">unique</span>(gm<span class="sc">$</span>id))</span>
+<span id="cb19-14"><a href="#cb19-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-15"><a href="#cb19-15" aria-hidden="true" tabindex="-1"></a>fc <span class="ot">&lt;-</span> <span class="fu">coxph</span>(<span class="fu">Surv</span>(Y_S) <span class="sc">~</span> A, <span class="at">data =</span> gm, <span class="at">robust =</span> <span class="cn">TRUE</span>, </span>
+<span id="cb19-16"><a href="#cb19-16" aria-hidden="true" tabindex="-1"></a>      <span class="at">weights =</span> weights)</span>
+<span id="cb19-17"><a href="#cb19-17" aria-hidden="true" tabindex="-1"></a>Vc <span class="ot">&lt;-</span> fc<span class="sc">$</span>var</span>
+<span id="cb19-18"><a href="#cb19-18" aria-hidden="true" tabindex="-1"></a>kc <span class="ot">&lt;-</span> <span class="fu">nrow</span>(gm)</span>
+<span id="cb19-19"><a href="#cb19-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-20"><a href="#cb19-20" aria-hidden="true" tabindex="-1"></a><span class="co">#Compute the variance and sneak it back into the fit object</span></span>
+<span id="cb19-21"><a href="#cb19-21" aria-hidden="true" tabindex="-1"></a>fc<span class="sc">$</span>var <span class="ot">&lt;-</span> (ks<span class="sc">/</span>(ks<span class="dv">-1</span>))<span class="sc">*</span>Vs <span class="sc">+</span> (ki<span class="sc">/</span>(ki<span class="dv">-1</span>))<span class="sc">*</span>Vi <span class="sc">-</span> (kc<span class="sc">/</span>(kc<span class="dv">-1</span>))<span class="sc">*</span>Vc</span>
+<span id="cb19-22"><a href="#cb19-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-23"><a href="#cb19-23" aria-hidden="true" tabindex="-1"></a>fc</span></code></pre></div>
 <p>The <code>robust se</code> column contains the computed SE, and the
 reported Z-test uses this SE. The <code>se(coef)</code> column should be
 ignored.</p>
+</div>
 </div>
 <div id="using-bootstrapping-to-estimate-confidence-intervals" class="section level3">
 <h3>Using Bootstrapping to Estimate Confidence Intervals</h3>
@@ -1144,50 +1141,50 @@ matching with replacement, since the standard bootstrap has been found
 to work well with it <span class="citation">(<a href="#ref-bodory2020" role="doc-biblioref">Bodory et al. 2020</a>; <a href="#ref-hill2006" role="doc-biblioref">Hill and Reiter 2006</a>)</span>, despite some
 analytic results recommending otherwise <span class="citation">(<a href="#ref-abadie2008" role="doc-biblioref">Abadie and Imbens
 2008</a>)</span>. We’ll implement g-computation manually rather than
-using <code>comparisons()</code>, as this dramatically improves the
+using <code>avg_comparisons()</code>, as this dramatically improves the
 speed of the estimation since we don’t require standard errors to be
-estimated in each sample (or other processing <code>comparisons()</code>
-does). We’ll consider the marginal RR ATT of <code>A</code> on the
-binary outcome <code>Y_B</code>.</p>
+estimated in each sample (or other processing
+<code>avg_comparisons()</code> does). We’ll consider the marginal RR ATT
+of <code>A</code> on the binary outcome <code>Y_B</code>.</p>
 <p>The first step is to write the estimation function, we we call
 <code>boot_fun</code>. This function returns the marginal RR. In it, we
 perform the matching, estimate the effect, and return the estimate of
 interest.</p>
-<div class="sourceCode" id="cb23"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>boot_fun <span class="ot">&lt;-</span> <span class="cf">function</span>(data, i) {</span>
-<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>  boot_data <span class="ot">&lt;-</span> data[i,]</span>
-<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a>  <span class="co">#Do 1:1 PS matching with replacement</span></span>
-<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a>  m <span class="ot">&lt;-</span> <span class="fu">matchit</span>(A <span class="sc">~</span> X1 <span class="sc">+</span> X2 <span class="sc">+</span> X3 <span class="sc">+</span> X4 <span class="sc">+</span> X5 <span class="sc">+</span> </span>
-<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a>                 X6 <span class="sc">+</span> X7 <span class="sc">+</span> X8 <span class="sc">+</span> X9,</span>
-<span id="cb23-7"><a href="#cb23-7" aria-hidden="true" tabindex="-1"></a>               <span class="at">data =</span> boot_data,</span>
-<span id="cb23-8"><a href="#cb23-8" aria-hidden="true" tabindex="-1"></a>               <span class="at">replace =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb23-9"><a href="#cb23-9" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb23-10"><a href="#cb23-10" aria-hidden="true" tabindex="-1"></a>  <span class="co">#Extract matched dataset</span></span>
-<span id="cb23-11"><a href="#cb23-11" aria-hidden="true" tabindex="-1"></a>  md <span class="ot">&lt;-</span> <span class="fu">match.data</span>(m, <span class="at">data =</span> boot_data)</span>
-<span id="cb23-12"><a href="#cb23-12" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb23-13"><a href="#cb23-13" aria-hidden="true" tabindex="-1"></a>  <span class="co">#Fit outcome model</span></span>
-<span id="cb23-14"><a href="#cb23-14" aria-hidden="true" tabindex="-1"></a>  fit <span class="ot">&lt;-</span> <span class="fu">glm</span>(Y_B <span class="sc">~</span> A <span class="sc">*</span> (X1 <span class="sc">+</span> X2 <span class="sc">+</span> X3 <span class="sc">+</span> X4 <span class="sc">+</span> X5 <span class="sc">+</span> </span>
-<span id="cb23-15"><a href="#cb23-15" aria-hidden="true" tabindex="-1"></a>                 X6 <span class="sc">+</span> X7 <span class="sc">+</span> X8 <span class="sc">+</span> X9),</span>
-<span id="cb23-16"><a href="#cb23-16" aria-hidden="true" tabindex="-1"></a>             <span class="at">data =</span> md, <span class="at">weights =</span> weights,</span>
-<span id="cb23-17"><a href="#cb23-17" aria-hidden="true" tabindex="-1"></a>             <span class="at">family =</span> <span class="fu">quasibinomial</span>())</span>
-<span id="cb23-18"><a href="#cb23-18" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb23-19"><a href="#cb23-19" aria-hidden="true" tabindex="-1"></a>  <span class="do">## G-computation ##</span></span>
-<span id="cb23-20"><a href="#cb23-20" aria-hidden="true" tabindex="-1"></a>  <span class="co">#Subset to treated units for ATT; skip for ATE</span></span>
-<span id="cb23-21"><a href="#cb23-21" aria-hidden="true" tabindex="-1"></a>  md1 <span class="ot">&lt;-</span> <span class="fu">subset</span>(md, A <span class="sc">==</span> <span class="dv">1</span>)</span>
-<span id="cb23-22"><a href="#cb23-22" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb23-23"><a href="#cb23-23" aria-hidden="true" tabindex="-1"></a>  <span class="co">#Estimated potential outcomes under treatment</span></span>
-<span id="cb23-24"><a href="#cb23-24" aria-hidden="true" tabindex="-1"></a>  p1 <span class="ot">&lt;-</span> <span class="fu">predict</span>(fit, <span class="at">type =</span> <span class="st">&quot;response&quot;</span>,</span>
-<span id="cb23-25"><a href="#cb23-25" aria-hidden="true" tabindex="-1"></a>                <span class="at">newdata =</span> <span class="fu">transform</span>(md1, <span class="at">A =</span> <span class="dv">1</span>))</span>
-<span id="cb23-26"><a href="#cb23-26" aria-hidden="true" tabindex="-1"></a>  Ep1 <span class="ot">&lt;-</span> <span class="fu">weighted.mean</span>(p1, md1<span class="sc">$</span>weights)</span>
-<span id="cb23-27"><a href="#cb23-27" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb23-28"><a href="#cb23-28" aria-hidden="true" tabindex="-1"></a>  <span class="co">#Estimated potential outcomes under control</span></span>
-<span id="cb23-29"><a href="#cb23-29" aria-hidden="true" tabindex="-1"></a>  p0 <span class="ot">&lt;-</span> <span class="fu">predict</span>(fit, <span class="at">type =</span> <span class="st">&quot;response&quot;</span>,</span>
-<span id="cb23-30"><a href="#cb23-30" aria-hidden="true" tabindex="-1"></a>                <span class="at">newdata =</span> <span class="fu">transform</span>(md1, <span class="at">A =</span> <span class="dv">0</span>))</span>
-<span id="cb23-31"><a href="#cb23-31" aria-hidden="true" tabindex="-1"></a>  Ep0 <span class="ot">&lt;-</span> <span class="fu">weighted.mean</span>(p0, md1<span class="sc">$</span>weights)</span>
-<span id="cb23-32"><a href="#cb23-32" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb23-33"><a href="#cb23-33" aria-hidden="true" tabindex="-1"></a>  <span class="co">#Risk ratio</span></span>
-<span id="cb23-34"><a href="#cb23-34" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(Ep1 <span class="sc">/</span> Ep0)</span>
-<span id="cb23-35"><a href="#cb23-35" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
+<div class="sourceCode" id="cb20"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>boot_fun <span class="ot">&lt;-</span> <span class="cf">function</span>(data, i) {</span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>  boot_data <span class="ot">&lt;-</span> data[i,]</span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>  <span class="co">#Do 1:1 PS matching with replacement</span></span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a>  m <span class="ot">&lt;-</span> <span class="fu">matchit</span>(A <span class="sc">~</span> X1 <span class="sc">+</span> X2 <span class="sc">+</span> X3 <span class="sc">+</span> X4 <span class="sc">+</span> X5 <span class="sc">+</span> </span>
+<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a>                 X6 <span class="sc">+</span> X7 <span class="sc">+</span> X8 <span class="sc">+</span> X9,</span>
+<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a>               <span class="at">data =</span> boot_data,</span>
+<span id="cb20-8"><a href="#cb20-8" aria-hidden="true" tabindex="-1"></a>               <span class="at">replace =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb20-9"><a href="#cb20-9" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb20-10"><a href="#cb20-10" aria-hidden="true" tabindex="-1"></a>  <span class="co">#Extract matched dataset</span></span>
+<span id="cb20-11"><a href="#cb20-11" aria-hidden="true" tabindex="-1"></a>  md <span class="ot">&lt;-</span> <span class="fu">match.data</span>(m, <span class="at">data =</span> boot_data)</span>
+<span id="cb20-12"><a href="#cb20-12" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb20-13"><a href="#cb20-13" aria-hidden="true" tabindex="-1"></a>  <span class="co">#Fit outcome model</span></span>
+<span id="cb20-14"><a href="#cb20-14" aria-hidden="true" tabindex="-1"></a>  fit <span class="ot">&lt;-</span> <span class="fu">glm</span>(Y_B <span class="sc">~</span> A <span class="sc">*</span> (X1 <span class="sc">+</span> X2 <span class="sc">+</span> X3 <span class="sc">+</span> X4 <span class="sc">+</span> X5 <span class="sc">+</span> </span>
+<span id="cb20-15"><a href="#cb20-15" aria-hidden="true" tabindex="-1"></a>                 X6 <span class="sc">+</span> X7 <span class="sc">+</span> X8 <span class="sc">+</span> X9),</span>
+<span id="cb20-16"><a href="#cb20-16" aria-hidden="true" tabindex="-1"></a>             <span class="at">data =</span> md, <span class="at">weights =</span> weights,</span>
+<span id="cb20-17"><a href="#cb20-17" aria-hidden="true" tabindex="-1"></a>             <span class="at">family =</span> <span class="fu">quasibinomial</span>())</span>
+<span id="cb20-18"><a href="#cb20-18" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb20-19"><a href="#cb20-19" aria-hidden="true" tabindex="-1"></a>  <span class="do">## G-computation ##</span></span>
+<span id="cb20-20"><a href="#cb20-20" aria-hidden="true" tabindex="-1"></a>  <span class="co">#Subset to treated units for ATT; skip for ATE</span></span>
+<span id="cb20-21"><a href="#cb20-21" aria-hidden="true" tabindex="-1"></a>  md1 <span class="ot">&lt;-</span> <span class="fu">subset</span>(md, A <span class="sc">==</span> <span class="dv">1</span>)</span>
+<span id="cb20-22"><a href="#cb20-22" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb20-23"><a href="#cb20-23" aria-hidden="true" tabindex="-1"></a>  <span class="co">#Estimated potential outcomes under treatment</span></span>
+<span id="cb20-24"><a href="#cb20-24" aria-hidden="true" tabindex="-1"></a>  p1 <span class="ot">&lt;-</span> <span class="fu">predict</span>(fit, <span class="at">type =</span> <span class="st">&quot;response&quot;</span>,</span>
+<span id="cb20-25"><a href="#cb20-25" aria-hidden="true" tabindex="-1"></a>                <span class="at">newdata =</span> <span class="fu">transform</span>(md1, <span class="at">A =</span> <span class="dv">1</span>))</span>
+<span id="cb20-26"><a href="#cb20-26" aria-hidden="true" tabindex="-1"></a>  Ep1 <span class="ot">&lt;-</span> <span class="fu">weighted.mean</span>(p1, md1<span class="sc">$</span>weights)</span>
+<span id="cb20-27"><a href="#cb20-27" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb20-28"><a href="#cb20-28" aria-hidden="true" tabindex="-1"></a>  <span class="co">#Estimated potential outcomes under control</span></span>
+<span id="cb20-29"><a href="#cb20-29" aria-hidden="true" tabindex="-1"></a>  p0 <span class="ot">&lt;-</span> <span class="fu">predict</span>(fit, <span class="at">type =</span> <span class="st">&quot;response&quot;</span>,</span>
+<span id="cb20-30"><a href="#cb20-30" aria-hidden="true" tabindex="-1"></a>                <span class="at">newdata =</span> <span class="fu">transform</span>(md1, <span class="at">A =</span> <span class="dv">0</span>))</span>
+<span id="cb20-31"><a href="#cb20-31" aria-hidden="true" tabindex="-1"></a>  Ep0 <span class="ot">&lt;-</span> <span class="fu">weighted.mean</span>(p0, md1<span class="sc">$</span>weights)</span>
+<span id="cb20-32"><a href="#cb20-32" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb20-33"><a href="#cb20-33" aria-hidden="true" tabindex="-1"></a>  <span class="co">#Risk ratio</span></span>
+<span id="cb20-34"><a href="#cb20-34" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(Ep1 <span class="sc">/</span> Ep0)</span>
+<span id="cb20-35"><a href="#cb20-35" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
 <p>Next, we call <code>boot::boot()</code> with this function and the
 original dataset supplied to perform the bootstrapping. We’ll request
 199 bootstrap replications here, but in practice you should use many
@@ -1197,11 +1194,11 @@ intervals (which you can request by setting <code>type = &quot;bca&quot;</code> 
 the call to <code>boot.ci()</code>), which are known to be the most
 accurate. See <code>?boot.ci</code> for details. Here, we’ll just use a
 percentile confidence interval.</p>
-<div class="sourceCode" id="cb24"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(<span class="st">&quot;boot&quot;</span>)</span>
-<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">54321</span>)</span>
-<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a>boot_out <span class="ot">&lt;-</span> <span class="fu">boot</span>(d, boot_fun, <span class="at">R =</span> <span class="dv">199</span>)</span>
-<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a>boot_out</span></code></pre></div>
+<div class="sourceCode" id="cb21"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(<span class="st">&quot;boot&quot;</span>)</span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">54321</span>)</span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>boot_out <span class="ot">&lt;-</span> <span class="fu">boot</span>(d, boot_fun, <span class="at">R =</span> <span class="dv">199</span>)</span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a>boot_out</span></code></pre></div>
 <pre><code>## 
 ## ORDINARY NONPARAMETRIC BOOTSTRAP
 ## 
@@ -1213,7 +1210,7 @@ percentile confidence interval.</p>
 ## Bootstrap Statistics :
 ##     original  bias    std. error
 ## t1*    1.347  0.1417      0.1937</code></pre>
-<div class="sourceCode" id="cb26"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="fu">boot.ci</span>(boot_out, <span class="at">type =</span> <span class="st">&quot;perc&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb23"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="fu">boot.ci</span>(boot_out, <span class="at">type =</span> <span class="st">&quot;perc&quot;</span>)</span></code></pre></div>
 <pre><code>## BOOTSTRAP CONFIDENCE INTERVAL CALCULATIONS
 ## Based on 199 bootstrap replicates
 ## 
@@ -1242,13 +1239,14 @@ to work well with it <span class="citation">(<a href="#ref-austin2014" role="doc
 membership, including other pair matching methods without replacement
 and full matching.</p>
 <p>As before, we’ll use g-computation to estimate the marginal RR ATT,
-and we’ll do so manually rather than using <code>comparisons()</code>
-for speed. Note that the cluster bootstrap is already much faster than
-the standard bootstrap because matching does not need to occur within
-each bootstrap sample. First, we’ll do a round of matching.</p>
-<div class="sourceCode" id="cb28"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>mNN <span class="ot">&lt;-</span> <span class="fu">matchit</span>(A <span class="sc">~</span> X1 <span class="sc">+</span> X2 <span class="sc">+</span> X3 <span class="sc">+</span> X4 <span class="sc">+</span> X5 <span class="sc">+</span> </span>
-<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>                 X6 <span class="sc">+</span> X7 <span class="sc">+</span> X8 <span class="sc">+</span> X9, <span class="at">data =</span> d)</span>
-<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a>mNN</span></code></pre></div>
+and we’ll do so manually rather than using
+<code>avg_comparisons()</code> for speed. Note that the cluster
+bootstrap is already much faster than the standard bootstrap because
+matching does not need to occur within each bootstrap sample. First,
+we’ll do a round of matching.</p>
+<div class="sourceCode" id="cb25"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>mNN <span class="ot">&lt;-</span> <span class="fu">matchit</span>(A <span class="sc">~</span> X1 <span class="sc">+</span> X2 <span class="sc">+</span> X3 <span class="sc">+</span> X4 <span class="sc">+</span> X5 <span class="sc">+</span> </span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>                 X6 <span class="sc">+</span> X7 <span class="sc">+</span> X8 <span class="sc">+</span> X9, <span class="at">data =</span> d)</span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>mNN</span></code></pre></div>
 <pre><code>## A matchit object
 ##  - method: 1:1 nearest neighbor matching without replacement
 ##  - distance: Propensity score
@@ -1256,46 +1254,46 @@ each bootstrap sample. First, we’ll do a round of matching.</p>
 ##  - number of obs.: 2000 (original), 882 (matched)
 ##  - target estimand: ATT
 ##  - covariates: X1, X2, X3, X4, X5, X6, X7, X8, X9</code></pre>
-<div class="sourceCode" id="cb30"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a>md <span class="ot">&lt;-</span> <span class="fu">match.data</span>(mNN)</span></code></pre></div>
+<div class="sourceCode" id="cb27"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>md <span class="ot">&lt;-</span> <span class="fu">match.data</span>(mNN)</span></code></pre></div>
 <p>Next, we’ll write the function that takes in cluster membership and
 the sampled indices and returns an estimate.</p>
-<div class="sourceCode" id="cb31"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Unique pair IDs</span></span>
-<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a>pair_ids <span class="ot">&lt;-</span> <span class="fu">levels</span>(md<span class="sc">$</span>subclass)</span>
-<span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb31-4"><a href="#cb31-4" aria-hidden="true" tabindex="-1"></a><span class="co">#Unit IDs, split by pair membership</span></span>
-<span id="cb31-5"><a href="#cb31-5" aria-hidden="true" tabindex="-1"></a>split_inds <span class="ot">&lt;-</span> <span class="fu">split</span>(<span class="fu">seq_len</span>(<span class="fu">nrow</span>(md)), md<span class="sc">$</span>subclass)</span>
-<span id="cb31-6"><a href="#cb31-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb31-7"><a href="#cb31-7" aria-hidden="true" tabindex="-1"></a>cluster_boot_fun <span class="ot">&lt;-</span> <span class="cf">function</span>(pairs, i) {</span>
-<span id="cb31-8"><a href="#cb31-8" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb31-9"><a href="#cb31-9" aria-hidden="true" tabindex="-1"></a>  <span class="co">#Extract units corresponding to selected pairs</span></span>
-<span id="cb31-10"><a href="#cb31-10" aria-hidden="true" tabindex="-1"></a>  ids <span class="ot">&lt;-</span> <span class="fu">unlist</span>(split_inds[pairs[i]])</span>
-<span id="cb31-11"><a href="#cb31-11" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb31-12"><a href="#cb31-12" aria-hidden="true" tabindex="-1"></a>  <span class="co">#Subset md with block bootstrapped indices</span></span>
-<span id="cb31-13"><a href="#cb31-13" aria-hidden="true" tabindex="-1"></a>  boot_md <span class="ot">&lt;-</span> md[ids,]</span>
-<span id="cb31-14"><a href="#cb31-14" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb31-15"><a href="#cb31-15" aria-hidden="true" tabindex="-1"></a>  <span class="co">#Fit outcome model</span></span>
-<span id="cb31-16"><a href="#cb31-16" aria-hidden="true" tabindex="-1"></a>  fit <span class="ot">&lt;-</span> <span class="fu">glm</span>(Y_B <span class="sc">~</span> A <span class="sc">*</span> (X1 <span class="sc">+</span> X2 <span class="sc">+</span> X3 <span class="sc">+</span> X4 <span class="sc">+</span> X5 <span class="sc">+</span> </span>
-<span id="cb31-17"><a href="#cb31-17" aria-hidden="true" tabindex="-1"></a>                 X6 <span class="sc">+</span> X7 <span class="sc">+</span> X8 <span class="sc">+</span> X9),</span>
-<span id="cb31-18"><a href="#cb31-18" aria-hidden="true" tabindex="-1"></a>             <span class="at">data =</span> boot_md, <span class="at">weights =</span> weights,</span>
-<span id="cb31-19"><a href="#cb31-19" aria-hidden="true" tabindex="-1"></a>             <span class="at">family =</span> <span class="fu">quasibinomial</span>())</span>
-<span id="cb31-20"><a href="#cb31-20" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb31-21"><a href="#cb31-21" aria-hidden="true" tabindex="-1"></a>  <span class="do">## G-computation ##</span></span>
-<span id="cb31-22"><a href="#cb31-22" aria-hidden="true" tabindex="-1"></a>  <span class="co">#Subset to treated units for ATT; skip for ATE</span></span>
-<span id="cb31-23"><a href="#cb31-23" aria-hidden="true" tabindex="-1"></a>  md1 <span class="ot">&lt;-</span> <span class="fu">subset</span>(boot_md, A <span class="sc">==</span> <span class="dv">1</span>)</span>
-<span id="cb31-24"><a href="#cb31-24" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb31-25"><a href="#cb31-25" aria-hidden="true" tabindex="-1"></a>  <span class="co">#Estimated potential outcomes under treatment</span></span>
-<span id="cb31-26"><a href="#cb31-26" aria-hidden="true" tabindex="-1"></a>  p1 <span class="ot">&lt;-</span> <span class="fu">predict</span>(fit, <span class="at">type =</span> <span class="st">&quot;response&quot;</span>,</span>
-<span id="cb31-27"><a href="#cb31-27" aria-hidden="true" tabindex="-1"></a>                <span class="at">newdata =</span> <span class="fu">transform</span>(md1, <span class="at">A =</span> <span class="dv">1</span>))</span>
-<span id="cb31-28"><a href="#cb31-28" aria-hidden="true" tabindex="-1"></a>  Ep1 <span class="ot">&lt;-</span> <span class="fu">weighted.mean</span>(p1, md1<span class="sc">$</span>weights)</span>
-<span id="cb31-29"><a href="#cb31-29" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb31-30"><a href="#cb31-30" aria-hidden="true" tabindex="-1"></a>  <span class="co">#Estimated potential outcomes under control</span></span>
-<span id="cb31-31"><a href="#cb31-31" aria-hidden="true" tabindex="-1"></a>  p0 <span class="ot">&lt;-</span> <span class="fu">predict</span>(fit, <span class="at">type =</span> <span class="st">&quot;response&quot;</span>,</span>
-<span id="cb31-32"><a href="#cb31-32" aria-hidden="true" tabindex="-1"></a>                <span class="at">newdata =</span> <span class="fu">transform</span>(md1, <span class="at">A =</span> <span class="dv">0</span>))</span>
-<span id="cb31-33"><a href="#cb31-33" aria-hidden="true" tabindex="-1"></a>  Ep0 <span class="ot">&lt;-</span> <span class="fu">weighted.mean</span>(p0, md1<span class="sc">$</span>weights)</span>
-<span id="cb31-34"><a href="#cb31-34" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb31-35"><a href="#cb31-35" aria-hidden="true" tabindex="-1"></a>  <span class="co">#Risk ratio</span></span>
-<span id="cb31-36"><a href="#cb31-36" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(Ep1 <span class="sc">/</span> Ep0)</span>
-<span id="cb31-37"><a href="#cb31-37" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
+<div class="sourceCode" id="cb28"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Unique pair IDs</span></span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>pair_ids <span class="ot">&lt;-</span> <span class="fu">levels</span>(md<span class="sc">$</span>subclass)</span>
+<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a><span class="co">#Unit IDs, split by pair membership</span></span>
+<span id="cb28-5"><a href="#cb28-5" aria-hidden="true" tabindex="-1"></a>split_inds <span class="ot">&lt;-</span> <span class="fu">split</span>(<span class="fu">seq_len</span>(<span class="fu">nrow</span>(md)), md<span class="sc">$</span>subclass)</span>
+<span id="cb28-6"><a href="#cb28-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-7"><a href="#cb28-7" aria-hidden="true" tabindex="-1"></a>cluster_boot_fun <span class="ot">&lt;-</span> <span class="cf">function</span>(pairs, i) {</span>
+<span id="cb28-8"><a href="#cb28-8" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb28-9"><a href="#cb28-9" aria-hidden="true" tabindex="-1"></a>  <span class="co">#Extract units corresponding to selected pairs</span></span>
+<span id="cb28-10"><a href="#cb28-10" aria-hidden="true" tabindex="-1"></a>  ids <span class="ot">&lt;-</span> <span class="fu">unlist</span>(split_inds[pairs[i]])</span>
+<span id="cb28-11"><a href="#cb28-11" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb28-12"><a href="#cb28-12" aria-hidden="true" tabindex="-1"></a>  <span class="co">#Subset md with block bootstrapped indices</span></span>
+<span id="cb28-13"><a href="#cb28-13" aria-hidden="true" tabindex="-1"></a>  boot_md <span class="ot">&lt;-</span> md[ids,]</span>
+<span id="cb28-14"><a href="#cb28-14" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb28-15"><a href="#cb28-15" aria-hidden="true" tabindex="-1"></a>  <span class="co">#Fit outcome model</span></span>
+<span id="cb28-16"><a href="#cb28-16" aria-hidden="true" tabindex="-1"></a>  fit <span class="ot">&lt;-</span> <span class="fu">glm</span>(Y_B <span class="sc">~</span> A <span class="sc">*</span> (X1 <span class="sc">+</span> X2 <span class="sc">+</span> X3 <span class="sc">+</span> X4 <span class="sc">+</span> X5 <span class="sc">+</span> </span>
+<span id="cb28-17"><a href="#cb28-17" aria-hidden="true" tabindex="-1"></a>                 X6 <span class="sc">+</span> X7 <span class="sc">+</span> X8 <span class="sc">+</span> X9),</span>
+<span id="cb28-18"><a href="#cb28-18" aria-hidden="true" tabindex="-1"></a>             <span class="at">data =</span> boot_md, <span class="at">weights =</span> weights,</span>
+<span id="cb28-19"><a href="#cb28-19" aria-hidden="true" tabindex="-1"></a>             <span class="at">family =</span> <span class="fu">quasibinomial</span>())</span>
+<span id="cb28-20"><a href="#cb28-20" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb28-21"><a href="#cb28-21" aria-hidden="true" tabindex="-1"></a>  <span class="do">## G-computation ##</span></span>
+<span id="cb28-22"><a href="#cb28-22" aria-hidden="true" tabindex="-1"></a>  <span class="co">#Subset to treated units for ATT; skip for ATE</span></span>
+<span id="cb28-23"><a href="#cb28-23" aria-hidden="true" tabindex="-1"></a>  md1 <span class="ot">&lt;-</span> <span class="fu">subset</span>(boot_md, A <span class="sc">==</span> <span class="dv">1</span>)</span>
+<span id="cb28-24"><a href="#cb28-24" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb28-25"><a href="#cb28-25" aria-hidden="true" tabindex="-1"></a>  <span class="co">#Estimated potential outcomes under treatment</span></span>
+<span id="cb28-26"><a href="#cb28-26" aria-hidden="true" tabindex="-1"></a>  p1 <span class="ot">&lt;-</span> <span class="fu">predict</span>(fit, <span class="at">type =</span> <span class="st">&quot;response&quot;</span>,</span>
+<span id="cb28-27"><a href="#cb28-27" aria-hidden="true" tabindex="-1"></a>                <span class="at">newdata =</span> <span class="fu">transform</span>(md1, <span class="at">A =</span> <span class="dv">1</span>))</span>
+<span id="cb28-28"><a href="#cb28-28" aria-hidden="true" tabindex="-1"></a>  Ep1 <span class="ot">&lt;-</span> <span class="fu">weighted.mean</span>(p1, md1<span class="sc">$</span>weights)</span>
+<span id="cb28-29"><a href="#cb28-29" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb28-30"><a href="#cb28-30" aria-hidden="true" tabindex="-1"></a>  <span class="co">#Estimated potential outcomes under control</span></span>
+<span id="cb28-31"><a href="#cb28-31" aria-hidden="true" tabindex="-1"></a>  p0 <span class="ot">&lt;-</span> <span class="fu">predict</span>(fit, <span class="at">type =</span> <span class="st">&quot;response&quot;</span>,</span>
+<span id="cb28-32"><a href="#cb28-32" aria-hidden="true" tabindex="-1"></a>                <span class="at">newdata =</span> <span class="fu">transform</span>(md1, <span class="at">A =</span> <span class="dv">0</span>))</span>
+<span id="cb28-33"><a href="#cb28-33" aria-hidden="true" tabindex="-1"></a>  Ep0 <span class="ot">&lt;-</span> <span class="fu">weighted.mean</span>(p0, md1<span class="sc">$</span>weights)</span>
+<span id="cb28-34"><a href="#cb28-34" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb28-35"><a href="#cb28-35" aria-hidden="true" tabindex="-1"></a>  <span class="co">#Risk ratio</span></span>
+<span id="cb28-36"><a href="#cb28-36" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(Ep1 <span class="sc">/</span> Ep0)</span>
+<span id="cb28-37"><a href="#cb28-37" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
 <p>Next, we call <code>boot::boot()</code> with this function and the
 vector of pair membership supplied to perform the bootstrapping. We’ll
 request 199 bootstrap replications, but in practice you should use many
@@ -1304,12 +1302,12 @@ to use the bias-corrected and accelerated (BCa) boot strap confidence
 intervals, which are known to be the most accurate. See
 <code>?boot.ci</code> for details. Here, we’ll just use a percentile
 confidence interval.</p>
-<div class="sourceCode" id="cb32"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(<span class="st">&quot;boot&quot;</span>)</span>
-<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">54321</span>)</span>
-<span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a>cluster_boot_out <span class="ot">&lt;-</span> <span class="fu">boot</span>(pair_ids, cluster_boot_fun,</span>
-<span id="cb32-4"><a href="#cb32-4" aria-hidden="true" tabindex="-1"></a>                         <span class="at">R =</span> <span class="dv">199</span>)</span>
-<span id="cb32-5"><a href="#cb32-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb32-6"><a href="#cb32-6" aria-hidden="true" tabindex="-1"></a>cluster_boot_out</span></code></pre></div>
+<div class="sourceCode" id="cb29"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(<span class="st">&quot;boot&quot;</span>)</span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">54321</span>)</span>
+<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a>cluster_boot_out <span class="ot">&lt;-</span> <span class="fu">boot</span>(pair_ids, cluster_boot_fun,</span>
+<span id="cb29-4"><a href="#cb29-4" aria-hidden="true" tabindex="-1"></a>                         <span class="at">R =</span> <span class="dv">199</span>)</span>
+<span id="cb29-5"><a href="#cb29-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-6"><a href="#cb29-6" aria-hidden="true" tabindex="-1"></a>cluster_boot_out</span></code></pre></div>
 <pre><code>## 
 ## ORDINARY NONPARAMETRIC BOOTSTRAP
 ## 
@@ -1321,7 +1319,7 @@ confidence interval.</p>
 ## Bootstrap Statistics :
 ##     original  bias    std. error
 ## t1*    1.588 0.01304      0.1313</code></pre>
-<div class="sourceCode" id="cb34"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a><span class="fu">boot.ci</span>(cluster_boot_out, <span class="at">type =</span> <span class="st">&quot;perc&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb31"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="fu">boot.ci</span>(cluster_boot_out, <span class="at">type =</span> <span class="st">&quot;perc&quot;</span>)</span></code></pre></div>
 <pre><code>## BOOTSTRAP CONFIDENCE INTERVAL CALCULATIONS
 ## Based on 199 bootstrap replicates
 ## 
@@ -1376,10 +1374,10 @@ Below, we’ll estimate a propensity score using a single propensity score
 model with a few moderator-by-covariate interactions. We’ll perform
 nearest neighbor matching on the propensity score and exact matching on
 the moderator, <code>X5</code>.</p>
-<div class="sourceCode" id="cb36"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a>mP <span class="ot">&lt;-</span> <span class="fu">matchit</span>(A <span class="sc">~</span> X1 <span class="sc">+</span> X2 <span class="sc">+</span> X5<span class="sc">*</span>X3 <span class="sc">+</span> X4 <span class="sc">+</span> </span>
-<span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a>                X5<span class="sc">*</span>X6 <span class="sc">+</span> X7 <span class="sc">+</span> X5<span class="sc">*</span>X8 <span class="sc">+</span> X9, <span class="at">data =</span> d,</span>
-<span id="cb36-3"><a href="#cb36-3" aria-hidden="true" tabindex="-1"></a>              <span class="at">exact =</span> <span class="sc">~</span>X5, <span class="at">method =</span> <span class="st">&quot;nearest&quot;</span>)</span>
-<span id="cb36-4"><a href="#cb36-4" aria-hidden="true" tabindex="-1"></a>mP</span></code></pre></div>
+<div class="sourceCode" id="cb33"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a>mP <span class="ot">&lt;-</span> <span class="fu">matchit</span>(A <span class="sc">~</span> X1 <span class="sc">+</span> X2 <span class="sc">+</span> X5<span class="sc">*</span>X3 <span class="sc">+</span> X4 <span class="sc">+</span> </span>
+<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a>                X5<span class="sc">*</span>X6 <span class="sc">+</span> X7 <span class="sc">+</span> X5<span class="sc">*</span>X8 <span class="sc">+</span> X9, <span class="at">data =</span> d,</span>
+<span id="cb33-3"><a href="#cb33-3" aria-hidden="true" tabindex="-1"></a>              <span class="at">exact =</span> <span class="sc">~</span>X5, <span class="at">method =</span> <span class="st">&quot;nearest&quot;</span>)</span>
+<span id="cb33-4"><a href="#cb33-4" aria-hidden="true" tabindex="-1"></a>mP</span></code></pre></div>
 <pre><code>## A matchit object
 ##  - method: 1:1 nearest neighbor matching without replacement
 ##  - distance: Propensity score
@@ -1394,48 +1392,48 @@ subgroups. The easiest way to check subgroup balance would be to use
 argument that can be used to assess balance within subgroups, e.g., by
 <code>cobalt::bal.tab(mP, cluster = &quot;X5&quot;)</code>. See the vignette
 “Appendix 2: Using cobalt with Clustered, Multiply Imputed, and Other
-Segmented Data” on the <code>cobalt</code> <a href="https://ngreifer.github.io/cobalt/index.html">website</a> or at
-<code>vignette(&quot;cobalt_A2_segmented_data&quot;, package = &quot;cobalt&quot;)</code>
-for details.</p>
+Segmented Data” on the <code>cobalt</code> <a href="https://ngreifer.github.io/cobalt/index.html">website</a> for
+details.</p>
 <p>If we are satisfied with balance, we can then model the outcome with
 an interaction between the treatment and the moderator.</p>
-<div class="sourceCode" id="cb38"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a>mdP <span class="ot">&lt;-</span> <span class="fu">match.data</span>(mP)</span>
-<span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb38-3"><a href="#cb38-3" aria-hidden="true" tabindex="-1"></a>fitP <span class="ot">&lt;-</span> <span class="fu">lm</span>(Y_C <span class="sc">~</span> A <span class="sc">*</span> X5, <span class="at">data =</span> mdP, <span class="at">weights =</span> weights)</span></code></pre></div>
-<p>To estimate the subgroup ATTs, we can use <code>comparisons()</code>,
-this time specifying the <code>by</code> argument to signify that we
-want treatment effects stratified by the moderator.</p>
-<div class="sourceCode" id="cb39"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a>comp <span class="ot">&lt;-</span> <span class="fu">comparisons</span>(fitP, <span class="at">variables =</span> <span class="st">&quot;A&quot;</span>,</span>
-<span id="cb39-2"><a href="#cb39-2" aria-hidden="true" tabindex="-1"></a>                    <span class="at">vcov =</span> <span class="sc">~</span>subclass,</span>
-<span id="cb39-3"><a href="#cb39-3" aria-hidden="true" tabindex="-1"></a>                    <span class="at">newdata =</span> <span class="fu">subset</span>(md, A <span class="sc">==</span> <span class="dv">1</span>),</span>
-<span id="cb39-4"><a href="#cb39-4" aria-hidden="true" tabindex="-1"></a>                    <span class="at">wts =</span> <span class="st">&quot;weights&quot;</span>,</span>
-<span id="cb39-5"><a href="#cb39-5" aria-hidden="true" tabindex="-1"></a>                    <span class="at">by =</span> <span class="st">&quot;X5&quot;</span>)</span>
-<span id="cb39-6"><a href="#cb39-6" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(comp)</span></code></pre></div>
-<pre><code>##   Term          Contrast X5 Effect Std. Error z value Pr(&gt;|z|) 2.5 % 97.5 %
-## 1    A mean(1) - mean(0)  1   2.18      0.569    3.83  0.00013 1.065   3.29
-## 2    A mean(1) - mean(0)  0   2.21      0.670    3.29  0.00099 0.894   3.52
+<div class="sourceCode" id="cb35"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a>mdP <span class="ot">&lt;-</span> <span class="fu">match.data</span>(mP)</span>
+<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-3"><a href="#cb35-3" aria-hidden="true" tabindex="-1"></a>fitP <span class="ot">&lt;-</span> <span class="fu">lm</span>(Y_C <span class="sc">~</span> A <span class="sc">*</span> X5, <span class="at">data =</span> mdP, <span class="at">weights =</span> weights)</span></code></pre></div>
+<p>To estimate the subgroup ATTs, we can use
+<code>avg_comparisons()</code>, this time specifying the <code>by</code>
+argument to signify that we want treatment effects stratified by the
+moderator.</p>
+<div class="sourceCode" id="cb36"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a><span class="fu">avg_comparisons</span>(fitP, <span class="at">variables =</span> <span class="st">&quot;A&quot;</span>,</span>
+<span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a>                <span class="at">vcov =</span> <span class="sc">~</span>subclass,</span>
+<span id="cb36-3"><a href="#cb36-3" aria-hidden="true" tabindex="-1"></a>                <span class="at">newdata =</span> <span class="fu">subset</span>(md, A <span class="sc">==</span> <span class="dv">1</span>),</span>
+<span id="cb36-4"><a href="#cb36-4" aria-hidden="true" tabindex="-1"></a>                <span class="at">wts =</span> <span class="st">&quot;weights&quot;</span>,</span>
+<span id="cb36-5"><a href="#cb36-5" aria-hidden="true" tabindex="-1"></a>                <span class="at">by =</span> <span class="st">&quot;X5&quot;</span>)</span></code></pre></div>
+<pre><code>## 
+##  Term          Contrast X5 Estimate Std. Error    z Pr(&gt;|z|) 2.5 % 97.5 %
+##     A mean(1) - mean(0)  1     2.18      0.569 3.83  0.00013 1.065   3.29
+##     A mean(1) - mean(0)  0     2.21      0.670 3.29  0.00099 0.894   3.52
 ## 
-## Model type:  lm 
-## Prediction type:  response</code></pre>
+## Prediction type:  response 
+## Columns: type, term, contrast, X5, estimate, std.error, statistic, p.value, conf.low, conf.high, predicted, predicted_hi, predicted_lo</code></pre>
 <p>We can see that the subgroup mean differences are quite similar to
 each other. Finally, we can test for moderation using another call to
-<code>comparisons()</code>, this time using the <code>hypothesis</code>
-argument to signify that we want to compare effects between
-subgroups:</p>
-<div class="sourceCode" id="cb41"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a>comp <span class="ot">&lt;-</span> <span class="fu">comparisons</span>(fitP, <span class="at">variables =</span> <span class="st">&quot;A&quot;</span>,</span>
-<span id="cb41-2"><a href="#cb41-2" aria-hidden="true" tabindex="-1"></a>                    <span class="at">vcov =</span> <span class="sc">~</span>subclass,</span>
-<span id="cb41-3"><a href="#cb41-3" aria-hidden="true" tabindex="-1"></a>                    <span class="at">newdata =</span> <span class="fu">subset</span>(md, A <span class="sc">==</span> <span class="dv">1</span>),</span>
-<span id="cb41-4"><a href="#cb41-4" aria-hidden="true" tabindex="-1"></a>                    <span class="at">wts =</span> <span class="st">&quot;weights&quot;</span>,</span>
-<span id="cb41-5"><a href="#cb41-5" aria-hidden="true" tabindex="-1"></a>                    <span class="at">by =</span> <span class="st">&quot;X5&quot;</span>,</span>
-<span id="cb41-6"><a href="#cb41-6" aria-hidden="true" tabindex="-1"></a>                    <span class="at">hypothesis =</span> <span class="st">&quot;pairwise&quot;</span>)</span>
-<span id="cb41-7"><a href="#cb41-7" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(comp)</span></code></pre></div>
-<pre><code>##    Term  Effect Std. Error z value Pr(&gt;|z|) 2.5 % 97.5 %
-## 1 1 - 0 -0.0275      0.879 -0.0313     0.98 -1.75    1.7
+<code>avg_comparisons()</code>, this time using the
+<code>hypothesis</code> argument to signify that we want to compare
+effects between subgroups:</p>
+<div class="sourceCode" id="cb38"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a><span class="fu">avg_comparisons</span>(fitP, <span class="at">variables =</span> <span class="st">&quot;A&quot;</span>,</span>
+<span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a>                <span class="at">vcov =</span> <span class="sc">~</span>subclass,</span>
+<span id="cb38-3"><a href="#cb38-3" aria-hidden="true" tabindex="-1"></a>                <span class="at">newdata =</span> <span class="fu">subset</span>(md, A <span class="sc">==</span> <span class="dv">1</span>),</span>
+<span id="cb38-4"><a href="#cb38-4" aria-hidden="true" tabindex="-1"></a>                <span class="at">wts =</span> <span class="st">&quot;weights&quot;</span>,</span>
+<span id="cb38-5"><a href="#cb38-5" aria-hidden="true" tabindex="-1"></a>                <span class="at">by =</span> <span class="st">&quot;X5&quot;</span>,</span>
+<span id="cb38-6"><a href="#cb38-6" aria-hidden="true" tabindex="-1"></a>                <span class="at">hypothesis =</span> <span class="st">&quot;pairwise&quot;</span>)</span></code></pre></div>
+<pre><code>## 
+##                                               Term Estimate Std. Error       z Pr(&gt;|z|) 2.5 % 97.5 %
+##  (1,A,mean(1) - mean(0)) - (0,A,mean(1) - mean(0))  -0.0275      0.879 -0.0313     0.98 -1.75    1.7
 ## 
-## Model type:  lm 
-## Prediction type:  response</code></pre>
+## Prediction type:  response 
+## Columns: type, term, estimate, std.error, statistic, p.value, conf.low, conf.high</code></pre>
 <p>As expected, the difference between the subgroup treatment effects is
-small and significant, so there is no evidence of moderation by
+small and nonsignificant, so there is no evidence of moderation by
 <code>X5</code>.</p>
 </div>
 <div id="reporting-results" class="section level3">
@@ -1456,7 +1454,7 @@ cluster, using the BCa bootstrap with 4999 bootstrap replications and
 the entire process of matching and effect estimation included in each
 replication)</li>
 <li>R packages and functions used in estimating the effect and its SE
-(e.g., <code>glm()</code> in base R, <code>comparisons()</code> in
+(e.g., <code>glm()</code> in base R, <code>avg_comparisons()</code> in
 <code>marginaleffects</code>, <code>boot()</code> and
 <code>boot.ci()</code> in <code>boot</code>)</li>
 <li>The effect and its SE and confidence interval</li>
@@ -1738,68 +1736,68 @@ Coefficients.”</span> <em>American Journal of Epidemiology</em> 177 (4):
 </div>
 <div id="code-to-generate-data-used-in-examples" class="section level2">
 <h2>Code to Generate Data used in Examples</h2>
-<div class="sourceCode" id="cb43"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Generating data similar to Austin (2009) for demonstrating treatment effect estimation</span></span>
-<span id="cb43-2"><a href="#cb43-2" aria-hidden="true" tabindex="-1"></a>gen_X <span class="ot">&lt;-</span> <span class="cf">function</span>(n) {</span>
-<span id="cb43-3"><a href="#cb43-3" aria-hidden="true" tabindex="-1"></a>  X <span class="ot">&lt;-</span> <span class="fu">matrix</span>(<span class="fu">rnorm</span>(<span class="dv">9</span> <span class="sc">*</span> n), <span class="at">nrow =</span> n, <span class="at">ncol =</span> <span class="dv">9</span>)</span>
-<span id="cb43-4"><a href="#cb43-4" aria-hidden="true" tabindex="-1"></a>  X[,<span class="dv">5</span>] <span class="ot">&lt;-</span> <span class="fu">as.numeric</span>(X[,<span class="dv">5</span>] <span class="sc">&lt;</span> .<span class="dv">5</span>)</span>
-<span id="cb43-5"><a href="#cb43-5" aria-hidden="true" tabindex="-1"></a>  X</span>
-<span id="cb43-6"><a href="#cb43-6" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb43-7"><a href="#cb43-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb43-8"><a href="#cb43-8" aria-hidden="true" tabindex="-1"></a><span class="co">#~20% treated</span></span>
-<span id="cb43-9"><a href="#cb43-9" aria-hidden="true" tabindex="-1"></a>gen_A <span class="ot">&lt;-</span> <span class="cf">function</span>(X) {</span>
-<span id="cb43-10"><a href="#cb43-10" aria-hidden="true" tabindex="-1"></a>  LP_A <span class="ot">&lt;-</span> <span class="sc">-</span> <span class="fl">1.2</span> <span class="sc">+</span> <span class="fu">log</span>(<span class="dv">2</span>)<span class="sc">*</span>X[,<span class="dv">1</span>] <span class="sc">-</span> <span class="fu">log</span>(<span class="fl">1.5</span>)<span class="sc">*</span>X[,<span class="dv">2</span>] <span class="sc">+</span> <span class="fu">log</span>(<span class="dv">2</span>)<span class="sc">*</span>X[,<span class="dv">4</span>] <span class="sc">-</span> <span class="fu">log</span>(<span class="fl">2.4</span>)<span class="sc">*</span>X[,<span class="dv">5</span>] <span class="sc">+</span> <span class="fu">log</span>(<span class="dv">2</span>)<span class="sc">*</span>X[,<span class="dv">7</span>] <span class="sc">-</span> <span class="fu">log</span>(<span class="fl">1.5</span>)<span class="sc">*</span>X[,<span class="dv">8</span>]</span>
-<span id="cb43-11"><a href="#cb43-11" aria-hidden="true" tabindex="-1"></a>  P_A <span class="ot">&lt;-</span> <span class="fu">plogis</span>(LP_A)</span>
-<span id="cb43-12"><a href="#cb43-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rbinom</span>(<span class="fu">nrow</span>(X), <span class="dv">1</span>, P_A)</span>
-<span id="cb43-13"><a href="#cb43-13" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb43-14"><a href="#cb43-14" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb43-15"><a href="#cb43-15" aria-hidden="true" tabindex="-1"></a><span class="co"># Continuous outcome</span></span>
-<span id="cb43-16"><a href="#cb43-16" aria-hidden="true" tabindex="-1"></a>gen_Y_C <span class="ot">&lt;-</span> <span class="cf">function</span>(A, X) {</span>
-<span id="cb43-17"><a href="#cb43-17" aria-hidden="true" tabindex="-1"></a>  <span class="dv">2</span><span class="sc">*</span>A <span class="sc">+</span> <span class="dv">2</span><span class="sc">*</span>X[,<span class="dv">1</span>] <span class="sc">+</span> <span class="dv">2</span><span class="sc">*</span>X[,<span class="dv">2</span>] <span class="sc">+</span> <span class="dv">2</span><span class="sc">*</span>X[,<span class="dv">3</span>] <span class="sc">+</span> <span class="dv">1</span><span class="sc">*</span>X[,<span class="dv">4</span>] <span class="sc">+</span> <span class="dv">2</span><span class="sc">*</span>X[,<span class="dv">5</span>] <span class="sc">+</span> <span class="dv">1</span><span class="sc">*</span>X[,<span class="dv">6</span>] <span class="sc">+</span> <span class="fu">rnorm</span>(<span class="fu">length</span>(A), <span class="dv">0</span>, <span class="dv">5</span>)</span>
-<span id="cb43-18"><a href="#cb43-18" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb43-19"><a href="#cb43-19" aria-hidden="true" tabindex="-1"></a><span class="co">#Conditional:</span></span>
-<span id="cb43-20"><a href="#cb43-20" aria-hidden="true" tabindex="-1"></a><span class="co">#  MD: 2</span></span>
-<span id="cb43-21"><a href="#cb43-21" aria-hidden="true" tabindex="-1"></a><span class="co">#Marginal:</span></span>
-<span id="cb43-22"><a href="#cb43-22" aria-hidden="true" tabindex="-1"></a><span class="co">#  MD: 2</span></span>
-<span id="cb43-23"><a href="#cb43-23" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb43-24"><a href="#cb43-24" aria-hidden="true" tabindex="-1"></a><span class="co"># Binary outcome</span></span>
-<span id="cb43-25"><a href="#cb43-25" aria-hidden="true" tabindex="-1"></a>gen_Y_B <span class="ot">&lt;-</span> <span class="cf">function</span>(A, X) {</span>
-<span id="cb43-26"><a href="#cb43-26" aria-hidden="true" tabindex="-1"></a>  LP_B <span class="ot">&lt;-</span> <span class="sc">-</span><span class="dv">2</span> <span class="sc">+</span> <span class="fu">log</span>(<span class="fl">2.4</span>)<span class="sc">*</span>A <span class="sc">+</span> <span class="fu">log</span>(<span class="dv">2</span>)<span class="sc">*</span>X[,<span class="dv">1</span>] <span class="sc">+</span> <span class="fu">log</span>(<span class="dv">2</span>)<span class="sc">*</span>X[,<span class="dv">2</span>] <span class="sc">+</span> <span class="fu">log</span>(<span class="dv">2</span>)<span class="sc">*</span>X[,<span class="dv">3</span>] <span class="sc">+</span> <span class="fu">log</span>(<span class="fl">1.5</span>)<span class="sc">*</span>X[,<span class="dv">4</span>] <span class="sc">+</span> <span class="fu">log</span>(<span class="fl">2.4</span>)<span class="sc">*</span>X[,<span class="dv">5</span>] <span class="sc">+</span> <span class="fu">log</span>(<span class="fl">1.5</span>)<span class="sc">*</span>X[,<span class="dv">6</span>]</span>
-<span id="cb43-27"><a href="#cb43-27" aria-hidden="true" tabindex="-1"></a>  P_B <span class="ot">&lt;-</span> <span class="fu">plogis</span>(LP_B)</span>
-<span id="cb43-28"><a href="#cb43-28" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rbinom</span>(<span class="fu">length</span>(A), <span class="dv">1</span>, P_B)</span>
-<span id="cb43-29"><a href="#cb43-29" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb43-30"><a href="#cb43-30" aria-hidden="true" tabindex="-1"></a><span class="co">#Conditional:</span></span>
-<span id="cb43-31"><a href="#cb43-31" aria-hidden="true" tabindex="-1"></a><span class="co">#  OR:   2.4</span></span>
-<span id="cb43-32"><a href="#cb43-32" aria-hidden="true" tabindex="-1"></a><span class="co">#  logOR: .875</span></span>
-<span id="cb43-33"><a href="#cb43-33" aria-hidden="true" tabindex="-1"></a><span class="co">#Marginal:</span></span>
-<span id="cb43-34"><a href="#cb43-34" aria-hidden="true" tabindex="-1"></a><span class="co">#  RD:    .144</span></span>
-<span id="cb43-35"><a href="#cb43-35" aria-hidden="true" tabindex="-1"></a><span class="co">#  RR:   1.54</span></span>
-<span id="cb43-36"><a href="#cb43-36" aria-hidden="true" tabindex="-1"></a><span class="co">#  logRR: .433</span></span>
-<span id="cb43-37"><a href="#cb43-37" aria-hidden="true" tabindex="-1"></a><span class="co">#  OR:   1.92</span></span>
-<span id="cb43-38"><a href="#cb43-38" aria-hidden="true" tabindex="-1"></a><span class="co">#  logOR  .655</span></span>
-<span id="cb43-39"><a href="#cb43-39" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb43-40"><a href="#cb43-40" aria-hidden="true" tabindex="-1"></a><span class="co"># Survival outcome</span></span>
-<span id="cb43-41"><a href="#cb43-41" aria-hidden="true" tabindex="-1"></a>gen_Y_S <span class="ot">&lt;-</span> <span class="cf">function</span>(A, X) {</span>
-<span id="cb43-42"><a href="#cb43-42" aria-hidden="true" tabindex="-1"></a>  LP_S <span class="ot">&lt;-</span> <span class="sc">-</span><span class="dv">2</span> <span class="sc">+</span> <span class="fu">log</span>(<span class="fl">2.4</span>)<span class="sc">*</span>A <span class="sc">+</span> <span class="fu">log</span>(<span class="dv">2</span>)<span class="sc">*</span>X[,<span class="dv">1</span>] <span class="sc">+</span> <span class="fu">log</span>(<span class="dv">2</span>)<span class="sc">*</span>X[,<span class="dv">2</span>] <span class="sc">+</span> <span class="fu">log</span>(<span class="dv">2</span>)<span class="sc">*</span>X[,<span class="dv">3</span>] <span class="sc">+</span> <span class="fu">log</span>(<span class="fl">1.5</span>)<span class="sc">*</span>X[,<span class="dv">4</span>] <span class="sc">+</span> <span class="fu">log</span>(<span class="fl">2.4</span>)<span class="sc">*</span>X[,<span class="dv">5</span>] <span class="sc">+</span> <span class="fu">log</span>(<span class="fl">1.5</span>)<span class="sc">*</span>X[,<span class="dv">6</span>]</span>
-<span id="cb43-43"><a href="#cb43-43" aria-hidden="true" tabindex="-1"></a>  <span class="fu">sqrt</span>(<span class="sc">-</span><span class="fu">log</span>(<span class="fu">runif</span>(<span class="fu">length</span>(A)))<span class="sc">*</span><span class="fl">2e4</span><span class="sc">*</span><span class="fu">exp</span>(<span class="sc">-</span>LP_S))</span>
-<span id="cb43-44"><a href="#cb43-44" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb43-45"><a href="#cb43-45" aria-hidden="true" tabindex="-1"></a><span class="co">#Conditional:</span></span>
-<span id="cb43-46"><a href="#cb43-46" aria-hidden="true" tabindex="-1"></a><span class="co">#  HR:   2.4</span></span>
-<span id="cb43-47"><a href="#cb43-47" aria-hidden="true" tabindex="-1"></a><span class="co">#  logHR: .875</span></span>
-<span id="cb43-48"><a href="#cb43-48" aria-hidden="true" tabindex="-1"></a><span class="co">#Marginal:</span></span>
-<span id="cb43-49"><a href="#cb43-49" aria-hidden="true" tabindex="-1"></a><span class="co">#  HR:   1.57</span></span>
-<span id="cb43-50"><a href="#cb43-50" aria-hidden="true" tabindex="-1"></a><span class="co">#  logHR: .452</span></span>
-<span id="cb43-51"><a href="#cb43-51" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb43-52"><a href="#cb43-52" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">19599</span>)</span>
-<span id="cb43-53"><a href="#cb43-53" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb43-54"><a href="#cb43-54" aria-hidden="true" tabindex="-1"></a>n <span class="ot">&lt;-</span> <span class="dv">2000</span></span>
-<span id="cb43-55"><a href="#cb43-55" aria-hidden="true" tabindex="-1"></a>X <span class="ot">&lt;-</span> <span class="fu">gen_X</span>(n)</span>
-<span id="cb43-56"><a href="#cb43-56" aria-hidden="true" tabindex="-1"></a>A <span class="ot">&lt;-</span> <span class="fu">gen_A</span>(X)</span>
-<span id="cb43-57"><a href="#cb43-57" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb43-58"><a href="#cb43-58" aria-hidden="true" tabindex="-1"></a>Y_C <span class="ot">&lt;-</span> <span class="fu">gen_Y_C</span>(A, X)</span>
-<span id="cb43-59"><a href="#cb43-59" aria-hidden="true" tabindex="-1"></a>Y_B <span class="ot">&lt;-</span> <span class="fu">gen_Y_B</span>(A, X)</span>
-<span id="cb43-60"><a href="#cb43-60" aria-hidden="true" tabindex="-1"></a>Y_S <span class="ot">&lt;-</span> <span class="fu">gen_Y_S</span>(A, X)</span>
-<span id="cb43-61"><a href="#cb43-61" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb43-62"><a href="#cb43-62" aria-hidden="true" tabindex="-1"></a>d <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(A, X, Y_C, Y_B, Y_S)</span></code></pre></div>
+<div class="sourceCode" id="cb40"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Generating data similar to Austin (2009) for demonstrating treatment effect estimation</span></span>
+<span id="cb40-2"><a href="#cb40-2" aria-hidden="true" tabindex="-1"></a>gen_X <span class="ot">&lt;-</span> <span class="cf">function</span>(n) {</span>
+<span id="cb40-3"><a href="#cb40-3" aria-hidden="true" tabindex="-1"></a>  X <span class="ot">&lt;-</span> <span class="fu">matrix</span>(<span class="fu">rnorm</span>(<span class="dv">9</span> <span class="sc">*</span> n), <span class="at">nrow =</span> n, <span class="at">ncol =</span> <span class="dv">9</span>)</span>
+<span id="cb40-4"><a href="#cb40-4" aria-hidden="true" tabindex="-1"></a>  X[,<span class="dv">5</span>] <span class="ot">&lt;-</span> <span class="fu">as.numeric</span>(X[,<span class="dv">5</span>] <span class="sc">&lt;</span> .<span class="dv">5</span>)</span>
+<span id="cb40-5"><a href="#cb40-5" aria-hidden="true" tabindex="-1"></a>  X</span>
+<span id="cb40-6"><a href="#cb40-6" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb40-7"><a href="#cb40-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb40-8"><a href="#cb40-8" aria-hidden="true" tabindex="-1"></a><span class="co">#~20% treated</span></span>
+<span id="cb40-9"><a href="#cb40-9" aria-hidden="true" tabindex="-1"></a>gen_A <span class="ot">&lt;-</span> <span class="cf">function</span>(X) {</span>
+<span id="cb40-10"><a href="#cb40-10" aria-hidden="true" tabindex="-1"></a>  LP_A <span class="ot">&lt;-</span> <span class="sc">-</span> <span class="fl">1.2</span> <span class="sc">+</span> <span class="fu">log</span>(<span class="dv">2</span>)<span class="sc">*</span>X[,<span class="dv">1</span>] <span class="sc">-</span> <span class="fu">log</span>(<span class="fl">1.5</span>)<span class="sc">*</span>X[,<span class="dv">2</span>] <span class="sc">+</span> <span class="fu">log</span>(<span class="dv">2</span>)<span class="sc">*</span>X[,<span class="dv">4</span>] <span class="sc">-</span> <span class="fu">log</span>(<span class="fl">2.4</span>)<span class="sc">*</span>X[,<span class="dv">5</span>] <span class="sc">+</span> <span class="fu">log</span>(<span class="dv">2</span>)<span class="sc">*</span>X[,<span class="dv">7</span>] <span class="sc">-</span> <span class="fu">log</span>(<span class="fl">1.5</span>)<span class="sc">*</span>X[,<span class="dv">8</span>]</span>
+<span id="cb40-11"><a href="#cb40-11" aria-hidden="true" tabindex="-1"></a>  P_A <span class="ot">&lt;-</span> <span class="fu">plogis</span>(LP_A)</span>
+<span id="cb40-12"><a href="#cb40-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rbinom</span>(<span class="fu">nrow</span>(X), <span class="dv">1</span>, P_A)</span>
+<span id="cb40-13"><a href="#cb40-13" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb40-14"><a href="#cb40-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb40-15"><a href="#cb40-15" aria-hidden="true" tabindex="-1"></a><span class="co"># Continuous outcome</span></span>
+<span id="cb40-16"><a href="#cb40-16" aria-hidden="true" tabindex="-1"></a>gen_Y_C <span class="ot">&lt;-</span> <span class="cf">function</span>(A, X) {</span>
+<span id="cb40-17"><a href="#cb40-17" aria-hidden="true" tabindex="-1"></a>  <span class="dv">2</span><span class="sc">*</span>A <span class="sc">+</span> <span class="dv">2</span><span class="sc">*</span>X[,<span class="dv">1</span>] <span class="sc">+</span> <span class="dv">2</span><span class="sc">*</span>X[,<span class="dv">2</span>] <span class="sc">+</span> <span class="dv">2</span><span class="sc">*</span>X[,<span class="dv">3</span>] <span class="sc">+</span> <span class="dv">1</span><span class="sc">*</span>X[,<span class="dv">4</span>] <span class="sc">+</span> <span class="dv">2</span><span class="sc">*</span>X[,<span class="dv">5</span>] <span class="sc">+</span> <span class="dv">1</span><span class="sc">*</span>X[,<span class="dv">6</span>] <span class="sc">+</span> <span class="fu">rnorm</span>(<span class="fu">length</span>(A), <span class="dv">0</span>, <span class="dv">5</span>)</span>
+<span id="cb40-18"><a href="#cb40-18" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb40-19"><a href="#cb40-19" aria-hidden="true" tabindex="-1"></a><span class="co">#Conditional:</span></span>
+<span id="cb40-20"><a href="#cb40-20" aria-hidden="true" tabindex="-1"></a><span class="co">#  MD: 2</span></span>
+<span id="cb40-21"><a href="#cb40-21" aria-hidden="true" tabindex="-1"></a><span class="co">#Marginal:</span></span>
+<span id="cb40-22"><a href="#cb40-22" aria-hidden="true" tabindex="-1"></a><span class="co">#  MD: 2</span></span>
+<span id="cb40-23"><a href="#cb40-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb40-24"><a href="#cb40-24" aria-hidden="true" tabindex="-1"></a><span class="co"># Binary outcome</span></span>
+<span id="cb40-25"><a href="#cb40-25" aria-hidden="true" tabindex="-1"></a>gen_Y_B <span class="ot">&lt;-</span> <span class="cf">function</span>(A, X) {</span>
+<span id="cb40-26"><a href="#cb40-26" aria-hidden="true" tabindex="-1"></a>  LP_B <span class="ot">&lt;-</span> <span class="sc">-</span><span class="dv">2</span> <span class="sc">+</span> <span class="fu">log</span>(<span class="fl">2.4</span>)<span class="sc">*</span>A <span class="sc">+</span> <span class="fu">log</span>(<span class="dv">2</span>)<span class="sc">*</span>X[,<span class="dv">1</span>] <span class="sc">+</span> <span class="fu">log</span>(<span class="dv">2</span>)<span class="sc">*</span>X[,<span class="dv">2</span>] <span class="sc">+</span> <span class="fu">log</span>(<span class="dv">2</span>)<span class="sc">*</span>X[,<span class="dv">3</span>] <span class="sc">+</span> <span class="fu">log</span>(<span class="fl">1.5</span>)<span class="sc">*</span>X[,<span class="dv">4</span>] <span class="sc">+</span> <span class="fu">log</span>(<span class="fl">2.4</span>)<span class="sc">*</span>X[,<span class="dv">5</span>] <span class="sc">+</span> <span class="fu">log</span>(<span class="fl">1.5</span>)<span class="sc">*</span>X[,<span class="dv">6</span>]</span>
+<span id="cb40-27"><a href="#cb40-27" aria-hidden="true" tabindex="-1"></a>  P_B <span class="ot">&lt;-</span> <span class="fu">plogis</span>(LP_B)</span>
+<span id="cb40-28"><a href="#cb40-28" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rbinom</span>(<span class="fu">length</span>(A), <span class="dv">1</span>, P_B)</span>
+<span id="cb40-29"><a href="#cb40-29" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb40-30"><a href="#cb40-30" aria-hidden="true" tabindex="-1"></a><span class="co">#Conditional:</span></span>
+<span id="cb40-31"><a href="#cb40-31" aria-hidden="true" tabindex="-1"></a><span class="co">#  OR:   2.4</span></span>
+<span id="cb40-32"><a href="#cb40-32" aria-hidden="true" tabindex="-1"></a><span class="co">#  logOR: .875</span></span>
+<span id="cb40-33"><a href="#cb40-33" aria-hidden="true" tabindex="-1"></a><span class="co">#Marginal:</span></span>
+<span id="cb40-34"><a href="#cb40-34" aria-hidden="true" tabindex="-1"></a><span class="co">#  RD:    .144</span></span>
+<span id="cb40-35"><a href="#cb40-35" aria-hidden="true" tabindex="-1"></a><span class="co">#  RR:   1.54</span></span>
+<span id="cb40-36"><a href="#cb40-36" aria-hidden="true" tabindex="-1"></a><span class="co">#  logRR: .433</span></span>
+<span id="cb40-37"><a href="#cb40-37" aria-hidden="true" tabindex="-1"></a><span class="co">#  OR:   1.92</span></span>
+<span id="cb40-38"><a href="#cb40-38" aria-hidden="true" tabindex="-1"></a><span class="co">#  logOR  .655</span></span>
+<span id="cb40-39"><a href="#cb40-39" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb40-40"><a href="#cb40-40" aria-hidden="true" tabindex="-1"></a><span class="co"># Survival outcome</span></span>
+<span id="cb40-41"><a href="#cb40-41" aria-hidden="true" tabindex="-1"></a>gen_Y_S <span class="ot">&lt;-</span> <span class="cf">function</span>(A, X) {</span>
+<span id="cb40-42"><a href="#cb40-42" aria-hidden="true" tabindex="-1"></a>  LP_S <span class="ot">&lt;-</span> <span class="sc">-</span><span class="dv">2</span> <span class="sc">+</span> <span class="fu">log</span>(<span class="fl">2.4</span>)<span class="sc">*</span>A <span class="sc">+</span> <span class="fu">log</span>(<span class="dv">2</span>)<span class="sc">*</span>X[,<span class="dv">1</span>] <span class="sc">+</span> <span class="fu">log</span>(<span class="dv">2</span>)<span class="sc">*</span>X[,<span class="dv">2</span>] <span class="sc">+</span> <span class="fu">log</span>(<span class="dv">2</span>)<span class="sc">*</span>X[,<span class="dv">3</span>] <span class="sc">+</span> <span class="fu">log</span>(<span class="fl">1.5</span>)<span class="sc">*</span>X[,<span class="dv">4</span>] <span class="sc">+</span> <span class="fu">log</span>(<span class="fl">2.4</span>)<span class="sc">*</span>X[,<span class="dv">5</span>] <span class="sc">+</span> <span class="fu">log</span>(<span class="fl">1.5</span>)<span class="sc">*</span>X[,<span class="dv">6</span>]</span>
+<span id="cb40-43"><a href="#cb40-43" aria-hidden="true" tabindex="-1"></a>  <span class="fu">sqrt</span>(<span class="sc">-</span><span class="fu">log</span>(<span class="fu">runif</span>(<span class="fu">length</span>(A)))<span class="sc">*</span><span class="fl">2e4</span><span class="sc">*</span><span class="fu">exp</span>(<span class="sc">-</span>LP_S))</span>
+<span id="cb40-44"><a href="#cb40-44" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb40-45"><a href="#cb40-45" aria-hidden="true" tabindex="-1"></a><span class="co">#Conditional:</span></span>
+<span id="cb40-46"><a href="#cb40-46" aria-hidden="true" tabindex="-1"></a><span class="co">#  HR:   2.4</span></span>
+<span id="cb40-47"><a href="#cb40-47" aria-hidden="true" tabindex="-1"></a><span class="co">#  logHR: .875</span></span>
+<span id="cb40-48"><a href="#cb40-48" aria-hidden="true" tabindex="-1"></a><span class="co">#Marginal:</span></span>
+<span id="cb40-49"><a href="#cb40-49" aria-hidden="true" tabindex="-1"></a><span class="co">#  HR:   1.57</span></span>
+<span id="cb40-50"><a href="#cb40-50" aria-hidden="true" tabindex="-1"></a><span class="co">#  logHR: .452</span></span>
+<span id="cb40-51"><a href="#cb40-51" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb40-52"><a href="#cb40-52" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">19599</span>)</span>
+<span id="cb40-53"><a href="#cb40-53" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb40-54"><a href="#cb40-54" aria-hidden="true" tabindex="-1"></a>n <span class="ot">&lt;-</span> <span class="dv">2000</span></span>
+<span id="cb40-55"><a href="#cb40-55" aria-hidden="true" tabindex="-1"></a>X <span class="ot">&lt;-</span> <span class="fu">gen_X</span>(n)</span>
+<span id="cb40-56"><a href="#cb40-56" aria-hidden="true" tabindex="-1"></a>A <span class="ot">&lt;-</span> <span class="fu">gen_A</span>(X)</span>
+<span id="cb40-57"><a href="#cb40-57" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb40-58"><a href="#cb40-58" aria-hidden="true" tabindex="-1"></a>Y_C <span class="ot">&lt;-</span> <span class="fu">gen_Y_C</span>(A, X)</span>
+<span id="cb40-59"><a href="#cb40-59" aria-hidden="true" tabindex="-1"></a>Y_B <span class="ot">&lt;-</span> <span class="fu">gen_Y_B</span>(A, X)</span>
+<span id="cb40-60"><a href="#cb40-60" aria-hidden="true" tabindex="-1"></a>Y_S <span class="ot">&lt;-</span> <span class="fu">gen_Y_S</span>(A, X)</span>
+<span id="cb40-61"><a href="#cb40-61" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb40-62"><a href="#cb40-62" aria-hidden="true" tabindex="-1"></a>d <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(A, X, Y_C, Y_B, Y_S)</span></code></pre></div>
 </div>
 <div class="footnotes footnotes-end-of-document">
 <hr />

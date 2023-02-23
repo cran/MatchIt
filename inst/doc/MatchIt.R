@@ -42,10 +42,10 @@ m.out1
 # Checking balance after NN matching
 summary(m.out1, un = FALSE)
 
-## -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+## ---- fig.alt="Jitter plot of the propensity scores, which shows that no treated unit were dropped, and a large number of control units with low propensity scores were dropped."---------------------
 plot(m.out1, type = "jitter", interactive = FALSE)
 
-## -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+## ---- fig.alt="Density plots of age, married and re75 in the unmatched and matched samples."----------------------------------------------------------------------------------------------------------
 plot(m.out1, type = "density", interactive = FALSE,
      which.xs = ~age + married + re75)
 
@@ -67,7 +67,7 @@ m.out2
 # Checking balance after full matching
 summary(m.out2, un = FALSE)
 
-## ---- eval = (use != "none")--------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+## ---- eval = (use != "none"), fig.alt = "A love plot with matched dots below the threshold lines, indicaitng good balance after matching, in contrast to the unmatched dots far from the treshold lines, indicating poor balance before matching."----
 plot(summary(m.out2))
 
 ## ---- eval = (use != "none")--------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -81,16 +81,21 @@ library("marginaleffects")
 fit <- lm(re78 ~ treat * (age + educ + race + married + nodegree + 
              re74 + re75), data = m.data, weights = weights)
 
-comp <- comparisons(fit,
-                     variables = "treat",
-                     vcov = ~subclass,
-                     newdata = subset(m.data, treat == 1),
-                     wts = "weights")
-summary(comp)
+avg_comparisons(fit,
+                variables = "treat",
+                vcov = ~subclass,
+                newdata = subset(m.data, treat == 1),
+                wts = "weights")
 
 ## ---- include = FALSE---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 est <- {
-  if (use != "none" && me_ok) summary(comp)
+  if (use != "none" && me_ok) {
+    avg_comparisons(fit,
+                variables = "treat",
+                vcov = ~subclass,
+                newdata = subset(m.data, treat == 1),
+                wts = "weights")
+  }
   else data.frame(type = "response", term = "1 - 0", estimate = 2114, 
                   std.error = 646, statistic = 3.27, 
                   p.value = 0.0011, conf.low = 848, 
