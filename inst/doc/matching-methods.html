@@ -12,7 +12,7 @@
 
 <meta name="author" content="Noah Greifer" />
 
-<meta name="date" content="2023-02-22" />
+<meta name="date" content="2023-03-21" />
 
 <title>Matching Methods</title>
 
@@ -261,7 +261,7 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 
 <h1 class="title toc-ignore">Matching Methods</h1>
 <h4 class="author">Noah Greifer</h4>
-<h4 class="date">2023-02-22</h4>
+<h4 class="date">2023-03-21</h4>
 
 
 <div id="TOC">
@@ -1002,10 +1002,10 @@ dimensionality. As with exact matching performed with
 <code>method = &quot;exact&quot;</code>, any units in strata lacking members of
 one of the treatment groups will be left unmatched. Note that although
 matching occurs within each exact matching stratum, propensity score
-estimation and computation of the Mahalanobis distance occur in the full
-sample. <strong>If units from the treated group are unmatched due to an
-exact matching restriction, the estimand no longer corresponds to the
-ATT.</strong></p>
+estimation and computation of the Mahalanobis or other distance matrix
+occur in the full sample. <strong>If units from the treated group are
+unmatched due to an exact matching restriction, the estimand no longer
+corresponds to the ATT.</strong></p>
 </div>
 <div id="anti-exact-matching-antiexact" class="section level3">
 <h3>Anti-exact matching (<code>antiexact</code>)</h3>

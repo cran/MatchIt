@@ -104,11 +104,11 @@ avg_comparisons(fit1, variables = "A",
                 wts = "weights")
 
 ## ---- eval=me_ok && packageVersion("marginaleffects") > "0.10.0"--------------------------------------------------------------------------------------------------------------------------------------
-#  avg_predictions(fit1, variables = "A",
-#                  vcov = ~subclass,
-#                  newdata = subset(md, A == 1),
-#                  wts = "weights",
-#                  by = "A")
+avg_predictions(fit1, variables = "A",
+                vcov = ~subclass,
+                newdata = subset(md, A == 1),
+                wts = "weights",
+                by = "A")
 
 ## ---- eval=me_ok--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 #Subclassification on the PS for the ATT
