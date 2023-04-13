@@ -103,12 +103,11 @@ avg_comparisons(fit1, variables = "A",
                 newdata = subset(md, A == 1),
                 wts = "weights")
 
-## ---- eval=me_ok && packageVersion("marginaleffects") > "0.10.0"--------------------------------------------------------------------------------------------------------------------------------------
+## ---- eval=me_ok && packageVersion("marginaleffects") >= "0.11.0"-------------------------------------------------------------------------------------------------------------------------------------
 avg_predictions(fit1, variables = "A",
                 vcov = ~subclass,
                 newdata = subset(md, A == 1),
-                wts = "weights",
-                by = "A")
+                wts = "weights")
 
 ## ---- eval=me_ok--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 #Subclassification on the PS for the ATT
@@ -141,8 +140,8 @@ avg_comparisons(fit2,
                 vcov = ~subclass,
                 newdata = subset(md, A == 1),
                 wts = "weights",
-                transform_pre = "lnratioavg",
-                transform_post = "exp")
+                comparison = "lnratioavg",
+                transform = "exp")
 
 ## ---- eval=su_ok--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 library("survival")

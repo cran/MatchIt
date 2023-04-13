@@ -1,5 +1,5 @@
 Package: MatchIt
-Version: 4.5.2
+Version: 4.5.3
 Title: Nonparametric Preprocessing for Parametric Causal Inference
 Description: Selects matched samples of the original treated and
     control groups with similar covariate distributions -- can be
@@ -25,11 +25,12 @@ Authors@R: c(
 	       comment = c(ORCID="0000-0003-3067-7154"))
   )
 Depends: R (>= 3.5.0)
-Imports: backports (>= 1.1.9), Rcpp (>= 1.0.10), utils, stats, graphics
+Imports: backports (>= 1.1.9), chk (>= 0.8.1), rlang (>= 1.1.0), Rcpp
+        (>= 1.0.10), utils, stats, graphics
 Suggests: optmatch (>= 0.10.6), Matching, rgenoud, quickmatch (>=
         0.2.1), nnet, rpart, mgcv, CBPS (>= 0.17), dbarts, randomForest
         (>= 4.7-1), glmnet (>= 4.0), gbm (>= 2.1.7), cobalt (>= 4.2.3),
-        boot, marginaleffects (>= 0.9.0), sandwich (>= 2.5-1),
+        boot, marginaleffects (>= 0.11.0), sandwich (>= 2.5-1),
         survival, RcppProgress (>= 0.4.2), Rglpk, Rsymphony, gurobi,
         knitr, rmarkdown
 LinkingTo: Rcpp, RcppProgress
@@ -42,7 +43,7 @@ BugReports: https://github.com/kosukeimai/MatchIt/issues
 VignetteBuilder: knitr
 RoxygenNote: 7.2.3
 NeedsCompilation: yes
-Packaged: 2023-03-21 20:44:51 UTC; noahgreifer
+Packaged: 2023-04-13 04:57:37 UTC; NoahGreifer
 Author: Daniel Ho [aut] (<https://orcid.org/0000-0002-2195-5469>),
   Kosuke Imai [aut] (<https://orcid.org/0000-0002-2748-1022>),
   Gary King [aut] (<https://orcid.org/0000-0002-5327-7631>),
@@ -51,4 +52,4 @@ Author: Daniel Ho [aut] (<https://orcid.org/0000-0002-2195-5469>),
   Noah Greifer [cre, aut] (<https://orcid.org/0000-0003-3067-7154>)
 Maintainer: Noah Greifer <noah.greifer@gmail.com>
 Repository: CRAN
-Date/Publication: 2023-03-22 13:30:02 UTC
+Date/Publication: 2023-04-13 12:10:06 UTC
