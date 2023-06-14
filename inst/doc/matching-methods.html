@@ -12,7 +12,7 @@
 
 <meta name="author" content="Noah Greifer" />
 
-<meta name="date" content="2023-04-13" />
+<meta name="date" content="2023-06-13" />
 
 <title>Matching Methods</title>
 
@@ -261,7 +261,7 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 
 <h1 class="title toc-ignore">Matching Methods</h1>
 <h4 class="author">Noah Greifer</h4>
-<h4 class="date">2023-04-13</h4>
+<h4 class="date">2023-06-13</h4>
 
 
 <div id="TOC">
@@ -310,6 +310,8 @@ matching (<code>exact</code>)</a></li>
 (<code>replace</code>)</a></li>
 <li><a href="#k1-matching-ratio" id="toc-k1-matching-ratio"><span class="math inline">\(k\)</span>:1 matching
 (<code>ratio</code>)</a></li>
+<li><a href="#matching-order-m.order" id="toc-matching-order-m.order">Matching order
+(<code>m.order</code>)</a></li>
 </ul></li>
 <li><a href="#choosing-a-matching-method" id="toc-choosing-a-matching-method">Choosing a Matching Method</a></li>
 <li><a href="#reporting-the-matching-specification" id="toc-reporting-the-matching-specification">Reporting the Matching
@@ -332,7 +334,8 @@ nonparametric preprocessing through matching is that a number of
 matching methods can be tried and their quality assessed without
 consulting the outcome, reducing the possibility of capitalizing on
 chance while allowing for the benefits of an exploratory analysis in the
-design phase <span class="citation">(<a href="#ref-ho2007" role="doc-biblioref">Ho et al. 2007</a>)</span>.</p>
+design phase <span class="citation">(<a href="#ref-ho2007">Ho et al.
+2007</a>)</span>.</p>
 <p>This vignette describes each matching method available in
 <code>MatchIt</code> and the various options that are allowed with
 matching methods and the consequences of their use. For a brief
@@ -354,10 +357,10 @@ comparison of the outcomes treatment and control groups is not
 confounded by the measured and balanced covariates. Although statistical
 estimation methods like regression can also be used to remove
 confounding due to measured covariates, <span class="citation">Ho et al.
-(<a href="#ref-ho2007" role="doc-biblioref">2007</a>)</span> argue that
-fitting regression models in matched samples reduces the dependence of
-the validity of the estimated treatment effect on the correct
-specification of the model.</p>
+(<a href="#ref-ho2007">2007</a>)</span> argue that fitting regression
+models in matched samples reduces the dependence of the validity of the
+estimated treatment effect on the correct specification of the
+model.</p>
 <p>Matching is nonparametric in the sense that the estimated weights and
 pruning of the sample are not direct functions of estimated model
 parameters but rather depend on the organization of discrete units in
@@ -369,7 +372,7 @@ as the intuitive understanding of matching by the public compared to
 regression or weighting, make it a robust and effective way to estimate
 treatment effects.</p>
 <p>It is important to note that this implementation of matching differs
-from the methods described by Abadie and Imbens <span class="citation">(<a href="#ref-abadie2006" role="doc-biblioref">2006</a>, <a href="#ref-abadie2016" role="doc-biblioref">2016</a>)</span> and implemented in the
+from the methods described by Abadie and Imbens <span class="citation">(<a href="#ref-abadie2006">2006</a>, <a href="#ref-abadie2016">2016</a>)</span> and implemented in the
 <code>Matching</code> R package and <code>teffects</code> routine in
 Stata. That form of matching is <em>matching imputation</em>, where the
 missing potential outcomes for each unit are imputed using the observed
@@ -393,24 +396,22 @@ experiments, which are more familiar to non-technical audiences.</p>
 <p>In addition to subset selection, matching often (though not always)
 involves a form of <em>stratification</em>, the assignment of units to
 pairs or strata containing multiple units. The distinction between
-subset selection and stratification is described by <span class="citation">Zubizarreta, Paredes, and Rosenbaum (<a href="#ref-zubizarreta2014" role="doc-biblioref">2014a</a>)</span>, who
-separate them into two separate steps. In <code>MatchIt</code>, with
-almost all matching methods, subset selection is performed by
-stratification; for example, treated units are paired with control
-units, and unpaired units are then dropped from the matched sample. With
-some methods, subclasses are used to assign matching or stratification
-weights to individual units, which increase or decrease each unit’s
-leverage in a subsequent analysis. There has been some debate about the
-importance of stratification after subset selection; while some authors
-have argued that, with some forms of matching, pair membership is
-incidental <span class="citation">(<a href="#ref-stuart2008" role="doc-biblioref">Stuart 2008</a>; <a href="#ref-schafer2008" role="doc-biblioref">Schafer and Kang 2008</a>)</span>, others have
+subset selection and stratification is described by <span class="citation">Zubizarreta, Paredes, and Rosenbaum (<a href="#ref-zubizarreta2014">2014a</a>)</span>, who separate them into
+two separate steps. In <code>MatchIt</code>, with almost all matching
+methods, subset selection is performed by stratification; for example,
+treated units are paired with control units, and unpaired units are then
+dropped from the matched sample. With some methods, subclasses are used
+to assign matching or stratification weights to individual units, which
+increase or decrease each unit’s leverage in a subsequent analysis.
+There has been some debate about the importance of stratification after
+subset selection; while some authors have argued that, with some forms
+of matching, pair membership is incidental <span class="citation">(<a href="#ref-stuart2008">Stuart 2008</a>; <a href="#ref-schafer2008">Schafer and Kang 2008</a>)</span>, others have
 argued that correctly incorporating pair membership into effect
-estimation can improve the quality of inferences <span class="citation">(<a href="#ref-austin2014a" role="doc-biblioref">Austin
-and Small 2014</a>; <a href="#ref-wan2019" role="doc-biblioref">Wan
-2019</a>)</span>. For methods that allow it, <code>MatchIt</code>
-includes stratum membership as an additional output of each matching
-specification. How these strata can be used is detailed in
-<code>vignette(&quot;Estimating Effects&quot;)</code>.</p>
+estimation can improve the quality of inferences <span class="citation">(<a href="#ref-austin2014a">Austin and Small 2014</a>;
+<a href="#ref-wan2019">Wan 2019</a>)</span>. For methods that allow it,
+<code>MatchIt</code> includes stratum membership as an additional output
+of each matching specification. How these strata can be used is detailed
+in <code>vignette(&quot;Estimating Effects&quot;)</code>.</p>
 <p>At the heart of <code>MatchIt</code> are three classes of methods:
 distance matching, stratum matching, and pure subset selection.
 <em>Distance matching</em> involves considering a focal group (usually
@@ -471,31 +472,29 @@ closest eligible control unit to be paired with each treated unit. It is
 greedy in the sense that each pairing occurs without reference to how
 other units will be or have been paired, and therefore does not aim to
 optimize any criterion. Nearest neighbor matching is the most common
-form of matching used <span class="citation">(<a href="#ref-thoemmes2011" role="doc-biblioref">Thoemmes and Kim 2011</a>;
-<a href="#ref-zakrison2018" role="doc-biblioref">Zakrison, Austin, and
-McCredie 2018</a>)</span> and has been extensively studied through
-simulations. See <code>?method_nearest</code> for the documentation for
+form of matching used <span class="citation">(<a href="#ref-thoemmes2011">Thoemmes and Kim 2011</a>; <a href="#ref-zakrison2018">Zakrison, Austin, and McCredie 2018</a>)</span>
+and has been extensively studied through simulations. See
+<code>?method_nearest</code> for the documentation for
 <code>matchit()</code> with <code>method = &quot;nearest&quot;</code>.</p>
 <p>Nearest neighbor matching requires the specification of a distance
 measure to define which control unit is closest to each treated unit.
 The default and most common distance is the <em>propensity score
 difference</em>, which is the difference between the propensity scores
-of each treated and control unit <span class="citation">(<a href="#ref-stuart2010" role="doc-biblioref">Stuart 2010</a>)</span>.
-Another popular distance is the Mahalanobis distance, described in the
-section “Mahalanobis distance matching” below. The order in which the
-treated units are to be paired must also be specified and has the
-potential to change the quality of the matches <span class="citation">(<a href="#ref-austin2013b" role="doc-biblioref">Austin
-2013</a>; <a href="#ref-rubin1973" role="doc-biblioref">Rubin
+of each treated and control unit <span class="citation">(<a href="#ref-stuart2010">Stuart 2010</a>)</span>. Another popular distance
+is the Mahalanobis distance, described in the section “Mahalanobis
+distance matching” below. The order in which the treated units are to be
+paired must also be specified and has the potential to change the
+quality of the matches <span class="citation">(<a href="#ref-austin2013b">Austin 2013</a>; <a href="#ref-rubin1973">Rubin
 1973</a>)</span>; this is specified by the <code>m.order</code>
 argument. With propensity score matching, the default is to go in
 descending order from the highest propensity score; doing so allows the
 units that would have the hardest time finding close matches to be
-matched first <span class="citation">(<a href="#ref-rubin1973" role="doc-biblioref">Rubin 1973</a>)</span>. Other orderings are
-possible, including random ordering, which can be tried multiple times
-until an adequate matched sample is found. When matching with
-replacement (i.e., where each control unit can be reused to be matched
-with any number of treated units), the matching order doesn’t
-matter.</p>
+matched first <span class="citation">(<a href="#ref-rubin1973">Rubin
+1973</a>)</span>. Other orderings are possible, including random
+ordering, which can be tried multiple times until an adequate matched
+sample is found. When matching with replacement (i.e., where each
+control unit can be reused to be matched with any number of treated
+units), the matching order doesn’t matter.</p>
 <p>When using a matching ratio greater than 1 (i.e., when more than 1
 control units are requested to be matched to each treated unit),
 matching occurs in a cycle, where each treated unit is first paired with
@@ -512,13 +511,14 @@ similar to nearest neighbor matching in that it attempts to pair each
 treated unit with one or more control units. Unlike nearest neighbor
 matching, however, it is “optimal” rather than greedy; it is optimal in
 the sense that it attempts to choose matches that collectively optimize
-an overall criterion <span class="citation">(<a href="#ref-hansen2006" role="doc-biblioref">Hansen and Klopfer 2006</a>; <a href="#ref-gu1993" role="doc-biblioref">Gu and Rosenbaum 1993</a>)</span>. The criterion
-used is the sum of the absolute pair distances in the matched sample.
-See <code>?method_optimal</code> for the documentation for
+an overall criterion <span class="citation">(<a href="#ref-hansen2006">Hansen and Klopfer 2006</a>; <a href="#ref-gu1993">Gu and Rosenbaum 1993</a>)</span>. The criterion used
+is the sum of the absolute pair distances in the matched sample. See
+<code>?method_optimal</code> for the documentation for
 <code>matchit()</code> with <code>method = &quot;optimal&quot;</code>. Optimal
 pair matching in <code>MatchIt</code> depends on the
 <code>fullmatch()</code> function in the <code>optmatch</code> package
-<span class="citation">(<a href="#ref-hansen2006" role="doc-biblioref">Hansen and Klopfer 2006</a>)</span>.</p>
+<span class="citation">(<a href="#ref-hansen2006">Hansen and Klopfer
+2006</a>)</span>.</p>
 <p>Like nearest neighbor matching, optimal pair matching requires the
 specification of a distance measure between units. Optimal pair matching
 can be thought of simply as an alternative to selecting the order of the
@@ -526,7 +526,7 @@ matching for nearest neighbor matching. Optimal pair matching and
 nearest neighbor matching often yield the same or very similar matched
 samples; indeed, some research has indicated that optimal pair matching
 is not much better than nearest neighbor matching at yielding balanced
-matched samples <span class="citation">(<a href="#ref-austin2013b" role="doc-biblioref">Austin 2013</a>)</span>.</p>
+matched samples <span class="citation">(<a href="#ref-austin2013b">Austin 2013</a>)</span>.</p>
 <p>The <code>tol</code> argument in <code>fullmatch()</code> can be
 supplied to <code>matchit()</code> with <code>method = &quot;optimal&quot;</code>;
 this controls the numerical tolerance used to determine whether the
@@ -537,21 +537,19 @@ smaller problems, should be set much lower (e.g., by setting
 <div id="optimal-full-matching-method-full" class="section level3">
 <h3>Optimal Full Matching (<code>method = &quot;full&quot;</code>)</h3>
 <p>Optimal full matching (often just called full matching) assigns every
-treated and control unit in the sample to one subclass each <span class="citation">(<a href="#ref-hansen2004" role="doc-biblioref">Hansen
-2004</a>; <a href="#ref-stuart2008a" role="doc-biblioref">Stuart and
-Green 2008</a>)</span>. Each subclass contains one treated unit and one
-or more control units or one control units and one or more treated
-units. It is optimal in the sense that the chosen number of subclasses
-and the assignment of units to subclasses minimize the sum of the
-absolute within-subclass distances in the matched sample. Weights are
-computed based on subclass membership, and these weights then function
-like propensity score weights and can be used to estimate a weighted
-treatment effect, ideally free of confounding by the measured
-covariates. See <code>?method_full</code> for the documentation for
-<code>matchit()</code> with <code>method = &quot;full&quot;</code>. Optimal full
-matching in <code>MatchIt</code> depends on the <code>fullmatch()</code>
-function in the <code>optmatch</code> package <span class="citation">(<a href="#ref-hansen2006" role="doc-biblioref">Hansen and Klopfer
-2006</a>)</span>.</p>
+treated and control unit in the sample to one subclass each <span class="citation">(<a href="#ref-hansen2004">Hansen 2004</a>; <a href="#ref-stuart2008a">Stuart and Green 2008</a>)</span>. Each subclass
+contains one treated unit and one or more control units or one control
+units and one or more treated units. It is optimal in the sense that the
+chosen number of subclasses and the assignment of units to subclasses
+minimize the sum of the absolute within-subclass distances in the
+matched sample. Weights are computed based on subclass membership, and
+these weights then function like propensity score weights and can be
+used to estimate a weighted treatment effect, ideally free of
+confounding by the measured covariates. See <code>?method_full</code>
+for the documentation for <code>matchit()</code> with
+<code>method = &quot;full&quot;</code>. Optimal full matching in
+<code>MatchIt</code> depends on the <code>fullmatch()</code> function in
+the <code>optmatch</code> package <span class="citation">(<a href="#ref-hansen2006">Hansen and Klopfer 2006</a>)</span>.</p>
 <p>Like the other distance matching methods, optimal full matching
 requires the specification of a distance measure between units. It can
 be seen a combination of distance matching and stratum matching:
@@ -563,10 +561,10 @@ distance matching methods, full matching can be used to estimate the
 ATE. Full matching can also be seen as a form of propensity score
 weighting that is less sensitive to the form of the propensity score
 model because the original propensity scores are used just to create the
-subclasses, not to form the weights directly <span class="citation">(<a href="#ref-austin2015a" role="doc-biblioref">Austin and Stuart
-2015a</a>)</span>. In addition, full matching does not have to rely on
-estimated propensity scores to form the subclasses and weights; other
-distance measures are allowed as well.</p>
+subclasses, not to form the weights directly <span class="citation">(<a href="#ref-austin2015a">Austin and Stuart 2015a</a>)</span>. In
+addition, full matching does not have to rely on estimated propensity
+scores to form the subclasses and weights; other distance measures are
+allowed as well.</p>
 <p>Although full matching uses all available units, there is a loss in
 precision due to the weights. Units may be weighted in such a way that
 they contribute less to the sample than would unweighted units, so the
@@ -587,25 +585,26 @@ problems by setting, e.g., <code>tol = 1e-7</code>.</p>
 <h3>Generalized Full Matching (<code>method = &quot;quick&quot;</code>)</h3>
 <p>Generalized full matching is a variant of full matching that uses a
 special fast clustering algorithm to dramatically speed up the matching,
-even for large datasets <span class="citation">(<a href="#ref-savjeGeneralizedFullMatching2021" role="doc-biblioref">Sävje,
-Higgins, and Sekhon 2021</a>)</span>. Like with optimal full matching,
-generalized full matching assigns every unit to a subclass. What makes
-generalized full match “generalized” is that the user can customize the
-matching in a number of ways, such as by specifying an arbitrary minimum
-number of units from each treatment group or total number of units per
-subclass, or by allowing not all units from a treatment group to have to
-be matched. Generalized full matching minimizes the largest
-within-subclass distances in the matched sample, but it does so in a way
-that is not completely optimal (though the solution is often very close
-to the optimal solution). Matching weights are computed based on
-subclass membership, and these weights then function like propensity
-score weights and can be used to estimate a weighted treatment effect,
-ideally free of confounding by the measured covariates. See
+even for large datasets <span class="citation">(<a href="#ref-savjeGeneralizedFullMatching2021">Sävje, Higgins, and Sekhon
+2021</a>)</span>. Like with optimal full matching, generalized full
+matching assigns every unit to a subclass. What makes generalized full
+match “generalized” is that the user can customize the matching in a
+number of ways, such as by specifying an arbitrary minimum number of
+units from each treatment group or total number of units per subclass,
+or by allowing not all units from a treatment group to have to be
+matched. Generalized full matching minimizes the largest within-subclass
+distances in the matched sample, but it does so in a way that is not
+completely optimal (though the solution is often very close to the
+optimal solution). Matching weights are computed based on subclass
+membership, and these weights then function like propensity score
+weights and can be used to estimate a weighted treatment effect, ideally
+free of confounding by the measured covariates. See
 <code>?method_quick</code> for the documentation for
 <code>matchit()</code> with <code>method = &quot;quick&quot;</code>. Generalized
 full matching in <code>MatchIt</code> depends on the
 <code>quickmatch()</code> function in the <code>quickmatch</code>
-package <span class="citation">(<a href="#ref-savjeQuickmatchQuickGeneralized2018" role="doc-biblioref">Savje, Sekhon, and Higgins 2018</a>)</span>.</p>
+package <span class="citation">(<a href="#ref-savjeQuickmatchQuickGeneralized2018">Savje, Sekhon, and
+Higgins 2018</a>)</span>.</p>
 <p>Generalized full matching includes different options for
 customization than optimal full matching. The user cannot supply their
 own distance matrix, but propensity scores and distance metrics that are
@@ -626,17 +625,16 @@ practice, though, the form of matching used is nearest neighbor pair
 matching. Genetic matching uses a genetic algorithm, which is an
 optimization routine used for non-differentiable objective functions, to
 find scaling factors for each variable in a generalized Mahalanobis
-distance formula <span class="citation">(<a href="#ref-diamond2013" role="doc-biblioref">Diamond and Sekhon 2013</a>)</span>. The criterion
-optimized by the algorithm is one based on covariate balance. Once the
-scaling factors have been found, nearest neighbor matching is performed
-on the scaled generalized Mahalanobis distance. See
+distance formula <span class="citation">(<a href="#ref-diamond2013">Diamond and Sekhon 2013</a>)</span>. The
+criterion optimized by the algorithm is one based on covariate balance.
+Once the scaling factors have been found, nearest neighbor matching is
+performed on the scaled generalized Mahalanobis distance. See
 <code>?method_genetic</code> for the documentation for
 <code>matchit()</code> with <code>method = &quot;genetic&quot;</code>. Genetic
 matching in <code>MatchIt</code> depends on the <code>GenMatch()</code>
-function in the <code>Matching</code> package <span class="citation">(<a href="#ref-sekhon2011" role="doc-biblioref">Sekhon 2011</a>)</span> to
-perform the genetic search and uses the <code>Match()</code> function to
-perform the nearest neighbor match using the scaled generalized
-Mahalanobis distance.</p>
+function in the <code>Matching</code> package <span class="citation">(<a href="#ref-sekhon2011">Sekhon 2011</a>)</span> to perform the genetic
+search and uses the <code>Match()</code> function to perform the nearest
+neighbor match using the scaled generalized Mahalanobis distance.</p>
 <p>Genetic matching considers the generalized Mahalanobis distance
 between a treated unit <span class="math inline">\(i\)</span> and a
 control unit <span class="math inline">\(j\)</span> as <span class="math display">\[\delta_{GMD}(\mathbf{x}_i,\mathbf{x}_j,
@@ -716,17 +714,17 @@ done.</p>
 <p>Coarsened exact matching (CEM) is a form of stratum matching that
 involves first coarsening the covariates by creating bins and then
 performing exact matching on the new coarsened versions of the
-covariates <span class="citation">(<a href="#ref-iacus2012" role="doc-biblioref">Iacus, King, and Porro 2012</a>)</span>. The degree
-and method of coarsening can be controlled by the user to manage the
-trade-off between exact and approximate balancing. For example,
-coarsening a covariate to two bins will mean that units that differ
-greatly on the covariate might be placed into the same subclass, while
-coarsening a variable to five bins may require units to be dropped due
-to not finding matches. Like exact matching, CEM is susceptible to the
-curse of dimensionality, making it a less viable solution with many
-covariates, especially with few units. Dropping units can also change
-the target population of the estimated effect. See
-<code>?method_cem</code> for the documentation for
+covariates <span class="citation">(<a href="#ref-iacus2012">Iacus, King,
+and Porro 2012</a>)</span>. The degree and method of coarsening can be
+controlled by the user to manage the trade-off between exact and
+approximate balancing. For example, coarsening a covariate to two bins
+will mean that units that differ greatly on the covariate might be
+placed into the same subclass, while coarsening a variable to five bins
+may require units to be dropped due to not finding matches. Like exact
+matching, CEM is susceptible to the curse of dimensionality, making it a
+less viable solution with many covariates, especially with few units.
+Dropping units can also change the target population of the estimated
+effect. See <code>?method_cem</code> for the documentation for
 <code>matchit()</code> with <code>method = &quot;cem&quot;</code>. CEM in
 <code>MatchIt</code> does not depend on any other package to perform the
 coarsening and matching, though it used to rely on the <code>cem</code>
@@ -741,10 +739,9 @@ quantiles of the propensity score distribution either in the treated
 group, control group, or overall, depending on the desired estimand.
 Propensity score subclassification is an old and well-studied method,
 though it can perform poorly compared to other, more modern propensity
-score methods such as full matching and weighting <span class="citation">(<a href="#ref-austin2010" role="doc-biblioref">Austin
-2010a</a>)</span>. See <code>?method_subclass</code> for the
-documentation for <code>matchit()</code> with
-<code>method = &quot;subclass&quot;</code>.</p>
+score methods such as full matching and weighting <span class="citation">(<a href="#ref-austin2010">Austin 2010a</a>)</span>.
+See <code>?method_subclass</code> for the documentation for
+<code>matchit()</code> with <code>method = &quot;subclass&quot;</code>.</p>
 <p>The binning of the propensity scores is typically based on dividing
 the distribution of covariates into approximately equally sized bins.
 The user specifies the number of subclasses using the
@@ -763,7 +760,7 @@ but can increase precision.</p>
 not be taken as a recommended value. Although early theory has
 recommended the use of 5 subclasses, in general there is an optimal
 number of subclasses that is typically much larger than 5 but that
-varies among datasets <span class="citation">(<a href="#ref-orihara2021" role="doc-biblioref">Orihara and Hamada 2021</a>)</span>. Rather than
+varies among datasets <span class="citation">(<a href="#ref-orihara2021">Orihara and Hamada 2021</a>)</span>. Rather than
 trying to figure this out for oneself, one can use optimal full matching
 (i.e., with <code>method = &quot;full&quot;</code>) or generalized full matching
 (<code>method = &quot;quick&quot;</code>) to optimally create subclasses that
@@ -773,8 +770,8 @@ assigned subclasses and the subclassification weights. Effects can be
 estimated either within each subclass and then averaged across them, or
 a single marginal effect can be estimated using the subclassification
 weights. This latter method has been called marginal mean weighting
-through subclassification [MMWS; <span class="citation">Hong (<a href="#ref-hong2010" role="doc-biblioref">2010</a>)</span>] and fine
-stratification weighting <span class="citation">(<a href="#ref-desai2017" role="doc-biblioref">Desai et al.
+through subclassification [MMWS; <span class="citation">Hong (<a href="#ref-hong2010">2010</a>)</span>] and fine stratification weighting
+<span class="citation">(<a href="#ref-desai2017">Desai et al.
 2017</a>)</span>. It is also implemented in the <code>WeightIt</code>
 package.</p>
 </div>
@@ -788,18 +785,18 @@ pairs or subclasses. They can be thought of as a weighting method where
 the weights are restricted to be zero or one. Cardinality matching
 involves finding the largest sample that satisfies user-supplied balance
 constraints and constraints on the ratio of matched treated to matched
-control units <span class="citation">(<a href="#ref-zubizarretaMatchingBalancePairing2014" role="doc-biblioref">Zubizarreta, Paredes, and Rosenbaum
-2014b</a>)</span>. It does not consider a specific estimand and can be a
-useful alternative to matching with a caliper for handling data with
-little overlap <span class="citation">(<a href="#ref-visconti2018" role="doc-biblioref">Visconti and Zubizarreta 2018</a>)</span>. Profile
-matching involves identifying a target distribution (e.g., the full
-sample for the ATE or the treated units for the ATT) and finding the
-largest subset of the treated and control groups that satisfy
-user-supplied balance constraints with respect to that target <span class="citation">(<a href="#ref-cohnProfileMatchingGeneralization2021" role="doc-biblioref">Cohn and Zubizarreta 2021</a>)</span>. See
-<code>?method_cardinality</code> for the documentation for using
-<code>matchit()</code> with <code>method = &quot;cardinality&quot;</code>,
-including which inputs are required to request either cardinality
-matching or profile matching.</p>
+control units <span class="citation">(<a href="#ref-zubizarretaMatchingBalancePairing2014">Zubizarreta, Paredes,
+and Rosenbaum 2014b</a>)</span>. It does not consider a specific
+estimand and can be a useful alternative to matching with a caliper for
+handling data with little overlap <span class="citation">(<a href="#ref-visconti2018">Visconti and Zubizarreta 2018</a>)</span>.
+Profile matching involves identifying a target distribution (e.g., the
+full sample for the ATE or the treated units for the ATT) and finding
+the largest subset of the treated and control groups that satisfy
+user-supplied balance constraints with respect to that target <span class="citation">(<a href="#ref-cohnProfileMatchingGeneralization2021">Cohn and Zubizarreta
+2021</a>)</span>. See <code>?method_cardinality</code> for the
+documentation for using <code>matchit()</code> with
+<code>method = &quot;cardinality&quot;</code>, including which inputs are required
+to request either cardinality matching or profile matching.</p>
 <p>Subset selection is performed by solving a mixed integer programming
 optimization problem with linear constraints. The problem involves
 maximizing the size of the matched sample subject to constraints on
@@ -819,8 +816,8 @@ the <code>tols</code> and <code>std.tols</code> arguments. One can also
 create pairs in the matched sample by using the <code>mahvars</code>
 argument, which requests that optimal Mahalanobis matching be done after
 subset selection; doing so can add additional precision and robustness
-<span class="citation">(<a href="#ref-zubizarretaMatchingBalancePairing2014" role="doc-biblioref">Zubizarreta, Paredes, and Rosenbaum
-2014b</a>)</span>.</p>
+<span class="citation">(<a href="#ref-zubizarretaMatchingBalancePairing2014">Zubizarreta, Paredes,
+and Rosenbaum 2014b</a>)</span>.</p>
 <p>The optimization problem requires a special solver to solve.
 Currently, the available options in <code>MatchIt</code> are the GLPK
 solver (through the <code>Rglpk</code> package), the SYMPHONY solver
@@ -856,11 +853,11 @@ propensity score. In <code>MatchIt</code>, propensity scores are often
 labeled as “distance” values, even though the propensity score itself is
 not a distance measure. This is to reflect that the propensity score is
 used in creating the distance value, but other scores could be used,
-such as prognostic scores for prognostic score matching <span class="citation">(<a href="#ref-hansen2008a" role="doc-biblioref">Hansen
-2008</a>)</span>. The propensity score is more like a “position” value,
-in that it reflects the position of each unit in the matching space, and
-the difference between positions is the distance between them. If the
-the argument to <code>distance</code> is one of the allowed methods for
+such as prognostic scores for prognostic score matching <span class="citation">(<a href="#ref-hansen2008a">Hansen 2008</a>)</span>.
+The propensity score is more like a “position” value, in that it
+reflects the position of each unit in the matching space, and the
+difference between positions is the distance between them. If the the
+argument to <code>distance</code> is one of the allowed methods for
 estimating propensity scores (see <code>?distance</code> for these
 values) or is a numeric vector with one value per unit, the distance
 between units will be computed as the pairwise difference between
@@ -876,14 +873,13 @@ generalized linear model. The <code>link</code> and
 specify the options for the propensity score models, including whether
 to use the raw propensity score or a linearized version of it (e.g., the
 logit of a logistic regression propensity score, which has been commonly
-referred to and recommended in the propensity score literature <span class="citation">(<a href="#ref-austin2011a" role="doc-biblioref">Austin
-2011</a>; <a href="#ref-stuart2010" role="doc-biblioref">Stuart
-2010</a>)</span>). Allowable options for the propensity score model
-include parametric and machine learning-based models, each of which have
-their strengths and limitations and may perform differently depending on
-the unique qualities of each dataset. We recommend multiple types of
-models be tried to find one that yields the best balance, as there is no
-way to make a single recommendation that will work for all cases.</p>
+referred to and recommended in the propensity score literature <span class="citation">(<a href="#ref-austin2011a">Austin 2011</a>; <a href="#ref-stuart2010">Stuart 2010</a>)</span>). Allowable options for
+the propensity score model include parametric and machine learning-based
+models, each of which have their strengths and limitations and may
+perform differently depending on the unique qualities of each dataset.
+We recommend multiple types of models be tried to find one that yields
+the best balance, as there is no way to make a single recommendation
+that will work for all cases.</p>
 <p>The <code>distance</code> argument can also be specified as a method
 of computing pairwise distances from the covariates directly (i.e.,
 without estimating propensity scores). The options include
@@ -897,19 +893,21 @@ for that unit, <span class="math inline">\(S\)</span> is a scaling
 matrix, and <span class="math inline">\(S^{-1}\)</span> is the
 (generalized) inverse of <span class="math inline">\(S\)</span>. For
 Mahalanobis distance matching, <span class="math inline">\(S\)</span> is
-the pooled covariance matrix of the covariates <span class="citation">(<a href="#ref-rubinBiasReductionUsing1980" role="doc-biblioref">Rubin 1980</a>)</span>; for Euclidean distance
-matching, <span class="math inline">\(S\)</span> is the identity matrix
-(i.e., no scaling); and for scaled Euclidean distance matching, <span class="math inline">\(S\)</span> is the diagonal of the pooled
+the pooled covariance matrix of the covariates <span class="citation">(<a href="#ref-rubinBiasReductionUsing1980">Rubin
+1980</a>)</span>; for Euclidean distance matching, <span class="math inline">\(S\)</span> is the identity matrix (i.e., no
+scaling); and for scaled Euclidean distance matching, <span class="math inline">\(S\)</span> is the diagonal of the pooled
 covariance matrix (containing just the variances). The robust
 Mahalanobis distance is computed not on the covariates directly but
-rather on their ranks and uses a correction for ties (see <span class="citation">Rosenbaum (<a href="#ref-rosenbaumDesignObservationalStudies2010" role="doc-biblioref">2010</a>)</span>, ch 8). For creating close pairs,
-matching with these distance measures tends work better than propensity
-score matching because paired units will have close values on all of the
-covariates, whereas propensity score-paired units may be close on the
-propensity score but not on any of the covariates themselves. This
-feature was the basis of King and Nielsen’s <span class="citation">(<a href="#ref-king2019" role="doc-biblioref">2019</a>)</span> warning
-against using propensity scores for matching. That said, they do not
-always outperform propensity score matching <span class="citation">(<a href="#ref-ripolloneImplicationsPropensityScore2018" role="doc-biblioref">Ripollone et al. 2018</a>)</span>.</p>
+rather on their ranks and uses a correction for ties (see <span class="citation">Rosenbaum (<a href="#ref-rosenbaumDesignObservationalStudies2010">2010</a>)</span>, ch
+8). For creating close pairs, matching with these distance measures
+tends work better than propensity score matching because paired units
+will have close values on all of the covariates, whereas propensity
+score-paired units may be close on the propensity score but not on any
+of the covariates themselves. This feature was the basis of King and
+Nielsen’s <span class="citation">(<a href="#ref-king2019">2019</a>)</span> warning against using propensity
+scores for matching. That said, they do not always outperform propensity
+score matching <span class="citation">(<a href="#ref-ripolloneImplicationsPropensityScore2018">Ripollone et al.
+2018</a>)</span>.</p>
 <p><code>distance</code> can also be supplied as a matrix of distance
 values between units. This makes it possible to use handcrafted distance
 matrices or distances created outside <code>MatchIt</code>. Only nearest
@@ -1028,20 +1026,19 @@ multiple treated units. Matching without replacement carries certain
 statistical benefits in that weights for each unit can be omitted or are
 more straightforward to include and dependence between units depends
 only on pair membership. Special standard error estimators are sometimes
-required for estimating effects after matching with replacement <span class="citation">(<a href="#ref-austin2020a" role="doc-biblioref">Austin
-and Cafri 2020</a>)</span>, and methods for accounting for uncertainty
-are not well understood for non-continuous outcomes. Matching with
-replacement will tend to yield better balance though, because the
-problem of “running out” of close control units to match to treated
-units is avoided, though the reuse of control units will decrease the
-effect sample size, thereby worsening precision <span class="citation">(<a href="#ref-austin2013b" role="doc-biblioref">Austin
-2013</a>)</span>. (This problem occurs in the Lalonde dataset used in
-<code>vignette(&quot;MatchIt&quot;)</code>, which is why nearest neighbor matching
-without replacement is not very effective there.) After matching with
-replacement, control units are assigned to more than one subclass, so
-the <code>get_matches()</code> function should be used instead of
-<code>match.data()</code> after matching with replacement if subclasses
-are to be used in follow-up analyses; see
+required for estimating effects after matching with replacement <span class="citation">(<a href="#ref-austin2020a">Austin and Cafri
+2020</a>)</span>, and methods for accounting for uncertainty are not
+well understood for non-continuous outcomes. Matching with replacement
+will tend to yield better balance though, because the problem of
+“running out” of close control units to match to treated units is
+avoided, though the reuse of control units will decrease the effect
+sample size, thereby worsening precision <span class="citation">(<a href="#ref-austin2013b">Austin 2013</a>)</span>. (This problem occurs in
+the Lalonde dataset used in <code>vignette(&quot;MatchIt&quot;)</code>, which is
+why nearest neighbor matching without replacement is not very effective
+there.) After matching with replacement, control units are assigned to
+more than one subclass, so the <code>get_matches()</code> function
+should be used instead of <code>match.data()</code> after matching with
+replacement if subclasses are to be used in follow-up analyses; see
 <code>vignette(&quot;estimating-effects&quot;)</code> for details.</p>
 <p>The <code>reuse.max</code> argument can also be used with
 <code>method = &quot;nearest&quot;</code> to control how many times each control
@@ -1062,20 +1059,47 @@ Performing <span class="math inline">\(k\)</span>:1 matching can
 preserve precision by preventing too many control units from being
 unmatched and dropped from the matched sample, though the gain in
 precision by increasing <span class="math inline">\(k\)</span>
-diminishes rapidly after 4 <span class="citation">(<a href="#ref-rosenbaum2020" role="doc-biblioref">Rosenbaum
-2020</a>)</span>. Importantly, for <span class="math inline">\(k&gt;1\)</span>, the matches after the first match
-will generally be worse than the first match in terms of closeness to
-the treated unit, so increasing <span class="math inline">\(k\)</span>
-can also worsen balance. <span class="citation">Austin (<a href="#ref-austin2010a" role="doc-biblioref">2010b</a>)</span> found
-that 1:1 or 1:2 matching generally performed best in terms of mean
+diminishes rapidly after 4 <span class="citation">(<a href="#ref-rosenbaum2020">Rosenbaum 2020</a>)</span>. Importantly, for
+<span class="math inline">\(k&gt;1\)</span>, the matches after the first
+match will generally be worse than the first match in terms of closeness
+to the treated unit, so increasing <span class="math inline">\(k\)</span> can also worsen balance. <span class="citation">Austin (<a href="#ref-austin2010a">2010b</a>)</span>
+found that 1:1 or 1:2 matching generally performed best in terms of mean
 squared error. In general, it makes sense to use higher values of <span class="math inline">\(k\)</span> while ensuring that balance is
 satisfactory.</p>
 <p>With nearest neighbor and optimal pair matching, variable <span class="math inline">\(k\)</span>:1 matching, in which the number of
 controls matched to each treated unit varies, can also be used; this can
-have improved performance over “fixed” <span class="math inline">\(k\)</span>:1 matching <span class="citation">(<a href="#ref-ming2000" role="doc-biblioref">Ming and Rosenbaum
-2000</a>)</span>. See <code>?method_nearest</code> and
+have improved performance over “fixed” <span class="math inline">\(k\)</span>:1 matching <span class="citation">(<a href="#ref-ming2000">Ming and Rosenbaum 2000</a>; <a href="#ref-rassenOnetomanyPropensityScore2012">Rassen et al.
+2012</a>)</span>. See <code>?method_nearest</code> and
 <code>?method_optimal</code> for information on implementing variable
 <span class="math inline">\(k\)</span>:1 matching.</p>
+</div>
+<div id="matching-order-m.order" class="section level3">
+<h3>Matching order (<code>m.order</code>)</h3>
+<p>For nearest neighbor matching (including genetic matching), units are
+matched in an order, and that order can affect the quality of individual
+matches and of the resulting matched sample. With
+<code>method = &quot;nearest&quot;</code>, the allowable options to
+<code>m.order</code> to control the matching order are
+<code>&quot;largest&quot;</code>, <code>&quot;smallest&quot;</code>, <code>&quot;closest&quot;</code>,
+<code>&quot;random&quot;</code>, and <code>&quot;data&quot;</code>. With
+<code>method = &quot;genetic&quot;</code>, all but <code>&quot;closest&quot;</code> can be
+used. Requesting <code>&quot;largest&quot;</code> means that treated units with
+the largest propensity scores, i.e., those least like the control units,
+will be matched first, which prevents them from having bad matches after
+all the close control units have been used up. <code>&quot;smallest&quot;</code>
+means that treated units with the smallest propensity scores are matched
+first. <code>&quot;closest&quot;</code> means that potential pairs with the
+smallest distance between units will be matched first, which ensures
+that the best possible matches are included in the matched sample but
+can yield poor matches for units whose best match is far from them; this
+makes it particularly useful when matching with a caliper.
+<code>&quot;random&quot;</code> matches in a random order and <code>&quot;data&quot;</code>
+matches in order of the data. A propensity score is required for
+<code>&quot;largest&quot;</code> and <code>&quot;smallest&quot;</code> but not for the other
+options. <span class="citation">Rubin (<a href="#ref-rubin1973">1973</a>)</span> recommends using
+<code>&quot;largest&quot;</code> or <code>&quot;random&quot;</code>, though <span class="citation">Austin (<a href="#ref-austin2013b">2013</a>)</span>
+recommends against <code>&quot;largest&quot;</code> and instead favors
+<code>&quot;closest&quot;</code> or <code>&quot;random&quot;</code>.</p>
 </div>
 </div>
 <div id="choosing-a-matching-method" class="section level2">
@@ -1100,11 +1124,11 @@ another, until a satisfactory specification has been found. It is
 important to assess balance broadly (i.e., beyond comparing the means of
 the covariates in the treated and control groups), and the search for a
 matching specification should not stop when a threshold is reached, but
-should attempt to come as close as possible to perfect balance <span class="citation">(<a href="#ref-ho2007" role="doc-biblioref">Ho et al.
-2007</a>)</span>. Even if the first matching specification appears
-successful at reducing imbalance, there may be another specification
-that could reduce it even further, thereby increasing the robustness of
-the inference and the plausibility of an unbiased effect estimate.</p>
+should attempt to come as close as possible to perfect balance <span class="citation">(<a href="#ref-ho2007">Ho et al. 2007</a>)</span>. Even
+if the first matching specification appears successful at reducing
+imbalance, there may be another specification that could reduce it even
+further, thereby increasing the robustness of the inference and the
+plausibility of an unbiased effect estimate.</p>
 <p>If the target of inference is the ATE, optimal or generalized full
 matching, subclassification, or profile matching can be used. If the
 target of inference is the ATT or ATC, any matching method may be used.
@@ -1170,36 +1194,38 @@ of each dataset.</p>
 engaging in treatment effect discovery or when when the sampled
 population is not of particular interest (e.g., it corresponds to an
 arbitrarily chosen hospital or school; see <span class="citation">Mao,
-Li, and Greene (<a href="#ref-mao2018" role="doc-biblioref">2018</a>)</span> for these and other reasons why
-retaining the target population may not be important), other methods
-that do not retain the characteristics of the original sample become
-available. These include matching with a caliper (on the propensity
-score or on the covariates themselves), cardinality matching, and more
-restrictive forms of matching like exact and coarsened exact matching,
-either on all covariates or just a subset, that are prone to discard
-units from the sample in such a way that the target population is
-changed. <span class="citation">Austin (<a href="#ref-austin2013b" role="doc-biblioref">2013</a>)</span> and Austin and Stuart <span class="citation">(<a href="#ref-austin2015c" role="doc-biblioref">2015b</a>, <a href="#ref-austin2015a" role="doc-biblioref">2015a</a>)</span> have found that caliper matching
-can be a particularly effective modification to nearest neighbor
-matching for eliminating imbalance and reducing bias when the target
-population is less relevant, but when inference to a specific target
-population is desired, using calipers can induce bias due to incomplete
-matching <span class="citation">(<a href="#ref-rosenbaum1985" role="doc-biblioref">Rosenbaum and Rubin 1985a</a>; <a href="#ref-wang2020" role="doc-biblioref">Wang 2020</a>)</span>.
-Cardinality matching can be particularly effective in data with little
-overlap between the treatment groups <span class="citation">(<a href="#ref-visconti2018" role="doc-biblioref">Visconti and Zubizarreta
-2018</a>)</span> and can perform better than caliper matching <span class="citation">(<a href="#ref-delosangelesresaDirectStableWeight2020" role="doc-biblioref">de los Angeles Resa and Zubizarreta
-2020</a>)</span>.</p>
+Li, and Greene (<a href="#ref-mao2018">2018</a>)</span> for these and
+other reasons why retaining the target population may not be important),
+other methods that do not retain the characteristics of the original
+sample become available. These include matching with a caliper (on the
+propensity score or on the covariates themselves), cardinality matching,
+and more restrictive forms of matching like exact and coarsened exact
+matching, either on all covariates or just a subset, that are prone to
+discard units from the sample in such a way that the target population
+is changed. <span class="citation">Austin (<a href="#ref-austin2013b">2013</a>)</span> and Austin and Stuart <span class="citation">(<a href="#ref-austin2015c">2015b</a>, <a href="#ref-austin2015a">2015a</a>)</span> have found that caliper
+matching can be a particularly effective modification to nearest
+neighbor matching for eliminating imbalance and reducing bias when the
+target population is less relevant, but when inference to a specific
+target population is desired, using calipers can induce bias due to
+incomplete matching <span class="citation">(<a href="#ref-rosenbaum1985">Rosenbaum and Rubin 1985a</a>; <a href="#ref-wang2020">Wang 2020</a>)</span>. Cardinality matching can be
+particularly effective in data with little overlap between the treatment
+groups <span class="citation">(<a href="#ref-visconti2018">Visconti and
+Zubizarreta 2018</a>)</span> and can perform better than caliper
+matching <span class="citation">(<a href="#ref-delosangelesresaDirectStableWeight2020">de los Angeles Resa
+and Zubizarreta 2020</a>)</span>.</p>
 <p>It is important not to rely excessively on theoretical or
 simulation-based findings or specific recommendations when making
 choices about the best matching method to use. For example, although
 nearest neighbor matching without replacement balance covariates better
-than did subclassification with five or ten subclasses in Austin’s <span class="citation">(<a href="#ref-austin2009c" role="doc-biblioref">2009</a>)</span> simulation, this does not imply it
-will be superior in all datasets. Likewise, though <span class="citation">Rosenbaum and Rubin (<a href="#ref-rosenbaum1985a" role="doc-biblioref">1985b</a>)</span> and <span class="citation">Austin
-(<a href="#ref-austin2011a" role="doc-biblioref">2011</a>)</span> both
-recommend using a caliper of .2 standard deviations of the logit of the
-propensity score, this does not imply that caliper will be optimal in
-all scenarios, and other widths should be tried, though it should be
+than did subclassification with five or ten subclasses in Austin’s <span class="citation">(<a href="#ref-austin2009c">2009</a>)</span>
+simulation, this does not imply it will be superior in all datasets.
+Likewise, though <span class="citation">Rosenbaum and Rubin (<a href="#ref-rosenbaum1985a">1985b</a>)</span> and <span class="citation">Austin (<a href="#ref-austin2011a">2011</a>)</span>
+both recommend using a caliper of .2 standard deviations of the logit of
+the propensity score, this does not imply that caliper will be optimal
+in all scenarios, and other widths should be tried, though it should be
 noted that tightening the caliper on the propensity score can sometimes
-degrade performance <span class="citation">(<a href="#ref-king2019" role="doc-biblioref">King and Nielsen 2019</a>)</span>.</p>
+degrade performance <span class="citation">(<a href="#ref-king2019">King
+and Nielsen 2019</a>)</span>.</p>
 <p>For large datasets (i.e., in 10,000s to millions), some matching
 methods will be too slow to be used at scale. Instead, users should
 consider generalized full matching, subclassification, or coarsened
@@ -1374,6 +1400,12 @@ Bias Reduction from Matching with a Variable Number of Controls.”</span>
 Orihara, Shunichiro, and Etsuo Hamada. 2021. <span>“Determination of the
 Optimal Number of Strata for Propensity Score Subclassification.”</span>
 <em>Statistics &amp; Probability Letters</em> 168 (January): 108951. <a href="https://doi.org/10.1016/j.spl.2020.108951">https://doi.org/10.1016/j.spl.2020.108951</a>.
+</div>
+<div id="ref-rassenOnetomanyPropensityScore2012" class="csl-entry">
+Rassen, Jeremy A., Abhi A. Shelat, Jessica Myers, Robert J. Glynn,
+Kenneth J. Rothman, and Sebastian Schneeweiss. 2012. <span>“One-to-Many
+Propensity Score Matching in Cohort Studies.”</span>
+<em>Pharmacoepidemiology and Drug Safety</em> 21 (S2): 69–80. <a href="https://doi.org/10.1002/pds.3263">https://doi.org/10.1002/pds.3263</a>.
 </div>
 <div id="ref-ripolloneImplicationsPropensityScore2018" class="csl-entry">
 Ripollone, John E., Krista F. Huybrechts, Kenneth J. Rothman, Ryan E.

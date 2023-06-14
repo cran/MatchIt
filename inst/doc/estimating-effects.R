@@ -7,6 +7,7 @@ me_ok <- requireNamespace("marginaleffects", quietly = TRUE) &&
 su_ok <- requireNamespace("survival", quietly = TRUE)
 boot_ok <- requireNamespace("boot", quietly = TRUE)
 
+## ---- include = FALSE---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 #Generating data similar to Austin (2009) for demonstrating treatment effect estimation
 gen_X <- function(n) {
   X <- matrix(rnorm(9 * n), nrow = n, ncol = 9)
