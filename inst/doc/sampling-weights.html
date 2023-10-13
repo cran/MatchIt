@@ -12,7 +12,7 @@
 
 <meta name="author" content="Noah Greifer" />
 
-<meta name="date" content="2023-06-13" />
+<meta name="date" content="2023-10-12" />
 
 <title>Matching with Sampling Weights</title>
 
@@ -362,7 +362,7 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 
 <h1 class="title toc-ignore">Matching with Sampling Weights</h1>
 <h4 class="author">Noah Greifer</h4>
-<h4 class="date">2023-06-13</h4>
+<h4 class="date">2023-10-12</h4>
 
 
 <div id="TOC">
@@ -664,10 +664,10 @@ to improve precision and decrease bias.</p>
 <span id="cb14-11"><a href="#cb14-11" tabindex="-1"></a>                <span class="at">newdata =</span> <span class="fu">subset</span>(md_F_s, A <span class="sc">==</span> <span class="dv">1</span>),</span>
 <span id="cb14-12"><a href="#cb14-12" tabindex="-1"></a>                <span class="at">wts =</span> <span class="st">&quot;weights&quot;</span>)</span></code></pre></div>
 <pre><code>## 
-##  Term Contrast Estimate Std. Error    z Pr(&gt;|z|) 2.5 % 97.5 %
-##     A    1 - 0     1.69       0.34 4.97   &lt;0.001  1.03   2.36
+##  Term Contrast Estimate Std. Error    z Pr(&gt;|z|)    S 2.5 % 97.5 %
+##     A    1 - 0     1.69       0.34 4.97   &lt;0.001 20.5  1.03   2.36
 ## 
-## Columns: term, contrast, estimate, std.error, statistic, p.value, conf.low, conf.high</code></pre>
+## Columns: term, contrast, estimate, std.error, statistic, p.value, s.value, conf.low, conf.high</code></pre>
 <p>Note that <code>match.data()</code> and <code>get_weights()</code>
 have the option <code>include.s.weights</code>, which, when set to
 <code>FALSE</code>, makes it so the returned weights do not incorporate
