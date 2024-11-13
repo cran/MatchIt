@@ -12,7 +12,7 @@
 
 <meta name="author" content="Noah Greifer" />
 
-<meta name="date" content="2023-10-12" />
+<meta name="date" content="2024-11-12" />
 
 <title>Estimating Effects After Matching</title>
 
@@ -51,7 +51,7 @@ overflow: visible;
 </style>
 <style type="text/css" data-origin="pandoc">
 pre > code.sourceCode { white-space: pre; position: relative; }
-pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span { line-height: 1.25; }
 pre > code.sourceCode > span:empty { height: 1.2em; }
 .sourceCode { overflow: visible; }
 code.sourceCode > span { color: inherit; text-decoration: inherit; }
@@ -62,7 +62,7 @@ div.sourceCode { overflow: auto; }
 }
 @media print {
 pre > code.sourceCode { white-space: pre-wrap; }
-pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
 }
 pre.numberSource code
 { counter-reset: source-line 0; }
@@ -150,6 +150,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; }
 div.csl-bib-body { }
 div.csl-entry {
 clear: both;
+margin-bottom: 0em;
 }
 .hanging div.csl-entry {
 margin-left:2em;
@@ -362,7 +363,7 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 
 <h1 class="title toc-ignore">Estimating Effects After Matching</h1>
 <h4 class="author">Noah Greifer</h4>
-<h4 class="date">2023-10-12</h4>
+<h4 class="date">2024-11-12</h4>
 
 
 <div id="TOC">
@@ -457,7 +458,7 @@ the average effect of treatment for the population from which the sample
 is a random sample. This estimand is estimable only for methods that
 allow the ATE and either do not discard units from the sample or
 explicit target full sample balance, which in <code>MatchIt</code> is
-limited to full matching, subclassification, and template matching when
+limited to full matching, subclassification, and profile matching when
 setting <code>estimand = &quot;ATE&quot;</code>. When treated units are discarded
 (e.g., through the use of common support restrictions, calipers,
 cardinality matching, or [coarsened] exact matching), the estimand
@@ -744,7 +745,7 @@ average marginal effects, including <code>margins</code> and
 <code>stdReg</code>. The <code>survey</code> package can be used to
 estimate robust SEs incorporating weights and provides functions for
 survey-weighted generalized linear models and Cox-proportional hazards
-models. It is often used with propensity score weighting.</p>
+models.</p>
 <div id="the-standard-case" class="section level3">
 <h3>The Standard Case</h3>
 <p>For almost all matching methods, whether a caliper, common support
@@ -761,7 +762,7 @@ scenarios, which we describe in the section “Adjustments to the Standard
 Case”. These adjustments include for the following cases: when matching
 for the ATE rather than the ATT, for matching with replacement, for
 matching with a method that doesn’t involve creating pairs (e.g.,
-cardinality and template matching and coarsened exact matching), for
+cardinality and profile matching and coarsened exact matching), for
 subclassification, for estimating effects with binary outcomes, and for
 estimating effects with survival outcomes. You must read the Standard
 Case to understand the basic procedure before reading about these
@@ -778,10 +779,9 @@ matching method.</p>
 <span id="cb5-3"><a href="#cb5-3" tabindex="-1"></a>                 X6 <span class="sc">+</span> X7 <span class="sc">+</span> X8 <span class="sc">+</span> X9, <span class="at">data =</span> d,</span>
 <span id="cb5-4"><a href="#cb5-4" tabindex="-1"></a>               <span class="at">method =</span> <span class="st">&quot;full&quot;</span>, <span class="at">estimand =</span> <span class="st">&quot;ATT&quot;</span>)</span>
 <span id="cb5-5"><a href="#cb5-5" tabindex="-1"></a>mF</span></code></pre></div>
-<pre><code>## A matchit object
+<pre><code>## A `matchit` object
 ##  - method: Optimal full matching
-##  - distance: Propensity score
-##              - estimated with logistic regression
+##  - distance: Propensity score             - estimated with logistic regression
 ##  - number of obs.: 2000 (original), 2000 (matched)
 ##  - target estimand: ATT
 ##  - covariates: X1, X2, X3, X4, X5, X6, X7, X8, X9</code></pre>
@@ -790,12 +790,12 @@ matching method.</p>
 <span id="cb7-3"><a href="#cb7-3" tabindex="-1"></a></span>
 <span id="cb7-4"><a href="#cb7-4" tabindex="-1"></a><span class="fu">head</span>(md)</span></code></pre></div>
 <pre><code>##   A      X1      X2      X3       X4 X5      X6      X7      X8       X9      Y_C Y_B     Y_S distance weights subclass
-## 1 0  0.1725 -1.4283 -0.4103 -2.36059  1 -1.1199  0.6398 -0.4840 -0.59385  0.07104   0  278.46  0.08461 0.35351      222
-## 2 0 -1.0959  0.8463  0.2456 -0.12333  1 -2.2687 -1.4491 -0.5514 -0.31439  0.15619   0  330.63  0.01855 0.04652      112
-## 3 0  0.1768  0.7905 -0.8436  0.82366  1 -0.2221  0.2971 -0.6966 -0.69516 -0.85180   1  369.94  0.22210 0.88379      276
-## 4 0 -0.4595  0.1726  1.9542 -0.62661  1 -0.4019 -0.8294 -0.5384  0.20729 -2.35184   0   91.06  0.04180 0.18606      291
-## 5 1  0.3563 -1.8121  0.8135 -0.67189  1 -0.8297  1.7297 -0.6439 -0.02648  0.68058   0  182.73  0.43291 1.00000       81
-## 6 0 -2.4313 -1.7984 -1.2940  0.04609  1 -1.2419 -1.1252 -1.8659 -0.56513 -5.62260   0 2563.73  0.04998 0.08417      323</code></pre>
+## 1 0  0.1725 -1.4283 -0.4103 -2.36059  1 -1.1199  0.6398 -0.4840 -0.59385  0.07104   0  278.46  0.08461 0.20795      150
+## 2 0 -1.0959  0.8463  0.2456 -0.12333  1 -2.2687 -1.4491 -0.5514 -0.31439  0.15619   0  330.63  0.01855 0.04475      119
+## 3 0  0.1768  0.7905 -0.8436  0.82366  1 -0.2221  0.2971 -0.6966 -0.69516 -0.85180   1  369.94  0.22210 0.88379      288
+## 4 0 -0.4595  0.1726  1.9542 -0.62661  1 -0.4019 -0.8294 -0.5384  0.20729 -2.35184   0   91.06  0.04180 0.17676      303
+## 5 1  0.3563 -1.8121  0.8135 -0.67189  1 -0.8297  1.7297 -0.6439 -0.02648  0.68058   0  182.73  0.43291 1.00000       86
+## 6 0 -2.4313 -1.7984 -1.2940  0.04609  1 -1.2419 -1.1252 -1.8659 -0.56513 -5.62260   0 2563.73  0.04998 0.12626      158</code></pre>
 <p>Typically one would assess balance and ensure that this matching
 specification works, but we will skip that step here to focus on effect
 estimation. See <code>vignette(&quot;MatchIt&quot;)</code> and
@@ -823,26 +823,25 @@ example.</p>
 estimate the ATT.</p>
 <div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" tabindex="-1"></a><span class="fu">avg_comparisons</span>(fit1, <span class="at">variables =</span> <span class="st">&quot;A&quot;</span>,</span>
 <span id="cb10-2"><a href="#cb10-2" tabindex="-1"></a>                <span class="at">vcov =</span> <span class="sc">~</span>subclass,</span>
-<span id="cb10-3"><a href="#cb10-3" tabindex="-1"></a>                <span class="at">newdata =</span> <span class="fu">subset</span>(md, A <span class="sc">==</span> <span class="dv">1</span>),</span>
-<span id="cb10-4"><a href="#cb10-4" tabindex="-1"></a>                <span class="at">wts =</span> <span class="st">&quot;weights&quot;</span>)</span></code></pre></div>
+<span id="cb10-3"><a href="#cb10-3" tabindex="-1"></a>                <span class="at">newdata =</span> <span class="fu">subset</span>(A <span class="sc">==</span> <span class="dv">1</span>))</span></code></pre></div>
 <pre><code>## 
-##  Term Contrast Estimate Std. Error    z Pr(&gt;|z|)    S 2.5 % 97.5 %
-##     A    1 - 0     1.71      0.496 3.44   &lt;0.001 10.8 0.735   2.68
+##  Estimate Std. Error    z Pr(&gt;|z|)    S 2.5 % 97.5 %
+##      1.75      0.479 3.65   &lt;0.001 11.9  0.81   2.69
 ## 
-## Columns: term, contrast, estimate, std.error, statistic, p.value, s.value, conf.low, conf.high</code></pre>
+## Term: A
+## Type:  response 
+## Comparison: mean(1) - mean(0)
+## Columns: term, contrast, estimate, std.error, statistic, p.value, s.value, conf.low, conf.high, predicted_lo, predicted_hi, predicted</code></pre>
 <p>Let’s break down the call to <code>avg_comparisons()</code>: to the
 first argument, we supply the model fit, <code>fit1</code>; to the
 <code>variables</code> argument, the name of the treatment
 (<code>&quot;A&quot;</code>); to the <code>vcov</code> argument, a formula with
 subclass membership (<code>~subclass</code>) to request cluster-robust
-SEs; to the <code>newdata</code> argument, a version of the matched
-dataset containing only the treated units
-(<code>subset(md, A == 1)</code>) to request the ATT; and to the
-<code>wts</code> argument, the names of the variable in <code>md</code>
-containing the matching weights (<code>&quot;weights&quot;</code>) to ensure they
-are included in the analysis. Some of these arguments differ depending
-on the specifics of the matching method and outcome type; see the
-sections below for information.</p>
+SEs; and to the <code>newdata</code> argument, a version of the matched
+dataset containing only the treated units (<code>subset(A == 1)</code>)
+to request the ATT. Some of these arguments differ depending on the
+specifics of the matching method and outcome type; see the sections
+below for information.</p>
 <p>If, in addition to the effect estimate, we want the average estimated
 potential outcomes, we can use
 <code>marginaleffects::avg_predictions()</code>, which we demonstrate
@@ -851,13 +850,13 @@ expected potential outcomes is only valid if all covariates present in
 the outcome model (if any) are interacted with the treatment.</p>
 <div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" tabindex="-1"></a><span class="fu">avg_predictions</span>(fit1, <span class="at">variables =</span> <span class="st">&quot;A&quot;</span>,</span>
 <span id="cb12-2"><a href="#cb12-2" tabindex="-1"></a>                <span class="at">vcov =</span> <span class="sc">~</span>subclass,</span>
-<span id="cb12-3"><a href="#cb12-3" tabindex="-1"></a>                <span class="at">newdata =</span> <span class="fu">subset</span>(md, A <span class="sc">==</span> <span class="dv">1</span>),</span>
-<span id="cb12-4"><a href="#cb12-4" tabindex="-1"></a>                <span class="at">wts =</span> <span class="st">&quot;weights&quot;</span>)</span></code></pre></div>
+<span id="cb12-3"><a href="#cb12-3" tabindex="-1"></a>                <span class="at">newdata =</span> <span class="fu">subset</span>(A <span class="sc">==</span> <span class="dv">1</span>))</span></code></pre></div>
 <pre><code>## 
 ##  A Estimate Std. Error     z Pr(&gt;|z|)     S 2.5 % 97.5 %
-##  0     2.19      0.391  5.59   &lt;0.001  25.4  1.42   2.95
-##  1     3.89      0.229 17.04   &lt;0.001 213.8  3.45   4.34
+##  0     2.14      0.382  5.61   &lt;0.001  25.6  1.39   2.89
+##  1     3.89      0.229 16.99   &lt;0.001 212.7  3.44   4.34
 ## 
+## Type:  response 
 ## Columns: A, estimate, std.error, statistic, p.value, s.value, conf.low, conf.high</code></pre>
 <p>We can see that the difference in potential outcome means is equal to
 the average treatment effect computed previously<a href="#fn4" class="footnote-ref" id="fnref4"><sup>4</sup></a>. All of the arguments
@@ -874,9 +873,8 @@ following special circumstances occur.</p>
 matching, subclassification, and cardinality matching), everything is
 identical to the Standard Case except that in the calls to
 <code>avg_comparisons()</code> and <code>avg_predictions()</code>, the
-<code>newdata</code> argument is omitted (or can be replaced with
-<code>newdata = md</code>). This is because the estimated potential
-outcomes are computed for the full matched sample rather than just the
+<code>newdata</code> argument is omitted. This is because the estimated
+potential outcomes are computed for the full sample rather than just the
 treated units.</p>
 </div>
 <div id="matching-with-replacement" class="section level4">
@@ -916,7 +914,7 @@ survival outcomes below.</p>
 <div id="matching-without-pairing" class="section level4">
 <h4>Matching without pairing</h4>
 <p>Some matching methods do not involve creating pairs; these include
-cardinality and template matching with <code>mahvars = NULL</code> (the
+cardinality and profile matching with <code>mahvars = NULL</code> (the
 default), exact matching, and coarsened exact matching with
 <code>k2k = FALSE</code> (the default). The only change that needs to be
 made to the Standard Case is that one should change
@@ -951,12 +949,10 @@ subclasses directly. It is only appropriate when there are a small
 number of subclasses relative to the sample size. In the outcome model,
 <code>subclass</code> should interact with all other predictors in the
 model (including the treatment, covariates, and interactions, if any),
-and the <code>weights</code> argument should be omitted. In the calls to
-<code>avg_comparisons()</code> and <code>avg_predictions()</code>, the
-<code>wts</code> argument should be omitted. As with MMWS, one should
-change <code>vcov = ~subclass</code> to <code>vcov = &quot;HC3&quot;</code> in the
-calls to <code>avg_comparisons()</code> and
-<code>avg_predictions()</code>. See an example below:</p>
+and the <code>weights</code> argument should be omitted. As with MMWS,
+one should change <code>vcov = ~subclass</code> to
+<code>vcov = &quot;HC3&quot;</code> in the calls to <code>avg_comparisons()</code>
+and <code>avg_predictions()</code>. See an example below:</p>
 <div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" tabindex="-1"></a><span class="co">#Subclassification on the PS for the ATT</span></span>
 <span id="cb14-2"><a href="#cb14-2" tabindex="-1"></a>mS <span class="ot">&lt;-</span> <span class="fu">matchit</span>(A <span class="sc">~</span> X1 <span class="sc">+</span> X2 <span class="sc">+</span> X3 <span class="sc">+</span> X4 <span class="sc">+</span> X5 <span class="sc">+</span> </span>
 <span id="cb14-3"><a href="#cb14-3" tabindex="-1"></a>                 X6 <span class="sc">+</span> X7 <span class="sc">+</span> X8 <span class="sc">+</span> X9, <span class="at">data =</span> d,</span>
@@ -972,12 +968,15 @@ calls to <code>avg_comparisons()</code> and
 <span id="cb14-13"><a href="#cb14-13" tabindex="-1"></a><span class="fu">avg_comparisons</span>(fitS,</span>
 <span id="cb14-14"><a href="#cb14-14" tabindex="-1"></a>                <span class="at">variables =</span> <span class="st">&quot;A&quot;</span>,</span>
 <span id="cb14-15"><a href="#cb14-15" tabindex="-1"></a>                <span class="at">vcov =</span> <span class="st">&quot;HC3&quot;</span>,</span>
-<span id="cb14-16"><a href="#cb14-16" tabindex="-1"></a>                <span class="at">newdata =</span> <span class="fu">subset</span>(md, A <span class="sc">==</span> <span class="dv">1</span>))</span></code></pre></div>
+<span id="cb14-16"><a href="#cb14-16" tabindex="-1"></a>                <span class="at">newdata =</span> <span class="fu">subset</span>(A <span class="sc">==</span> <span class="dv">1</span>))</span></code></pre></div>
 <pre><code>## 
-##  Term Contrast Estimate Std. Error    z Pr(&gt;|z|)    S 2.5 % 97.5 %
-##     A    1 - 0     1.65      0.364 4.54   &lt;0.001 17.4  0.94   2.37
+##  Estimate Std. Error    z Pr(&gt;|z|)    S 2.5 % 97.5 %
+##      1.65      0.364 4.54   &lt;0.001 17.4  0.94   2.37
 ## 
-## Columns: term, contrast, estimate, std.error, statistic, p.value, s.value, conf.low, conf.high</code></pre>
+## Term: A
+## Type:  response 
+## Comparison: mean(1) - mean(0)
+## Columns: term, contrast, estimate, std.error, statistic, p.value, s.value, conf.low, conf.high, predicted_lo, predicted_hi, predicted</code></pre>
 <p>A model with fewer terms may be required when subclasses are small;
 removing covariates or their interactions with treatment may be required
 and can increase precision in smaller datasets. Remember that if
@@ -1016,14 +1015,16 @@ displays the statistics of interest:</p>
 <span id="cb16-8"><a href="#cb16-8" tabindex="-1"></a><span class="fu">avg_comparisons</span>(fit2,</span>
 <span id="cb16-9"><a href="#cb16-9" tabindex="-1"></a>                <span class="at">variables =</span> <span class="st">&quot;A&quot;</span>,</span>
 <span id="cb16-10"><a href="#cb16-10" tabindex="-1"></a>                <span class="at">vcov =</span> <span class="sc">~</span>subclass,</span>
-<span id="cb16-11"><a href="#cb16-11" tabindex="-1"></a>                <span class="at">newdata =</span> <span class="fu">subset</span>(md, A <span class="sc">==</span> <span class="dv">1</span>),</span>
-<span id="cb16-12"><a href="#cb16-12" tabindex="-1"></a>                <span class="at">wts =</span> <span class="st">&quot;weights&quot;</span>,</span>
-<span id="cb16-13"><a href="#cb16-13" tabindex="-1"></a>                <span class="at">comparison =</span> <span class="st">&quot;lnratioavg&quot;</span>,</span>
-<span id="cb16-14"><a href="#cb16-14" tabindex="-1"></a>                <span class="at">transform =</span> <span class="st">&quot;exp&quot;</span>)</span></code></pre></div>
+<span id="cb16-11"><a href="#cb16-11" tabindex="-1"></a>                <span class="at">newdata =</span> <span class="fu">subset</span>(A <span class="sc">==</span> <span class="dv">1</span>),</span>
+<span id="cb16-12"><a href="#cb16-12" tabindex="-1"></a>                <span class="at">comparison =</span> <span class="st">&quot;lnratioavg&quot;</span>,</span>
+<span id="cb16-13"><a href="#cb16-13" tabindex="-1"></a>                <span class="at">transform =</span> <span class="st">&quot;exp&quot;</span>)</span></code></pre></div>
 <pre><code>## 
-##  Term              Contrast Estimate Pr(&gt;|z|)    S 2.5 % 97.5 %
-##     A ln(mean(1) / mean(0))     1.57   &lt;0.001 52.0  1.41   1.75
+##  Estimate Pr(&gt;|z|)    S 2.5 % 97.5 %
+##      1.57   &lt;0.001 52.0  1.41   1.75
 ## 
+## Term: A
+## Type:  response 
+## Comparison: ln(mean(1) / mean(0))
 ## Columns: term, contrast, estimate, p.value, s.value, conf.low, conf.high, predicted_lo, predicted_hi, predicted</code></pre>
 <p>The output displays the marginal RR, its Z-value, the p-value for the
 Z-test of the log RR against 0, and its confidence interval. (Note that
@@ -1054,7 +1055,7 @@ this model.) To request cluster-robust SEs as recommended by <span class="citati
 we need to supply pair membership (stored in the <code>subclass</code>
 column of <code>md</code>) to the <code>cluster</code> argument and set
 <code>robust = TRUE</code>. For matching methods that don’t involve
-pairing (e.g., cardinality and template matching and [coarsened] exact
+pairing (e.g., cardinality and profile matching and [coarsened] exact
 matching), we can omit the <code>cluster</code> argument (but keep
 <code>robust = TRUE</code>)<a href="#fn9" class="footnote-ref" id="fnref9"><sup>9</sup></a>.</p>
 <div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" tabindex="-1"></a><span class="fu">library</span>(<span class="st">&quot;survival&quot;</span>)</span>
@@ -1173,12 +1174,12 @@ interest.</p>
 <span id="cb21-23"><a href="#cb21-23" tabindex="-1"></a>  <span class="co">#Estimated potential outcomes under treatment</span></span>
 <span id="cb21-24"><a href="#cb21-24" tabindex="-1"></a>  p1 <span class="ot">&lt;-</span> <span class="fu">predict</span>(fit, <span class="at">type =</span> <span class="st">&quot;response&quot;</span>,</span>
 <span id="cb21-25"><a href="#cb21-25" tabindex="-1"></a>                <span class="at">newdata =</span> <span class="fu">transform</span>(md1, <span class="at">A =</span> <span class="dv">1</span>))</span>
-<span id="cb21-26"><a href="#cb21-26" tabindex="-1"></a>  Ep1 <span class="ot">&lt;-</span> <span class="fu">weighted.mean</span>(p1, md1<span class="sc">$</span>weights)</span>
+<span id="cb21-26"><a href="#cb21-26" tabindex="-1"></a>  Ep1 <span class="ot">&lt;-</span> <span class="fu">mean</span>(p1)</span>
 <span id="cb21-27"><a href="#cb21-27" tabindex="-1"></a>  </span>
 <span id="cb21-28"><a href="#cb21-28" tabindex="-1"></a>  <span class="co">#Estimated potential outcomes under control</span></span>
 <span id="cb21-29"><a href="#cb21-29" tabindex="-1"></a>  p0 <span class="ot">&lt;-</span> <span class="fu">predict</span>(fit, <span class="at">type =</span> <span class="st">&quot;response&quot;</span>,</span>
 <span id="cb21-30"><a href="#cb21-30" tabindex="-1"></a>                <span class="at">newdata =</span> <span class="fu">transform</span>(md1, <span class="at">A =</span> <span class="dv">0</span>))</span>
-<span id="cb21-31"><a href="#cb21-31" tabindex="-1"></a>  Ep0 <span class="ot">&lt;-</span> <span class="fu">weighted.mean</span>(p0, md1<span class="sc">$</span>weights)</span>
+<span id="cb21-31"><a href="#cb21-31" tabindex="-1"></a>  Ep0 <span class="ot">&lt;-</span> <span class="fu">mean</span>(p0)</span>
 <span id="cb21-32"><a href="#cb21-32" tabindex="-1"></a>  </span>
 <span id="cb21-33"><a href="#cb21-33" tabindex="-1"></a>  <span class="co">#Risk ratio</span></span>
 <span id="cb21-34"><a href="#cb21-34" tabindex="-1"></a>  <span class="fu">return</span>(Ep1 <span class="sc">/</span> Ep0)</span>
@@ -1244,10 +1245,9 @@ we’ll do a round of matching.</p>
 <div class="sourceCode" id="cb26"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" tabindex="-1"></a>mNN <span class="ot">&lt;-</span> <span class="fu">matchit</span>(A <span class="sc">~</span> X1 <span class="sc">+</span> X2 <span class="sc">+</span> X3 <span class="sc">+</span> X4 <span class="sc">+</span> X5 <span class="sc">+</span> </span>
 <span id="cb26-2"><a href="#cb26-2" tabindex="-1"></a>                 X6 <span class="sc">+</span> X7 <span class="sc">+</span> X8 <span class="sc">+</span> X9, <span class="at">data =</span> d)</span>
 <span id="cb26-3"><a href="#cb26-3" tabindex="-1"></a>mNN</span></code></pre></div>
-<pre><code>## A matchit object
+<pre><code>## A `matchit` object
 ##  - method: 1:1 nearest neighbor matching without replacement
-##  - distance: Propensity score
-##              - estimated with logistic regression
+##  - distance: Propensity score             - estimated with logistic regression
 ##  - number of obs.: 2000 (original), 882 (matched)
 ##  - target estimand: ATT
 ##  - covariates: X1, X2, X3, X4, X5, X6, X7, X8, X9</code></pre>
@@ -1281,12 +1281,12 @@ the sampled indices and returns an estimate.</p>
 <span id="cb29-25"><a href="#cb29-25" tabindex="-1"></a>  <span class="co">#Estimated potential outcomes under treatment</span></span>
 <span id="cb29-26"><a href="#cb29-26" tabindex="-1"></a>  p1 <span class="ot">&lt;-</span> <span class="fu">predict</span>(fit, <span class="at">type =</span> <span class="st">&quot;response&quot;</span>,</span>
 <span id="cb29-27"><a href="#cb29-27" tabindex="-1"></a>                <span class="at">newdata =</span> <span class="fu">transform</span>(md1, <span class="at">A =</span> <span class="dv">1</span>))</span>
-<span id="cb29-28"><a href="#cb29-28" tabindex="-1"></a>  Ep1 <span class="ot">&lt;-</span> <span class="fu">weighted.mean</span>(p1, md1<span class="sc">$</span>weights)</span>
+<span id="cb29-28"><a href="#cb29-28" tabindex="-1"></a>  Ep1 <span class="ot">&lt;-</span> <span class="fu">mean</span>(p1)</span>
 <span id="cb29-29"><a href="#cb29-29" tabindex="-1"></a>  </span>
 <span id="cb29-30"><a href="#cb29-30" tabindex="-1"></a>  <span class="co">#Estimated potential outcomes under control</span></span>
 <span id="cb29-31"><a href="#cb29-31" tabindex="-1"></a>  p0 <span class="ot">&lt;-</span> <span class="fu">predict</span>(fit, <span class="at">type =</span> <span class="st">&quot;response&quot;</span>,</span>
 <span id="cb29-32"><a href="#cb29-32" tabindex="-1"></a>                <span class="at">newdata =</span> <span class="fu">transform</span>(md1, <span class="at">A =</span> <span class="dv">0</span>))</span>
-<span id="cb29-33"><a href="#cb29-33" tabindex="-1"></a>  Ep0 <span class="ot">&lt;-</span> <span class="fu">weighted.mean</span>(p0, md1<span class="sc">$</span>weights)</span>
+<span id="cb29-33"><a href="#cb29-33" tabindex="-1"></a>  Ep0 <span class="ot">&lt;-</span> <span class="fu">mean</span>(p0)</span>
 <span id="cb29-34"><a href="#cb29-34" tabindex="-1"></a>  </span>
 <span id="cb29-35"><a href="#cb29-35" tabindex="-1"></a>  <span class="co">#Risk ratio</span></span>
 <span id="cb29-36"><a href="#cb29-36" tabindex="-1"></a>  <span class="fu">return</span>(Ep1 <span class="sc">/</span> Ep0)</span>
@@ -1314,8 +1314,8 @@ confidence interval.</p>
 ## 
 ## 
 ## Bootstrap Statistics :
-##     original  bias    std. error
-## t1*    1.588 0.01304      0.1313</code></pre>
+##     original   bias    std. error
+## t1*    1.588 0.001319      0.1265</code></pre>
 <div class="sourceCode" id="cb32"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" tabindex="-1"></a><span class="fu">boot.ci</span>(cluster_boot_out, <span class="at">type =</span> <span class="st">&quot;perc&quot;</span>)</span></code></pre></div>
 <pre><code>## BOOTSTRAP CONFIDENCE INTERVAL CALCULATIONS
 ## Based on 199 bootstrap replicates
@@ -1325,10 +1325,10 @@ confidence interval.</p>
 ## 
 ## Intervals : 
 ## Level     Percentile     
-## 95%   ( 1.348,  1.877 )  
+## 95%   ( 1.356,  1.857 )  
 ## Calculations and Intervals on Original Scale
 ## Some percentile intervals may be unstable</code></pre>
-<p>We find a RR of 1.588 with a confidence interval of (1.348, 1.877).
+<p>We find a RR of 1.588 with a confidence interval of (1.356, 1.857).
 If we had wanted a risk difference, we could have changed the final line
 in <code>cluster_boot_fun()</code> to be <code>Ep1 - Ep0</code>.</p>
 </div>
@@ -1378,10 +1378,9 @@ the moderator, <code>X5</code>.</p>
 <span id="cb34-2"><a href="#cb34-2" tabindex="-1"></a>                X5<span class="sc">*</span>X6 <span class="sc">+</span> X7 <span class="sc">+</span> X5<span class="sc">*</span>X8 <span class="sc">+</span> X9, <span class="at">data =</span> d,</span>
 <span id="cb34-3"><a href="#cb34-3" tabindex="-1"></a>              <span class="at">exact =</span> <span class="sc">~</span>X5, <span class="at">method =</span> <span class="st">&quot;nearest&quot;</span>)</span>
 <span id="cb34-4"><a href="#cb34-4" tabindex="-1"></a>mP</span></code></pre></div>
-<pre><code>## A matchit object
+<pre><code>## A `matchit` object
 ##  - method: 1:1 nearest neighbor matching without replacement
-##  - distance: Propensity score
-##              - estimated with logistic regression
+##  - distance: Propensity score             - estimated with logistic regression
 ##  - number of obs.: 2000 (original), 882 (matched)
 ##  - target estimand: ATT
 ##  - covariates: X1, X2, X5, X3, X4, X6, X7, X8, X9</code></pre>
@@ -1405,14 +1404,16 @@ argument to signify that we want treatment effects stratified by the
 moderator.</p>
 <div class="sourceCode" id="cb37"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1" tabindex="-1"></a><span class="fu">avg_comparisons</span>(fitP, <span class="at">variables =</span> <span class="st">&quot;A&quot;</span>,</span>
 <span id="cb37-2"><a href="#cb37-2" tabindex="-1"></a>                <span class="at">vcov =</span> <span class="sc">~</span>subclass,</span>
-<span id="cb37-3"><a href="#cb37-3" tabindex="-1"></a>                <span class="at">newdata =</span> <span class="fu">subset</span>(md, A <span class="sc">==</span> <span class="dv">1</span>),</span>
-<span id="cb37-4"><a href="#cb37-4" tabindex="-1"></a>                <span class="at">wts =</span> <span class="st">&quot;weights&quot;</span>,</span>
-<span id="cb37-5"><a href="#cb37-5" tabindex="-1"></a>                <span class="at">by =</span> <span class="st">&quot;X5&quot;</span>)</span></code></pre></div>
+<span id="cb37-3"><a href="#cb37-3" tabindex="-1"></a>                <span class="at">newdata =</span> <span class="fu">subset</span>(A <span class="sc">==</span> <span class="dv">1</span>),</span>
+<span id="cb37-4"><a href="#cb37-4" tabindex="-1"></a>                <span class="at">by =</span> <span class="st">&quot;X5&quot;</span>)</span></code></pre></div>
 <pre><code>## 
-##  Term          Contrast X5 Estimate Std. Error    z Pr(&gt;|z|)    S 2.5 % 97.5 %
-##     A mean(1) - mean(0)  0     2.21      0.670 3.29   &lt;0.001 10.0 0.894   3.52
-##     A mean(1) - mean(0)  1     2.18      0.569 3.83   &lt;0.001 12.9 1.065   3.29
+##  X5 Estimate Std. Error    z Pr(&gt;|z|)    S 2.5 % 97.5 %
+##   0     2.21      0.670 3.29   &lt;0.001 10.0 0.894   3.52
+##   1     2.18      0.569 3.83   &lt;0.001 12.9 1.065   3.29
 ## 
+## Term: A
+## Type:  response 
+## Comparison: mean(1) - mean(0)
 ## Columns: term, contrast, X5, estimate, std.error, statistic, p.value, s.value, conf.low, conf.high, predicted_lo, predicted_hi, predicted</code></pre>
 <p>We can see that the subgroup mean differences are quite similar to
 each other. Finally, we can test for moderation using another call to
@@ -1421,14 +1422,15 @@ each other. Finally, we can test for moderation using another call to
 effects between subgroups:</p>
 <div class="sourceCode" id="cb39"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb39-1"><a href="#cb39-1" tabindex="-1"></a><span class="fu">avg_comparisons</span>(fitP, <span class="at">variables =</span> <span class="st">&quot;A&quot;</span>,</span>
 <span id="cb39-2"><a href="#cb39-2" tabindex="-1"></a>                <span class="at">vcov =</span> <span class="sc">~</span>subclass,</span>
-<span id="cb39-3"><a href="#cb39-3" tabindex="-1"></a>                <span class="at">newdata =</span> <span class="fu">subset</span>(md, A <span class="sc">==</span> <span class="dv">1</span>),</span>
-<span id="cb39-4"><a href="#cb39-4" tabindex="-1"></a>                <span class="at">wts =</span> <span class="st">&quot;weights&quot;</span>,</span>
-<span id="cb39-5"><a href="#cb39-5" tabindex="-1"></a>                <span class="at">by =</span> <span class="st">&quot;X5&quot;</span>,</span>
-<span id="cb39-6"><a href="#cb39-6" tabindex="-1"></a>                <span class="at">hypothesis =</span> <span class="st">&quot;pairwise&quot;</span>)</span></code></pre></div>
+<span id="cb39-3"><a href="#cb39-3" tabindex="-1"></a>                <span class="at">newdata =</span> <span class="fu">subset</span>(A <span class="sc">==</span> <span class="dv">1</span>),</span>
+<span id="cb39-4"><a href="#cb39-4" tabindex="-1"></a>                <span class="at">by =</span> <span class="st">&quot;X5&quot;</span>,</span>
+<span id="cb39-5"><a href="#cb39-5" tabindex="-1"></a>                <span class="at">hypothesis =</span> <span class="st">&quot;pairwise&quot;</span>)</span></code></pre></div>
 <pre><code>## 
-##   Term Estimate Std. Error      z Pr(&gt;|z|)   S 2.5 % 97.5 %
-##  0 - 1   0.0275      0.879 0.0313    0.975 0.0  -1.7   1.75
+##  Estimate Std. Error      z Pr(&gt;|z|)   S 2.5 % 97.5 %
+##    0.0275      0.879 0.0313    0.975 0.0  -1.7   1.75
 ## 
+## Term: 0 - 1
+## Type:  response 
 ## Columns: term, estimate, std.error, statistic, p.value, s.value, conf.low, conf.high</code></pre>
 <p>As expected, the difference between the subgroup treatment effects is
 small and nonsignificant, so there is no evidence of moderation by
@@ -1548,7 +1550,7 @@ interactions.</p>
 </div>
 <div id="references" class="section level2">
 <h2>References</h2>
-<div id="refs" class="references csl-bib-body hanging-indent">
+<div id="refs" class="references csl-bib-body hanging-indent" entry-spacing="0">
 <div id="ref-abadie2008" class="csl-entry">
 Abadie, Alberto, and Guido W. Imbens. 2008. <span>“On the Failure of the
 Bootstrap for Matching Estimators.”</span> <em>Econometrica</em> 76 (6):
@@ -1827,8 +1829,8 @@ described by <span class="citation">Desai et al. (<a href="#ref-desai2017">2017<
 occur with certain kinds of matching; the results will be identical
 regardless.<a href="#fnref6" class="footnote-back">↩︎</a></p></li>
 <li id="fn7"><p>Note that for low or high average expected risks
-computed with <code>predictions()</code>, the confidence intervals may
-go below 0 or above 1; this is because an approximation is used. To
+computed with <code>avg_predictions()</code>, the confidence intervals
+may go below 0 or above 1; this is because an approximation is used. To
 avoid this problem, bootstrapping or simulation-based inference can be
 used instead.<a href="#fnref7" class="footnote-back">↩︎</a></p></li>
 <li id="fn8"><p>It is not immediately clear how to estimate a marginal
