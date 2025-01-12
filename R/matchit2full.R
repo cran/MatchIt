@@ -82,7 +82,7 @@
 #' @param s.weights the variable containing sampling weights to be incorporated
 #' into propensity score models and balance statistics.
 #' @param caliper the width(s) of the caliper(s) used for caliper matching.
-#' Calipers are processed by \pkgfun{optmatch}{caliper}. See Notes and Examples.
+#' Calipers are processed by \pkgfun{optmatch}{caliper}. Positive and negative calipers are allowed. See Notes and Examples.
 #' @param std.caliper `logical`; when calipers are specified, whether they
 #' are in standard deviation units (`TRUE`) or raw units (`FALSE`).
 #' @param verbose `logical`; whether information about the matching
@@ -197,15 +197,18 @@
 #'
 #' # Optimal full PS matching
 #' m.out1 <- matchit(treat ~ age + educ + race + nodegree +
-#'                     married + re74 + re75, data = lalonde,
+#'                     married + re74 + re75,
+#'                   data = lalonde,
 #'                   method = "full")
 #' m.out1
 #' summary(m.out1)
 #'
 #' # Optimal full Mahalanobis distance matching within a PS caliper
 #' m.out2 <- matchit(treat ~ age + educ + race + nodegree +
-#'                     married + re74 + re75, data = lalonde,
-#'                   method = "full", caliper = .01,
+#'                     married + re74 + re75,
+#'                   data = lalonde,
+#'                   method = "full",
+#'                   caliper = .01,
 #'                   mahvars = ~ age + educ + re74 + re75)
 #' m.out2
 #' summary(m.out2, un = FALSE)
@@ -213,13 +216,17 @@
 #' # Optimal full Mahalanobis distance matching within calipers
 #' # of 500 on re74 and re75
 #' m.out3 <- matchit(treat ~ age + educ + re74 + re75,
-#'                   data = lalonde, distance = "mahalanobis",
+#'                   data = lalonde,
+#'                   distance = "mahalanobis",
 #'                   method = "full",
-#'                   caliper = c(re74 = 500, re75 = 500),
+#'                   caliper = c(re74 = 500,
+#'                               re75 = 500),
 #'                   std.caliper = FALSE)
 #' m.out3
-#' summary(m.out3, addlvariables = ~race + nodegree + married,
-#'         data = lalonde, un = FALSE)
+#' summary(m.out3,
+#'         addlvariables = ~race + nodegree + married,
+#'         data = lalonde,
+#'         un = FALSE)
 NULL
 
 matchit2full <- function(treat, formula, data, distance, discarded,
@@ -233,7 +240,7 @@ matchit2full <- function(treat, formula, data, distance, discarded,
   .cat_verbose("Full matching... \n", verbose = verbose)
 
   fm.args <- c("omit.fraction", "mean.controls", "tol", "solver")
-  A <- setNames(lapply(fm.args, ...get, ...), fm.args)
+  A <- ...mget(fm.args)
   A[lengths(A) == 0L] <- NULL
 
   #Set max problem size to Inf and return to original value after match
@@ -300,7 +307,9 @@ matchit2full <- function(treat, formula, data, distance, discarded,
   }
 
   #Transpose distance mat as needed
-  if (focal == 0) mo <- t(mo)
+  if (focal == 0) {
+    mo <- t(mo)
+  }
 
   #Remove discarded units from distance mat
   mo <- mo[!discarded[treat == focal], !discarded[treat != focal], drop = FALSE]
@@ -325,7 +334,7 @@ matchit2full <- function(treat, formula, data, distance, discarded,
 
     if (any(names(caliper) != "")) {
       cov.cals <- setdiff(names(caliper), "")
-      calcovs <- get.covs.matrix(reformulate(cov.cals, intercept = FALSE), data = data)
+      calcovs <- get_covs_matrix(reformulate(cov.cals, intercept = FALSE), data = data)
     }
 
     for (i in seq_along(caliper)) {
@@ -339,7 +348,8 @@ matchit2full <- function(treat, formula, data, distance, discarded,
         mo_cal <- optmatch::match_on(setNames(distance[!discarded], names(treat_)), z = treat_)
       }
 
-      mo <- mo + optmatch::caliper(mo_cal, caliper[i])
+      mo <- mo + optmatch::caliper(mo_cal, abs(caliper[i]),
+                                   compare = if (caliper[i] >= 0) `<=` else `>=`)
     }
 
     rm(mo_cal)

@@ -179,8 +179,11 @@ scaled_euclidean_dist <- function(formula = NULL,
                                   var = NULL,
                                   discarded = NULL,
                                   ...) {
-  X <- transform_covariates(formula, data, method = "scaled_euclidean",
-                            s.weights = s.weights, var = var,
+  X <- transform_covariates(formula,
+                            data = data,
+                            method = "scaled_euclidean",
+                            s.weights = s.weights,
+                            var = var,
                             discarded = discarded)
   eucdist_internal(X, attr(X, "treat"))
 }
@@ -192,8 +195,11 @@ robust_mahalanobis_dist <- function(formula = NULL,
                                     s.weights = NULL,
                                     discarded = NULL,
                                     ...) {
-  X <- transform_covariates(formula, data = data, method = "robust_mahalanobis",
-                            s.weights = s.weights, discarded = discarded)
+  X <- transform_covariates(formula,
+                            data = data,
+                            method = "robust_mahalanobis",
+                            s.weights = s.weights,
+                            discarded = discarded)
   eucdist_internal(X, attr(X, "treat"))
 }
 
@@ -202,7 +208,9 @@ robust_mahalanobis_dist <- function(formula = NULL,
 euclidean_dist <- function(formula = NULL,
                            data = NULL,
                            ...) {
-  X <- transform_covariates(formula, data = data, method = "euclidean")
+  X <- transform_covariates(formula,
+                            data = data,
+                            method = "euclidean")
   eucdist_internal(X, attr(X, "treat"))
 }
 
@@ -212,18 +220,18 @@ euclidean_dist <- function(formula = NULL,
 transform_covariates <- function(formula = NULL, data = NULL, method = "mahalanobis",
                                  s.weights = NULL, var = NULL, treat = NULL,
                                  discarded = NULL) {
-  X <- get.covs.matrix.for.dist(formula, data)
+  X <- get_covs_matrix_for_dist(formula, data)
 
   X <- .check_X(X)
   treat <- check_treat(treat, X)
 
   #If allvariables have no variance, use Euclidean to avoid errors
   #If some have no variance, removes those to avoid messing up distances
-  no_variance <- which(apply(X, 2, function(x) abs(max(x) - min(x)) < sqrt(.Machine$double.eps)))
+  no_variance <- which(apply(X, 2L, function(x) abs(max(x) - min(x)) < sqrt(.Machine$double.eps)))
 
   if (length(no_variance) == ncol(X)) {
     method <- "euclidean"
-    X <- X[, 1, drop = FALSE]
+    X <- X[, 1L, drop = FALSE]
   }
   else if (is_not_null(no_variance)) {
     X <- X[, -no_variance, drop = FALSE]
@@ -310,7 +318,7 @@ transform_covariates <- function(formula = NULL, data = NULL, method = "mahalano
         sds <- pooled_sd(X[!discarded,, drop = FALSE], treat[!discarded], s.weights[!discarded])
       }
       else {
-        sds <- sqrt(apply(X[!discarded,, drop = FALSE], 2, wvar, w = s.weights))
+        sds <- sqrt(apply(X[!discarded,, drop = FALSE], 2L, wvar, w = s.weights))
       }
     }
     else if (is.cov_like(var, X)) {
@@ -347,7 +355,7 @@ eucdist_internal <- function(X, treat = NULL) {
 
     dimnames(d) <- list(rownames(X), rownames(X))
   }
-  else {
+  else if (!isTRUE(attr(treat, "type") == "multi")) {
     treat_l <- as.logical(treat)
 
     d <- {
@@ -357,13 +365,16 @@ eucdist_internal <- function(X, treat = NULL) {
 
     dimnames(d) <- list(rownames(X)[treat_l], rownames(X)[!treat_l])
   }
+  else {
+    stop("`eucdist_internal()` cannot use a multi-category treat.")
+  }
 
   d
 }
 
 #Get covariates (RHS) vars from formula; factor variable contrasts divided by sqrt(2)
 #to ensure same result as when non-factor binary variable supplied (see optmatch:::contr.match_on)
-get.covs.matrix.for.dist <- function(formula = NULL, data = NULL) {
+get_covs_matrix_for_dist <- function(formula = NULL, data = NULL) {
 
   if (is_null(formula)) {
     if (is_null(colnames(data))) {
@@ -401,6 +412,7 @@ get.covs.matrix.for.dist <- function(formula = NULL, data = NULL) {
     assign <- attr(X, "assign")[-1L]
     X <- X[, -1L, drop = FALSE]
   }
+
   attr(X, "assign") <- assign
 
   attr(X, "treat") <-  model.response(mf)
@@ -435,6 +447,7 @@ get.covs.matrix.for.dist <- function(formula = NULL, data = NULL) {
 
   attr(X, "checked") <- TRUE
   attr(X, "treat") <- treat
+
   X
 }
 

@@ -33,7 +33,7 @@ of the propensity score) but sampling weights are required for generalizing
 an effect to the correct population. Without adding sampling weights to the
 \code{matchit} object, balance assessment tools (i.e., \code{\link[=summary.matchit]{summary.matchit()}}
 and \code{\link[=plot.matchit]{plot.matchit()}}) will not calculate balance statistics correctly, and
-the weights produced by \code{\link[=match.data]{match.data()}} and \code{\link[=get_matches]{get_matches()}} will not
+the weights produced by \code{\link[=match_data]{match_data()}} and \code{\link[=get_matches]{get_matches()}} will not
 incorporate the sampling weights.
 }
 \examples{
@@ -47,7 +47,8 @@ sw <- rchisq(nrow(lalonde), 2)
 # NN PS match using logistic regression PS that doesn't
 # include sampling weights
 m.out <- matchit(treat ~ age + educ + race + nodegree +
-                   married  + re74 + re75, data = lalonde)
+                   married  + re74 + re75,
+                 data = lalonde)
 
 m.out
 
@@ -62,7 +63,7 @@ summary(m.out, improvement = FALSE)
 
 }
 \seealso{
-\code{\link[=matchit]{matchit()}}; \code{\link[=match.data]{match.data()}}
+\code{\link[=matchit]{matchit()}}; \code{\link[=match_data]{match_data()}}
 }
 \author{
 Noah Greifer

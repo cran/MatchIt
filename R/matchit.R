@@ -112,8 +112,7 @@
 #' use in matching. Should be a numeric vector with each value named according
 #' to the variable to which the caliper applies. To apply to the distance
 #' measure, the value should be unnamed. See the individual methods pages for
-#' information on whether and how this argument is used. The default is
-#' `NULL` for no caliper.
+#' information on whether and how this argument is used. Positive values require the distance between paired units to be no larger than the supplied caliper; negative values require the distance between paired units to be larger than the absolute value value of the supplied caliper. The default is `NULL` for no caliper.
 #' @param std.caliper `logical`; when a caliper is specified, whether the
 #' the caliper is in standard deviation units (`TRUE`) or raw units
 #' (`FALSE`). Can either be of length 1, applying to all calipers, or of
@@ -236,7 +235,7 @@
 #' For cardinality matching, all matched units receive a weight
 #' of 1.
 #'
-#' ### Matching witht replacement
+#' ### Matching with replacement
 #'
 #' For matching *with* replacement, units are not assigned to unique strata. For
 #' the ATT, each treated unit gets a weight of 1. Each control unit is weighted
@@ -259,7 +258,7 @@
 #' If sampling weights are included through the
 #' `s.weights` argument, they will be included in the `matchit()`
 #' output object but not incorporated into the matching weights.
-#' [match.data()], which extracts the matched set from a `matchit` object,
+#' [match_data()], which extracts the matched set from a `matchit` object,
 #' combines the matching weights and sampling weights.
 #'
 #' @return When `method` is something other than `"subclass"`, a
@@ -321,8 +320,7 @@
 #' Causal Inference. *Political Analysis*, 15(3), 199–236. \doi{10.1093/pan/mpl013}
 #'
 #' Ho, D. E., Imai, K., King, G., & Stuart, E. A. (2011). MatchIt:
-#' Nonparametric Preprocessing for Parametric Causal Inference. *Journal of
-#' Statistical Software*, 42(8). \doi{10.18637/jss.v042.i08}
+#' Nonparametric Preprocessing for Parametric Causal Inference. *Journal of Statistical Software*, 42(8). \doi{10.18637/jss.v042.i08}
 #'
 #' @examples
 #' data("lalonde")
@@ -330,7 +328,8 @@
 #' # Default: 1:1 NN PS matching w/o replacement
 #'
 #' m.out1 <- matchit(treat ~ age + educ + race + nodegree +
-#'                    married + re74 + re75, data = lalonde)
+#'                     married + re74 + re75,
+#'                   data = lalonde)
 #' m.out1
 #' summary(m.out1)
 #'
@@ -338,9 +337,11 @@
 #' # exact matching on married and race
 #'
 #' m.out2 <- matchit(treat ~ age + educ + race + nodegree +
-#'                    married + re74 + re75, data = lalonde,
-#'                    distance = "mahalanobis", replace = TRUE,
-#'                    exact = ~ married + race)
+#'                     married + re74 + re75,
+#'                   data = lalonde,
+#'                   distance = "mahalanobis",
+#'                   replace = TRUE,
+#'                   exact = ~ married + race)
 #' m.out2
 #' summary(m.out2, un = TRUE)
 #'
@@ -348,10 +349,13 @@
 #' # by a probit pregression PS
 #'
 #' m.out3 <- matchit(treat ~ age + educ + race + nodegree +
-#'                    married + re74 + re75, data = lalonde,
-#'                    distance = "glm", link = "probit",
-#'                    mahvars = ~ age + educ + re74 + re75,
-#'                    caliper = .1, ratio = 2)
+#'                     married + re74 + re75,
+#'                   data = lalonde,
+#'                   distance = "glm",
+#'                   link = "probit",
+#'                   mahvars = ~ age + educ + re74 + re75,
+#'                   caliper = .1,
+#'                   ratio = 2)
 #' m.out3
 #' summary(m.out3, un = TRUE)
 #'
@@ -359,10 +363,12 @@
 #' # PS, age, and educ
 #' @examplesIf requireNamespace("optmatch", quietly = TRUE)
 #' m.out4 <- matchit(treat ~ age + educ + race + nodegree +
-#'                    married + re74 + re75, data = lalonde,
-#'                    method = "full", estimand = "ATE",
-#'                    caliper = c(.1, age = 2, educ = 1),
-#'                    std.caliper = c(TRUE, FALSE, FALSE))
+#'                     married + re74 + re75,
+#'                   data = lalonde,
+#'                   method = "full",
+#'                   estimand = "ATE",
+#'                   caliper = c(.1, age = 2, educ = 1),
+#'                   std.caliper = c(TRUE, FALSE, FALSE))
 #' m.out4
 #' summary(m.out4, un = TRUE)
 #' @examples
@@ -370,9 +376,12 @@
 #' # discarding controls outside common support of PS
 #'
 #' s.out1 <- matchit(treat ~ age + educ + race + nodegree +
-#'                    married + re74 + re75, data = lalonde,
-#'                    method = "subclass", distance = "glm",
-#'                    discard = "control", subclass = 10)
+#'                     married + re74 + re75,
+#'                   data = lalonde,
+#'                   method = "subclass",
+#'                   distance = "glm",
+#'                   discard = "control",
+#'                   subclass = 10)
 #' s.out1
 #' summary(s.out1, un = TRUE)
 
@@ -566,7 +575,7 @@ matchit <- function(formula,
     dist.model <- link <- NULL
   }
   else {
-    .cat_verbose("Estimating propensity scores... \n", verbose = verbose)
+    .cat_verbose("Estimating propensity scores...\n", verbose = verbose)
 
     if (is_not_null(s.weights)) {
       attr(s.weights, "in_ps") <- !distance %in% c("bart")
@@ -597,7 +606,7 @@ matchit <- function(formula,
       else link
     }
 
-    dist.out <- do.call(fn1, distance.options, quote = TRUE)
+    dist.out <- do.call(fn1, distance.options)
 
     dist.model <- dist.out$model
     distance <- dist.out$distance
@@ -732,7 +741,7 @@ print.matchit <- function(x, ...) {
 
   cat("A `matchit` object\n")
 
-  cat(sprintf(" - method: %s\n", info.to.method(info)))
+  cat(sprintf(" - method: %s\n", info_to_method(info)))
 
   if (is_not_null(info$distance) || info$mahalanobis) {
     cat(" - distance: ")
@@ -759,11 +768,11 @@ print.matchit <- function(x, ...) {
       }
 
       if (info$distance != "user") {
-        cat(sprintf("             - estimated with %s\n",
-                    info.to.distance(info)))
+        cat(sprintf("\n             - estimated with %s\n",
+                    info_to_distance(info)))
         if (is_not_null(x[["s.weights"]])) {
-          cat(sprintf("             - sampling weights %sincluded in estimation\n",
-                      if (isTRUE(attr(x[["s.weights"]], "in_ps"))) "" else "not "))
+          cat(sprintf("             - sampling weights %s in estimation\n",
+                      if (isTRUE(attr(x[["s.weights"]], "in_ps"))) "included" else "not included"))
         }
       }
     }

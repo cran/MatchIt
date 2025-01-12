@@ -77,7 +77,7 @@
 #' re-estimate the propensity score in the remaining sample prior to matching.
 #' @param s.weights the variable containing sampling weights to be incorporated
 #' into propensity score models and balance statistics.
-#' @param caliper the width of the caliper used for caliper matching. A caliper can only be placed on the propensity score.
+#' @param caliper the width of the caliper used for caliper matching. A caliper can only be placed on the propensity score and cannot be negative.
 #' @param std.caliper `logical`; when a caliper is specified, whether it
 #' is in standard deviation units (`TRUE`) or raw units (`FALSE`).
 #' @param verbose `logical`; whether information about the matching
@@ -101,17 +101,14 @@
 #'
 #' Generalized full matching is similar to optimal full matching, but has some additional flexibility that can be controlled by some of the extra arguments available. By default, `method = "quick"` performs a standard full match in which all units are matched (unless restricted by the caliper) and assigned to a subclass. Each subclass could contain multiple units from each treatment group. The subclasses are chosen to minimize the largest within-subclass distance between units (including between units of the same treatment group). Notably, generalized full matching requires less memory and can run much faster than optimal full matching and optimal pair matching and, in some cases, even than nearest neighbor matching, and it can be used with huge datasets (e.g., in the millions) while running in under a minute.
 #'
-#'
 #' @references In a manuscript, be sure to cite the *quickmatch* package if using
-#' `matchit()` with `method = "quick"`:
-#'
-#' Sävje, F., Sekhon, J., & Higgins, M. (2018). quickmatch: Quick generalized full matching. \url{https://CRAN.R-project.org/package=quickmatch}
+#' `matchit()` with `method = "quick"`. A citation can be generated using `citation("quickmatch")`.
 #'
 #' For example, a sentence might read:
 #'
 #' *Generalized full matching was performed using the MatchIt package (Ho,
 #' Imai, King, & Stuart, 2011) in R, which calls functions from the quickmatch
-#' package (Savje, Sekhon, & Higgins, 2018).*
+#' package (Sävje, Sekhon, & Higgins, 2024).*
 #'
 #' You should also cite the following paper, which develops and describes the method:
 #'
@@ -129,7 +126,8 @@
 #'
 #' # Generalize full PS matching
 #' m.out1 <- matchit(treat ~ age + educ + race + nodegree +
-#'                     married + re74 + re75, data = lalonde,
+#'                     married + re74 + re75,
+#'                   data = lalonde,
 #'                   method = "quick")
 #' m.out1
 #' summary(m.out1)
@@ -207,11 +205,11 @@ matchit2quick <- function(treat, formula, data, distance, discarded,
   #Process caliper
   if (is_not_null(caliper)) {
     if (is_not_null(mahvars)) {
-      .err("with `method = \"quick\"`, a caliper can only be used when `distance` is a propensity score or vector and `mahvars` is not specified")
+      .err('with `method = "quick"`, a caliper can only be used when `distance` is a propensity score or vector and `mahvars` is not specified')
     }
 
     if (length(caliper) > 1L || !identical(names(caliper), "")) {
-      .err("with `method = \"quick\"`, calipers cannot be placed on covariates")
+      .err('with `method = "quick"`, calipers cannot be placed on covariates')
     }
   }
 

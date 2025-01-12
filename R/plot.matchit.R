@@ -122,19 +122,24 @@
 #' data("lalonde")
 #'
 #' m.out <- matchit(treat ~ age + educ + married +
-#'                    race + re74, data = lalonde,
+#'                    race + re74,
+#'                  data = lalonde,
 #'                  method = "nearest")
-#' plot(m.out, type = "qq", interactive = FALSE,
+#' plot(m.out, type = "qq",
+#'      interactive = FALSE,
 #'      which.xs = ~age + educ + re74)
 #' plot(m.out, type = "histogram")
 #'
 #' s.out <- matchit(treat ~ age + educ + married +
 #'                    race + nodegree + re74 + re75,
-#'                  data = lalonde, method = "subclass")
-#' plot(s.out, type = "density", interactive = FALSE,
+#'                  data = lalonde,
+#'                  method = "subclass")
+#' plot(s.out, type = "density",
+#'      interactive = FALSE,
 #'      which.xs = ~age + educ + re74,
 #'      subclass = 3)
-#' plot(s.out, type = "jitter", interactive = FALSE)
+#' plot(s.out, type = "jitter",
+#'      interactive = FALSE)
 #'
 
 #' @exportS3Method plot matchit
@@ -150,13 +155,13 @@ plot.matchit <- function(x, type = "qq", interactive = TRUE, which.xs = NULL, da
   }
   else if (type == "jitter") {
     if (is_null(x$distance)) {
-      .err("`type = \"jitter\"` cannot be used if a distance measure is not estimated or supplied. No plots generated")
+      .err('`type = "jitter"` cannot be used if a distance measure is not estimated or supplied. No plots generated')
     }
     jitter_pscore(x, interactive = interactive,...)
   }
   else if (type == "histogram") {
     if (is_null(x$distance)) {
-      .err("`type = \"hist\"` cannot be used if a distance measure is not estimated or supplied. No plots generated")
+      .err('`type = "hist"` cannot be used if a distance measure is not estimated or supplied. No plots generated')
     }
     hist_pscore(x,...)
   }
@@ -167,15 +172,16 @@ plot.matchit <- function(x, type = "qq", interactive = TRUE, which.xs = NULL, da
 #' @rdname plot.matchit
 plot.matchit.subclass <- function(x, type = "qq", interactive = TRUE, which.xs = NULL, subclass, ...) {
   choice.menu <- function(choices, question) {
-    k <- length(choices)-1
+    k <- length(choices) - 1
     Choices <- data.frame(choices)
     row.names(Choices) <- 0:k
     names(Choices) <- "Choices"
-    print.data.frame(Choices, right=FALSE)
+    print.data.frame(Choices, right = FALSE)
     ans <- readline(question)
+
     while (!ans %in% 0:k) {
       message("Not valid -- please pick one of the choices")
-      print.data.frame(Choices, right=FALSE)
+      print.data.frame(Choices, right = FALSE)
       ans <- readline(question)
     }
 
@@ -232,15 +238,15 @@ plot.matchit.subclass <- function(x, type = "qq", interactive = TRUE, which.xs =
       matchit.covplot(x, type = type, interactive = interactive, which.xs = which.xs, ...)
     }
   }
-  else if (type=="jitter") {
+  else if (type == "jitter") {
     if (is_null(x$distance)) {
-      .err("`type = \"jitter\"` cannot be used when no distance variable was estimated or supplied")
+      .err('`type = "jitter"` cannot be used when no distance variable was estimated or supplied')
     }
     jitter_pscore(x, interactive = interactive, ...)
   }
   else if (type == "histogram") {
     if (is_null(x$distance)) {
-      .err("`type = \"histogram\"` cannot be used when no distance variable was estimated or supplied")
+      .err('`type = "histogram"` cannot be used when no distance variable was estimated or supplied')
     }
     hist_pscore(x,...)
   }
@@ -330,12 +336,12 @@ matchit.covplot <- function(object, type = "qq", interactive = TRUE, which.xs = 
   t <- object$treat
 
   sw <- {
-    if (is_null(object$s.weights)) rep(1, length(t))
+    if (is_null(object$s.weights)) rep.int(1, length(t))
     else object$s.weights
   }
 
   w <- object$weights * sw
-  if (is_null(w)) w <- rep(1, length(t))
+  if (is_null(w)) w <- rep.int(1, length(t))
 
   w <- .make_sum_to_1(w, by = t)
   sw <- .make_sum_to_1(sw, by = t)
@@ -344,7 +350,7 @@ matchit.covplot <- function(object, type = "qq", interactive = TRUE, which.xs = 
     varnames <- names(X)
   }
   else {
-    X <- get.covs.matrix(data = X)
+    X <- get_covs_matrix(data = X)
     varnames <- colnames(X)
   }
 
@@ -364,7 +370,7 @@ matchit.covplot <- function(object, type = "qq", interactive = TRUE, which.xs = 
 
     plot.new()
 
-    if (((i-1)%%3)==0) {
+    if (((i-1) %% 3) == 0) {
 
       if (type == "qq") {
         htext <- "eQQ Plots"
@@ -493,7 +499,7 @@ matchit.covplot.subclass <- function(object, type = "qq", which.subclass = NULL,
     varnames <- names(X)
   }
   else {
-    X <- get.covs.matrix(data = X)
+    X <- get_covs_matrix(data = X)
     varnames <- colnames(X)
   }
 
@@ -624,7 +630,7 @@ qqplot_match <- function(x, t, w, sw, discrete.cutoff = 5, ...) {
   }
 
   if (length(u) <= discrete.cutoff) {
-    md <- min(diff(u))
+    md <- min(diff1(u))
     x0 <- jitter(x0, amount = .1 * md)
     x1 <- jitter(x1, amount = .1 * md)
   }
@@ -632,8 +638,8 @@ qqplot_match <- function(x, t, w, sw, discrete.cutoff = 5, ...) {
   rr <- range(c(x0, x1))
   plot(x0, x1, xlab = "", ylab = "", xlim = rr, ylim = rr, axes = FALSE, ...)
   abline(a = 0, b = 1)
-  abline(a = (rr[2]-rr[1]) * 0.1, b = 1, lty = 2)
-  abline(a = -(rr[2]-rr[1]) * 0.1, b = 1, lty = 2)
+  abline(a = (rr[2L] - rr[1L]) * 0.1, b = 1, lty = 2)
+  abline(a = (rr[1L] - rr[2L]) * 0.1, b = 1, lty = 2)
   axis(2)
   box()
 
@@ -675,15 +681,15 @@ qqplot_match <- function(x, t, w, sw, discrete.cutoff = 5, ...) {
   }
 
   if (length(u) <= discrete.cutoff) {
-    md <- min(diff(u))
+    md <- min(diff1(u))
     x0 <- jitter(x0, amount = .1 * md)
     x1 <- jitter(x1, amount = .1 * md)
   }
 
   plot(x0, x1, xlab = "", ylab = "", xlim = rr, ylim = rr, axes = FALSE, ...)
   abline(a = 0, b = 1)
-  abline(a = (rr[2]-rr[1]) * 0.1, b = 1, lty = 2)
-  abline(a = -(rr[2]-rr[1]) * 0.1, b = 1, lty = 2)
+  abline(a = (rr[2L] - rr[1L]) * 0.1, b = 1, lty = 2)
+  abline(a = (rr[1L] - rr[2L]) * 0.1, b = 1, lty = 2)
   box()
 }
 
@@ -856,7 +862,7 @@ hist_pscore <- function(x, xlab = "Propensity Score", freq = FALSE, ...) {
   pscore <- x$distance[!is.na(x$distance)]
 
   s.weights <- {
-    if (is_null(x$s.weights)) rep(1, length(treat))
+    if (is_null(x$s.weights)) rep.int(1, length(treat))
     else x$s.weights
   }
 

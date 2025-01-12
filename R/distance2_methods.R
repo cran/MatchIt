@@ -173,8 +173,7 @@
 #' estimated. The `link` and `distance.options` arguments are ignored with these
 #' methods. See the individual matching methods pages for whether these
 #' distances are allowed and how they are used. Each of these distance measures
-#' can also be calculated outside `matchit()` using its [corresponding
-#' function][euclidean_dist].
+#' can also be calculated outside `matchit()` using its [corresponding function][euclidean_dist].
 #'
 #' \describe{
 #' \item{`"euclidean"`}{ The Euclidean distance is the raw
@@ -237,26 +236,33 @@
 #'
 #' # Linearized probit regression PS:
 #' m.out1 <- matchit(treat ~ age + educ + race + married +
-#'                     nodegree + re74 + re75, data = lalonde,
-#'                   distance = "glm", link = "linear.probit")
+#'                     nodegree + re74 + re75,
+#'                   data = lalonde,
+#'                   distance = "glm",
+#'                   link = "linear.probit")
 #' @examplesIf requireNamespace("mgcv", quietly = TRUE)
 #' # GAM logistic PS with smoothing splines (s()):
-#' m.out2 <- matchit(treat ~ s(age) + s(educ) + race + married +
-#'                     nodegree + re74 + re75, data = lalonde,
+#' m.out2 <- matchit(treat ~ s(age) + s(educ) +
+#'                     race + married +
+#'                     nodegree + re74 + re75,
+#'                   data = lalonde,
 #'                   distance = "gam")
 #' summary(m.out2$model)
 #' @examplesIf requireNamespace("CBPS", quietly = TRUE)
 #' # CBPS for ATC matching w/replacement, using the just-
 #' # identified version of CBPS (setting method = "exact"):
 #' m.out3 <- matchit(treat ~ age + educ + race + married +
-#'                     nodegree + re74 + re75, data = lalonde,
-#'                   distance = "cbps", estimand = "ATC",
+#'                     nodegree + re74 + re75,
+#'                   data = lalonde,
+#'                   distance = "cbps",
+#'                   estimand = "ATC",
 #'                   distance.options = list(method = "exact"),
 #'                   replace = TRUE)
 #' @examples
 #' # Mahalanobis distance matching - no PS estimated
 #' m.out4 <- matchit(treat ~ age + educ + race + married +
-#'                     nodegree + re74 + re75, data = lalonde,
+#'                     nodegree + re74 + re75,
+#'                   data = lalonde,
 #'                   distance = "mahalanobis")
 #'
 #' m.out4$distance #NULL
@@ -264,8 +270,10 @@
 #' # Mahalanobis distance matching with PS estimated
 #' # for use in a caliper; matching done on mahvars
 #' m.out5 <- matchit(treat ~ age + educ + race + married +
-#'                     nodegree + re74 + re75, data = lalonde,
-#'                   distance = "glm", caliper = .1,
+#'                     nodegree + re74 + re75,
+#'                   data = lalonde,
+#'                   distance = "glm",
+#'                   caliper = .1,
 #'                   mahvars = ~ age + educ + race + married +
 #'                                 nodegree + re74 + re75)
 #'
@@ -273,24 +281,25 @@
 #'
 #' # User-supplied propensity scores
 #' p.score <- fitted(glm(treat ~ age + educ + race + married +
-#'                         nodegree + re74 + re75, data = lalonde,
+#'                         nodegree + re74 + re75,
+#'                       data = lalonde,
 #'                       family = binomial))
 #'
 #' m.out6 <- matchit(treat ~ age + educ + race + married +
-#'                     nodegree + re74 + re75, data = lalonde,
+#'                     nodegree + re74 + re75,
+#'                   data = lalonde,
 #'                   distance = p.score)
 #'
-#' # User-supplied distance matrix using optmatch::match_on()
-#' @examplesIf requireNamespace("optmatch", quietly = TRUE)
-#' dist_mat <- optmatch::match_on(
+#' # User-supplied distance matrix using rank_mahalanobis()
+#' dist_mat <- robust_mahalanobis_dist(
 #'               treat ~ age + educ + race + nodegree +
-#'                 married + re74 + re75, data = lalonde,
-#'               method = "rank_mahalanobis")
+#'                 married + re74 + re75,
+#'               data = lalonde)
 #'
 #' m.out7 <- matchit(treat ~ age + educ + race + nodegree +
-#'                     married + re74 + re75, data = lalonde,
+#'                     married + re74 + re75,
+#'                   data = lalonde,
 #'                   distance = dist_mat)
-
 NULL
 
 #distance2glm-----------------
@@ -299,11 +308,20 @@ distance2glm <- function(formula, data = NULL, link = "logit", ...) {
   linear <- is_not_null(link) && startsWith(as.character(link), "linear")
   if (linear) link <- sub("linear.", "", as.character(link), fixed = TRUE)
 
-  args <- c(names(formals(glm)), names(formals(glm.control)))
-  A <- setNames(lapply(args, ...get, ...), args)
+  args <- unique(c(names(formals(glm)), names(formals(glm.control))))
+  A <- ...mget(args)
   A[lengths(A) == 0L] <- NULL
 
-  res <- do.call("glm", c(list(formula = formula, data = data, family = quasibinomial(link = link)), A))
+  family <- {
+    if (is_null(A[["weights"]])) binomial(link = link)
+    else quasibinomial(link = link)
+  }
+
+  A[["data"]] <- data
+  A[["formula"]] <- formula
+  A[["family"]] <- family
+
+  res <- do.call("glm", A)
 
   pred <- predict(res, type = if (linear) "link" else "response")
 
@@ -334,8 +352,8 @@ distance2gam <- function(formula, data = NULL, link = "logit", ...) {
 distance2rpart <- function(formula, data = NULL, link = NULL, ...) {
   rlang::check_installed("rpart")
 
-  args <- c(names(formals(rpart::rpart)), names(formals(rpart::rpart.control)))
-  A <- setNames(lapply(args, ...get, ...), args)
+  args <- unique(c(names(formals(rpart::rpart)), names(formals(rpart::rpart.control))))
+  A <- ...mget(args)
   A[lengths(A) == 0L] <- NULL
 
   A$formula <- formula
@@ -354,7 +372,7 @@ distance2nnet <- function(formula, data = NULL, link = NULL, ...) {
   weights <- A$weights
   A$weights <- NULL
 
-  res <- do.call(nnet::nnet, c(list(formula, data, weights = weights, entropy = TRUE), A), quote = TRUE)
+  res <- do.call(nnet::nnet, c(list(formula, data = data, weights = weights, entropy = TRUE), A), quote = TRUE)
   list(model = res, distance = drop(fitted(res)))
 }
 
@@ -390,8 +408,11 @@ distance2cbps <- function(formula, data = NULL, link = NULL, ...) {
     A[["weights"]] <- NULL
   }
 
+  A[["formula"]] <- formula
+  A[["data"]] <- data
+
   capture.output({ #Keeps from printing message about treatment
-    res <- do.call(CBPS::CBPS, c(list(formula, data), A), quote = TRUE)
+    res <- do.call(CBPS::CBPS, A, quote = TRUE)
   })
 
   pred <- fitted(res)
@@ -406,8 +427,8 @@ distance2bart <- function(formula, data = NULL, link = NULL, ...) {
 
   linear <- is_not_null(link) && startsWith(as.character(link), "linear")
 
-  args <- c(names(formals(dbarts::bart2)), names(formals(dbarts::dbartsControl)))
-  A <- setNames(lapply(args, ...get, ...), args)
+  args <- unique(c(names(formals(dbarts::bart2)), names(formals(dbarts::dbartsControl))))
+  A <- ...mget(args)
   A[lengths(A) == 0L] <- NULL
 
   A$formula <- formula
@@ -466,7 +487,7 @@ distance2bart <- function(formula, data = NULL, link = NULL, ...) {
 distance2randomforest <- function(formula, data = NULL, link = NULL, ...) {
   rlang::check_installed("randomForest")
   newdata <- get_all_vars(formula, data)
-  treatvar <- as.character(formula[[2]])
+  treatvar <- as.character(formula[[2L]])
   newdata[[treatvar]] <- factor(newdata[[treatvar]], levels = c("0", "1"))
   res <- randomForest::randomForest(formula, data = newdata, ...)
 
@@ -480,13 +501,13 @@ distance2elasticnet <- function(formula, data = NULL, link = NULL, ...) {
   linear <- is_not_null(link) && startsWith(as.character(link), "linear")
   if (linear) link <- sub("linear.", "", as.character(link), fixed = TRUE)
 
-  s <- ...get("s", ...)
+  s <- ...get("s")
   if (is_null(s)) {
     s <- "lambda.1se"
   }
 
-  args <- c(names(formals(glmnet::glmnet)), names(formals(glmnet::cv.glmnet)))
-  A <- setNames(lapply(args, ...get, ...), args)
+  args <- unique(c(names(formals(glmnet::glmnet)), names(formals(glmnet::cv.glmnet))))
+  A <- ...mget(args)
   A[lengths(A) == 0L] <- NULL
 
   if (is_null(link)) link <- "logit"
@@ -514,8 +535,8 @@ distance2elasticnet <- function(formula, data = NULL, link = NULL, ...) {
 }
 distance2lasso <- function(formula, data = NULL, link = NULL, ...) {
   if ("alpha" %in% ...names()) {
-    args <- c("s", names(formals(glmnet::glmnet)), names(formals(glmnet::cv.glmnet)))
-    A <- setNames(lapply(args, ...get, ...), args)
+    args <- unique(c("s", names(formals(glmnet::glmnet)), names(formals(glmnet::cv.glmnet))))
+    A <- ...mget(args)
     A[lengths(A) == 0L] <- NULL
 
     A$alpha <- 1
@@ -528,8 +549,8 @@ distance2lasso <- function(formula, data = NULL, link = NULL, ...) {
 }
 distance2ridge <- function(formula, data = NULL, link = NULL, ...) {
   if ("alpha" %in% ...names()) {
-    args <- c("s", names(formals(glmnet::glmnet)), names(formals(glmnet::cv.glmnet)))
-    A <- setNames(lapply(args, ...get, ...), args)
+    args <- unique(c("s", names(formals(glmnet::glmnet)), names(formals(glmnet::cv.glmnet))))
+    A <- ...mget(args)
     A[lengths(A) == 0L] <- NULL
 
     A$alpha <- 0
@@ -547,12 +568,10 @@ distance2gbm <- function(formula, data = NULL, link = NULL, ...) {
 
   linear <- is_not_null(link) && startsWith(as.character(link), "linear")
 
-  A <- list(...)
-
-  method <- ...get("method", ...)
+  method <- ...get("method")
 
   args <- names(formals(gbm::gbm))
-  A <- setNames(lapply(args, ...get, ...), args)
+  A <- ...mget(args)
   A[lengths(A) == 0L] <- NULL
 
   A$formula <- formula

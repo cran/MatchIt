@@ -246,33 +246,40 @@
 #' Checking: Coarsened Exact Matching. *Political Analysis*, 20(1), 1–24. \doi{10.1093/pan/mpr013}
 #'
 #' @examples
-#'
 #' data("lalonde")
 #'
 #' # Coarsened exact matching on age, race, married, and educ with educ
 #' # coarsened into 5 bins and race coarsened into 2 categories,
 #' # grouping "white" and "hispan" together
-#' m.out1 <- matchit(treat ~ age + race + married + educ, data = lalonde,
-#'                   method = "cem", cutpoints = list(educ = 5),
-#'                   grouping = list(race = list(c("white", "hispan"),
-#'                                               c("black"))))
+#' cutpoints <- list(educ = 5)
+#' grouping <- list(race = list(c("white", "hispan"),
+#'                              c("black")))
+#'
+#' m.out1 <- matchit(treat ~ age + race + married + educ,
+#'                   data = lalonde,
+#'                   method = "cem",
+#'                   cutpoints = cutpoints,
+#'                   grouping = grouping)
 #' m.out1
 #' summary(m.out1)
 #'
 #' # The same but requesting 1:1 Mahalanobis distance matching with
 #' # the k2k and k2k.method argument. Note the remaining number of units
 #' # is smaller than when retaining the full matched sample.
-#' m.out2 <- matchit(treat ~ age + race + married + educ, data = lalonde,
-#'                   method = "cem", cutpoints = list(educ = 5),
-#'                   grouping = list(race = list(c("white", "hispan"),
-#'                                               "black")),
-#'                   k2k = TRUE, k2k.method = "mahalanobis")
+#' m.out2 <- matchit(treat ~ age + race + married + educ,
+#'                   data = lalonde,
+#'                   method = "cem",
+#'                   cutpoints = cutpoints,
+#'                   grouping = grouping,
+#'                   k2k = TRUE,
+#'                   k2k.method = "mahalanobis")
 #' m.out2
 #' summary(m.out2, un = FALSE)
 
 NULL
 
-matchit2cem <- function(treat, covs, estimand = "ATT", s.weights = NULL, m.order = NULL, verbose = FALSE, ...) {
+matchit2cem <- function(treat, covs, estimand = "ATT", s.weights = NULL,
+                        m.order = NULL, verbose = FALSE, ...) {
   if (is_null(covs)) {
     .err("Covariates must be specified in the input formula to use coarsened exact matching")
   }
@@ -292,7 +299,7 @@ matchit2cem <- function(treat, covs, estimand = "ATT", s.weights = NULL, m.order
   strat <- cem_matchit(treat = treat, X = covs, ...)
 
   mm <- NULL
-  if (isTRUE(...get("k2k", ...))) {
+  if (isTRUE(...get("k2k"))) {
     focal <- switch(estimand, "ATC" = 0, 1)
 
     mm <- do_k2k(treat = treat,

@@ -12,7 +12,7 @@
 
 <meta name="author" content="Noah Greifer" />
 
-<meta name="date" content="2024-11-12" />
+<meta name="date" content="2025-01-11" />
 
 <title>Matching Methods</title>
 
@@ -262,7 +262,7 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 
 <h1 class="title toc-ignore">Matching Methods</h1>
 <h4 class="author">Noah Greifer</h4>
-<h4 class="date">2024-11-12</h4>
+<h4 class="date">2025-01-11</h4>
 
 
 <div id="TOC">
@@ -613,8 +613,8 @@ free of confounding by the measured covariates. See
 <code>matchit()</code> with <code>method = &quot;quick&quot;</code>. Generalized
 full matching in <code>MatchIt</code> depends on the
 <code>quickmatch()</code> function in the <code>quickmatch</code>
-package <span class="citation">(<a href="#ref-savjeQuickmatchQuickGeneralized2018">Savje, Sekhon, and
-Higgins 2018</a>)</span>.</p>
+package <span class="citation">(<a href="#ref-savjeQuickmatchQuickGeneralized2018">Fredrik Sävje, Sekhon,
+and Higgins 2018</a>)</span>.</p>
 <p>Generalized full matching includes different options for
 customization than optimal full matching. The user cannot supply their
 own distance matrix, but propensity scores and distance metrics that are
@@ -970,8 +970,11 @@ matched sample. Multiple variables can be supplied to
 Using calipers can be a good alternative to exact or coarsened exact
 matching to ensure only similar units are paired with each other. The
 <code>std.caliper</code> argument controls whether the provided calipers
-are in raw units or standard deviation units. <strong>If units from the
-treated group are left unmatched due to a caliper, the estimand no
+are in raw units or standard deviation units. When negative calipers are
+supplied, this forces units whose distance on the calipered covariate is
+<em>smaller</em> than the absolute caliper width for that covariate to
+be disallowed from being matched to each other. <strong>If units from
+the treated group are left unmatched due to a caliper, the estimand no
 longer corresponds to the ATT.</strong></p>
 </div>
 <div id="mahalanobis-distance-matching-mahvars" class="section level3">
@@ -1025,7 +1028,9 @@ matching variables cannot be paired. This can be useful when finding
 comparison units outside of a unit’s group, such as when matching units
 in one group to units in another when units within the same group might
 otherwise be close matches. See examples <a href="https://stackoverflow.com/questions/66526115/propensity-score-matching-with-panel-data">here</a>
-and <a href="https://stackoverflow.com/questions/61120201/avoiding-duplicates-from-propensity-score-matching?rq=1">here</a>.</p>
+and <a href="https://stackoverflow.com/questions/61120201/avoiding-duplicates-from-propensity-score-matching?rq=1">here</a>.
+A similar effect can be implemented by supplying negative caliper
+values.</p>
 </div>
 <div id="matching-with-replacement-replace" class="section level3">
 <h3>Matching with replacement (<code>replace</code>)</h3>
@@ -1052,7 +1057,7 @@ the Lalonde dataset used in <code>vignette(&quot;MatchIt&quot;)</code>, which is
 why nearest neighbor matching without replacement is not very effective
 there.) After matching with replacement, control units are assigned to
 more than one subclass, so the <code>get_matches()</code> function
-should be used instead of <code>match.data()</code> after matching with
+should be used instead of <code>match_data()</code> after matching with
 replacement if subclasses are to be used in follow-up analyses; see
 <code>vignette(&quot;estimating-effects&quot;)</code> for details.</p>
 <p>The <code>reuse.max</code> argument can also be used with
@@ -1468,10 +1473,6 @@ Studies.”</span> <em>Biometrics</em> 29 (1): 159. <a href="https://doi.org/10.
 ———. 1980. <span>“Bias <span>Reduction Using Mahalanobis-Metric
 Matching</span>.”</span> <em>Biometrics</em> 36 (2): 293–98. <a href="https://doi.org/10.2307/2529981">https://doi.org/10.2307/2529981</a>.
 </div>
-<div id="ref-savjeQuickmatchQuickGeneralized2018" class="csl-entry">
-Savje, Fredrik, Jasjeet Sekhon, and Michael Higgins. 2018.
-<em>Quickmatch: Quick Generalized Full Matching</em>. <a href="https://CRAN.R-project.org/package=quickmatch">https://CRAN.R-project.org/package=quickmatch</a>.
-</div>
 <div id="ref-savjeInconsistencyMatchingReplacement2022" class="csl-entry">
 Sävje, F. 2022. <span>“On the Inconsistency of Matching Without
 Replacement.”</span> <em>Biometrika</em> 109 (2): 551–58. <a href="https://doi.org/10.1093/biomet/asab035">https://doi.org/10.1093/biomet/asab035</a>.
@@ -1480,6 +1481,10 @@ Replacement.”</span> <em>Biometrika</em> 109 (2): 551–58. <a href="https://d
 Sävje, Fredrik, Michael J. Higgins, and Jasjeet S. Sekhon. 2021.
 <span>“Generalized Full Matching.”</span> <em>Political Analysis</em> 29
 (4): 423–47. <a href="https://doi.org/10.1017/pan.2020.32">https://doi.org/10.1017/pan.2020.32</a>.
+</div>
+<div id="ref-savjeQuickmatchQuickGeneralized2018" class="csl-entry">
+Sävje, Fredrik, Jasjeet Sekhon, and Michael Higgins. 2018.
+<em>Quickmatch: Quick Generalized Full Matching</em>. <a href="https://CRAN.R-project.org/package=quickmatch">https://CRAN.R-project.org/package=quickmatch</a>.
 </div>
 <div id="ref-schafer2008" class="csl-entry">
 Schafer, Joseph L., and Joseph Kang. 2008. <span>“Average Causal Effects

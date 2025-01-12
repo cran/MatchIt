@@ -12,7 +12,7 @@
 
 <meta name="author" content="Noah Greifer" />
 
-<meta name="date" content="2024-11-12" />
+<meta name="date" content="2025-01-11" />
 
 <title>Matching with Sampling Weights</title>
 
@@ -363,7 +363,7 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 
 <h1 class="title toc-ignore">Matching with Sampling Weights</h1>
 <h4 class="author">Noah Greifer</h4>
-<h4 class="date">2024-11-12</h4>
+<h4 class="date">2025-01-11</h4>
 
 
 <div id="TOC">
@@ -458,7 +458,8 @@ will not run.</p>
 <span id="cb4-5"><a href="#cb4-5" tabindex="-1"></a>mF_s</span></code></pre></div>
 <pre><code>## A `matchit` object
 ##  - method: Optimal full matching
-##  - distance: Propensity score             - estimated with logistic regression
+##  - distance: Propensity score
+##              - estimated with logistic regression
 ##              - sampling weights included in estimation
 ##  - number of obs.: 2000 (original), 2000 (matched)
 ##  - sampling weights: present
@@ -484,7 +485,8 @@ specification as was used in
 <span id="cb6-5"><a href="#cb6-5" tabindex="-1"></a>mF</span></code></pre></div>
 <pre><code>## A `matchit` object
 ##  - method: Optimal full matching
-##  - distance: Propensity score             - estimated with logistic regression
+##  - distance: Propensity score
+##              - estimated with logistic regression
 ##  - number of obs.: 2000 (original), 2000 (matched)
 ##  - target estimand: ATE
 ##  - covariates: X1, X2, X3, X4, X5, X6, X7, X8, X9</code></pre>
@@ -500,7 +502,8 @@ supplied <code>matchit</code> objects.</p>
 <span id="cb8-3"><a href="#cb8-3" tabindex="-1"></a>mF</span></code></pre></div>
 <pre><code>## A `matchit` object
 ##  - method: Optimal full matching
-##  - distance: Propensity score             - estimated with logistic regression
+##  - distance: Propensity score
+##              - estimated with logistic regression
 ##              - sampling weights not included in estimation
 ##  - number of obs.: 2000 (original), 2000 (matched)
 ##  - sampling weights: present
@@ -643,7 +646,7 @@ they are not included in the propensity score estimation.</p>
 when using sampling weights. Effects are estimated in the same way as
 when sampling weights are excluded, except that the matching weights
 must be multiplied by the sampling weights for use in the outcome model
-to yield accurate, generalizable estimates. <code>match.data()</code>
+to yield accurate, generalizable estimates. <code>match_data()</code>
 and <code>get_matches()</code> do this automatically, so the weights
 produced by these functions already are a product of the matching
 weights and the sampling weights. Note this will only be true if
@@ -653,7 +656,7 @@ included when estimating the treatment effect.</p>
 <p>Below we estimate the effect of <code>A</code> on <code>Y_C</code> in
 the matched and sampling weighted sample, adjusting for the covariates
 to improve precision and decrease bias.</p>
-<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" tabindex="-1"></a>md_F_s <span class="ot">&lt;-</span> <span class="fu">match.data</span>(mF_s)</span>
+<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" tabindex="-1"></a>md_F_s <span class="ot">&lt;-</span> <span class="fu">match_data</span>(mF_s)</span>
 <span id="cb14-2"><a href="#cb14-2" tabindex="-1"></a></span>
 <span id="cb14-3"><a href="#cb14-3" tabindex="-1"></a>fit <span class="ot">&lt;-</span> <span class="fu">lm</span>(Y_C <span class="sc">~</span> A <span class="sc">*</span> (X1 <span class="sc">+</span> X2 <span class="sc">+</span> X3 <span class="sc">+</span> X4 <span class="sc">+</span> X5 <span class="sc">+</span> </span>
 <span id="cb14-4"><a href="#cb14-4" tabindex="-1"></a>             X6 <span class="sc">+</span> X7 <span class="sc">+</span> X8 <span class="sc">+</span> X9), <span class="at">data =</span> md_F_s,</span>
@@ -671,9 +674,9 @@ to improve precision and decrease bias.</p>
 ## 
 ## Term: A
 ## Type:  response 
-## Comparison: mean(1) - mean(0)
+## Comparison: 1 - 0
 ## Columns: term, contrast, estimate, std.error, statistic, p.value, s.value, conf.low, conf.high, predicted_lo, predicted_hi, predicted</code></pre>
-<p>Note that <code>match.data()</code> and <code>get_weights()</code>
+<p>Note that <code>match_data()</code> and <code>get_weights()</code>
 have the option <code>include.s.weights</code>, which, when set to
 <code>FALSE</code>, makes it so the returned weights do not incorporate
 the sampling weights and are simply the matching weights. Because one
