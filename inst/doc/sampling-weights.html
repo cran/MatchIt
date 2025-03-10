@@ -12,7 +12,7 @@
 
 <meta name="author" content="Noah Greifer" />
 
-<meta name="date" content="2025-01-11" />
+<meta name="date" content="2025-03-09" />
 
 <title>Matching with Sampling Weights</title>
 
@@ -363,7 +363,7 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 
 <h1 class="title toc-ignore">Matching with Sampling Weights</h1>
 <h4 class="author">Noah Greifer</h4>
-<h4 class="date">2025-01-11</h4>
+<h4 class="date">2025-03-09</h4>
 
 
 <div id="TOC">
@@ -448,23 +448,11 @@ sampling weights into propensity scores estimated using logistic
 regression for optimal full matching for the average treatment effect in
 the population (ATE) (note that all methods and steps apply the same way
 to all forms of matching and all estimands).</p>
-<p>Note: if the <code>optmatch</code>, <code>marginaleffects</code>, or
-<code>sandwich</code> packages are not available, the subsequent lines
-will not run.</p>
 <div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a>mF_s <span class="ot">&lt;-</span> <span class="fu">matchit</span>(A <span class="sc">~</span> X1 <span class="sc">+</span> X2 <span class="sc">+</span> X3 <span class="sc">+</span> X4 <span class="sc">+</span> X5 <span class="sc">+</span> </span>
 <span id="cb4-2"><a href="#cb4-2" tabindex="-1"></a>                  X6 <span class="sc">+</span> X7 <span class="sc">+</span> X8 <span class="sc">+</span> X9, <span class="at">data =</span> d,</span>
 <span id="cb4-3"><a href="#cb4-3" tabindex="-1"></a>                <span class="at">method =</span> <span class="st">&quot;full&quot;</span>, <span class="at">distance =</span> <span class="st">&quot;glm&quot;</span>,</span>
 <span id="cb4-4"><a href="#cb4-4" tabindex="-1"></a>                <span class="at">estimand =</span> <span class="st">&quot;ATE&quot;</span>, <span class="at">s.weights =</span> <span class="sc">~</span>SW)</span>
 <span id="cb4-5"><a href="#cb4-5" tabindex="-1"></a>mF_s</span></code></pre></div>
-<pre><code>## A `matchit` object
-##  - method: Optimal full matching
-##  - distance: Propensity score
-##              - estimated with logistic regression
-##              - sampling weights included in estimation
-##  - number of obs.: 2000 (original), 2000 (matched)
-##  - sampling weights: present
-##  - target estimand: ATE
-##  - covariates: X1, X2, X3, X4, X5, X6, X7, X8, X9</code></pre>
 <p>Notice that the description of the matching specification when the
 <code>matchit</code> object is printed includes lines indicating that
 the sampling weights were included in the estimation of the propensity
@@ -478,18 +466,11 @@ they are calculated simply as a result of the matching.</p>
 include the sampling weights in its estimation. Here we use the same
 specification as was used in
 <code>vignette(&quot;estimating-effects&quot;)</code>.</p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" tabindex="-1"></a>mF <span class="ot">&lt;-</span> <span class="fu">matchit</span>(A <span class="sc">~</span> X1 <span class="sc">+</span> X2 <span class="sc">+</span> X3 <span class="sc">+</span> X4 <span class="sc">+</span> X5 <span class="sc">+</span> </span>
-<span id="cb6-2"><a href="#cb6-2" tabindex="-1"></a>                X6 <span class="sc">+</span> X7 <span class="sc">+</span> X8 <span class="sc">+</span> X9, <span class="at">data =</span> d,</span>
-<span id="cb6-3"><a href="#cb6-3" tabindex="-1"></a>              <span class="at">method =</span> <span class="st">&quot;full&quot;</span>, <span class="at">distance =</span> <span class="st">&quot;glm&quot;</span>,</span>
-<span id="cb6-4"><a href="#cb6-4" tabindex="-1"></a>              <span class="at">estimand =</span> <span class="st">&quot;ATE&quot;</span>)</span>
-<span id="cb6-5"><a href="#cb6-5" tabindex="-1"></a>mF</span></code></pre></div>
-<pre><code>## A `matchit` object
-##  - method: Optimal full matching
-##  - distance: Propensity score
-##              - estimated with logistic regression
-##  - number of obs.: 2000 (original), 2000 (matched)
-##  - target estimand: ATE
-##  - covariates: X1, X2, X3, X4, X5, X6, X7, X8, X9</code></pre>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" tabindex="-1"></a>mF <span class="ot">&lt;-</span> <span class="fu">matchit</span>(A <span class="sc">~</span> X1 <span class="sc">+</span> X2 <span class="sc">+</span> X3 <span class="sc">+</span> X4 <span class="sc">+</span> X5 <span class="sc">+</span> </span>
+<span id="cb5-2"><a href="#cb5-2" tabindex="-1"></a>                X6 <span class="sc">+</span> X7 <span class="sc">+</span> X8 <span class="sc">+</span> X9, <span class="at">data =</span> d,</span>
+<span id="cb5-3"><a href="#cb5-3" tabindex="-1"></a>              <span class="at">method =</span> <span class="st">&quot;full&quot;</span>, <span class="at">distance =</span> <span class="st">&quot;glm&quot;</span>,</span>
+<span id="cb5-4"><a href="#cb5-4" tabindex="-1"></a>              <span class="at">estimand =</span> <span class="st">&quot;ATE&quot;</span>)</span>
+<span id="cb5-5"><a href="#cb5-5" tabindex="-1"></a>mF</span></code></pre></div>
 <p>Notice that there is no mention of sampling weights in the
 description of the matching specification. However, to properly assess
 balance and estimate effects, we need the sampling weights to be
@@ -497,18 +478,9 @@ included in the <code>matchit</code> object, even if they were not used
 at all in the matching. To do so, we use the function
 <code>add_s.weights()</code>, which adds sampling weights to the
 supplied <code>matchit</code> objects.</p>
-<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" tabindex="-1"></a>mF <span class="ot">&lt;-</span> <span class="fu">add_s.weights</span>(mF, <span class="sc">~</span>SW)</span>
-<span id="cb8-2"><a href="#cb8-2" tabindex="-1"></a></span>
-<span id="cb8-3"><a href="#cb8-3" tabindex="-1"></a>mF</span></code></pre></div>
-<pre><code>## A `matchit` object
-##  - method: Optimal full matching
-##  - distance: Propensity score
-##              - estimated with logistic regression
-##              - sampling weights not included in estimation
-##  - number of obs.: 2000 (original), 2000 (matched)
-##  - sampling weights: present
-##  - target estimand: ATE
-##  - covariates: X1, X2, X3, X4, X5, X6, X7, X8, X9</code></pre>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" tabindex="-1"></a>mF <span class="ot">&lt;-</span> <span class="fu">add_s.weights</span>(mF, <span class="sc">~</span>SW)</span>
+<span id="cb6-2"><a href="#cb6-2" tabindex="-1"></a></span>
+<span id="cb6-3"><a href="#cb6-3" tabindex="-1"></a>mF</span></code></pre></div>
 <p>Now when we print the <code>matchit</code> object, we can see lines
 have been added identifying that sampling weights are present but they
 were not used in the estimation of the propensity score used in the
@@ -547,76 +519,11 @@ being supplied with the <code>s.weights</code> argument in the call to
 <code>matchit()</code> or to being added afterward by
 <code>add_s.weights()</code>), they will be correctly incorporated into
 the balance statistics.</p>
-<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" tabindex="-1"></a><span class="co">#Balance before matching and for the SW propensity score full matching</span></span>
-<span id="cb10-2"><a href="#cb10-2" tabindex="-1"></a><span class="fu">summary</span>(mF_s)</span></code></pre></div>
-<pre><code>## 
-## Call:
-## matchit(formula = A ~ X1 + X2 + X3 + X4 + X5 + X6 + X7 + X8 + 
-##     X9, data = d, method = &quot;full&quot;, distance = &quot;glm&quot;, estimand = &quot;ATE&quot;, 
-##     s.weights = ~SW)
-## 
-## Summary of Balance for All Data:
-##          Means Treated Means Control Std. Mean Diff. Var. Ratio eCDF Mean eCDF Max
-## distance         0.470         0.225           1.200      1.533     0.281    0.467
-## X1               0.185        -0.120           0.287      1.309     0.105    0.171
-## X2              -0.565        -0.202          -0.368      0.854     0.108    0.194
-## X3              -0.059        -0.057          -0.003      0.739     0.041    0.083
-## X4               0.852         0.150           0.680      1.016     0.180    0.293
-## X5               0.567         0.713          -0.307          .     0.146    0.146
-## X6               0.169        -0.008           0.171      1.014     0.048    0.103
-## X7               0.378        -0.089           0.474      1.205     0.130    0.210
-## X8              -0.376        -0.142          -0.216      1.190     0.071    0.129
-## X9               0.088        -0.001           0.090      0.945     0.027    0.066
-## 
-## Summary of Balance for Matched Data:
-##          Means Treated Means Control Std. Mean Diff. Var. Ratio eCDF Mean eCDF Max Std. Pair Dist.
-## distance         0.310         0.292           0.087      1.011     0.025    0.061           0.007
-## X1               0.091        -0.025           0.109      1.089     0.047    0.104           0.955
-## X2              -0.310        -0.282          -0.028      1.030     0.014    0.061           1.067
-## X3              -0.095        -0.016          -0.084      0.647     0.046    0.104           1.126
-## X4               0.297         0.334          -0.036      1.127     0.022    0.064           0.899
-## X5               0.660         0.669          -0.020          .     0.009    0.009           0.842
-## X6               0.028         0.061          -0.031      1.065     0.024    0.065           1.123
-## X7               0.147         0.028           0.120      1.130     0.027    0.062           1.050
-## X8              -0.225        -0.226           0.001      1.137     0.014    0.052           1.010
-## X9               0.015         0.034          -0.019      1.192     0.020    0.066           1.164
-## 
-## Sample Sizes:
-##               Control Treated
-## All (ESS)       987.1   177.1
-## All            1559.    441. 
-## Matched (ESS)   513.3   175.3
-## Matched        1559.    441. 
-## Unmatched         0.      0. 
-## Discarded         0.      0.</code></pre>
-<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" tabindex="-1"></a><span class="co">#Balance for the non-SW propensity score full matching</span></span>
-<span id="cb12-2"><a href="#cb12-2" tabindex="-1"></a><span class="fu">summary</span>(mF, <span class="at">un =</span> <span class="cn">FALSE</span>)</span></code></pre></div>
-<pre><code>## 
-## Call:
-## matchit(formula = A ~ X1 + X2 + X3 + X4 + X5 + X6 + X7 + X8 + 
-##     X9, data = d, method = &quot;full&quot;, distance = &quot;glm&quot;, estimand = &quot;ATE&quot;)
-## 
-## Summary of Balance for Matched Data:
-##          Means Treated Means Control Std. Mean Diff. Var. Ratio eCDF Mean eCDF Max Std. Pair Dist.
-## distance         0.282         0.276           0.033      0.970     0.021    0.070           0.009
-## X1              -0.182         0.020          -0.190      1.253     0.046    0.110           0.948
-## X2              -0.324        -0.255          -0.070      1.015     0.033    0.101           1.147
-## X3              -0.062        -0.073           0.012      0.661     0.048    0.081           1.112
-## X4               0.503         0.280           0.217      1.136     0.058    0.143           0.962
-## X5               0.663         0.672          -0.018          .     0.009    0.009           0.817
-## X6               0.062        -0.016           0.075      1.021     0.027    0.053           1.121
-## X7               0.026         0.038          -0.013      1.059     0.017    0.056           0.984
-## X8              -0.312        -0.221          -0.085      1.260     0.019    0.080           0.988
-## X9              -0.032         0.036          -0.070      0.881     0.032    0.107           1.101
-## 
-## Sample Sizes:
-##               Control Treated
-## All (ESS)       987.1   177.1
-## All            1559.    441. 
-## Matched (ESS)   582.5   108.6
-## Matched        1559.    441. 
-## Unmatched         0.      0. 
-## Discarded         0.      0.</code></pre>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" tabindex="-1"></a><span class="co">#Balance before matching and for the SW propensity score full matching</span></span>
+<span id="cb7-2"><a href="#cb7-2" tabindex="-1"></a><span class="fu">summary</span>(mF_s)</span>
+<span id="cb7-3"><a href="#cb7-3" tabindex="-1"></a></span>
+<span id="cb7-4"><a href="#cb7-4" tabindex="-1"></a><span class="co">#Balance for the non-SW propensity score full matching</span></span>
+<span id="cb7-5"><a href="#cb7-5" tabindex="-1"></a><span class="fu">summary</span>(mF, <span class="at">un =</span> <span class="cn">FALSE</span>)</span></code></pre></div>
 <p>The results of the two matching specifications are similar. Balance
 appears to be slightly better when using the sampling weight-estimated
 propensity scores than when using the unweighted propensity scores.
@@ -656,26 +563,18 @@ included when estimating the treatment effect.</p>
 <p>Below we estimate the effect of <code>A</code> on <code>Y_C</code> in
 the matched and sampling weighted sample, adjusting for the covariates
 to improve precision and decrease bias.</p>
-<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" tabindex="-1"></a>md_F_s <span class="ot">&lt;-</span> <span class="fu">match_data</span>(mF_s)</span>
-<span id="cb14-2"><a href="#cb14-2" tabindex="-1"></a></span>
-<span id="cb14-3"><a href="#cb14-3" tabindex="-1"></a>fit <span class="ot">&lt;-</span> <span class="fu">lm</span>(Y_C <span class="sc">~</span> A <span class="sc">*</span> (X1 <span class="sc">+</span> X2 <span class="sc">+</span> X3 <span class="sc">+</span> X4 <span class="sc">+</span> X5 <span class="sc">+</span> </span>
-<span id="cb14-4"><a href="#cb14-4" tabindex="-1"></a>             X6 <span class="sc">+</span> X7 <span class="sc">+</span> X8 <span class="sc">+</span> X9), <span class="at">data =</span> md_F_s,</span>
-<span id="cb14-5"><a href="#cb14-5" tabindex="-1"></a>          <span class="at">weights =</span> weights)</span>
-<span id="cb14-6"><a href="#cb14-6" tabindex="-1"></a></span>
-<span id="cb14-7"><a href="#cb14-7" tabindex="-1"></a><span class="fu">library</span>(<span class="st">&quot;marginaleffects&quot;</span>)</span>
-<span id="cb14-8"><a href="#cb14-8" tabindex="-1"></a><span class="fu">avg_comparisons</span>(fit,</span>
-<span id="cb14-9"><a href="#cb14-9" tabindex="-1"></a>                <span class="at">variables =</span> <span class="st">&quot;A&quot;</span>,</span>
-<span id="cb14-10"><a href="#cb14-10" tabindex="-1"></a>                <span class="at">vcov =</span> <span class="sc">~</span>subclass,</span>
-<span id="cb14-11"><a href="#cb14-11" tabindex="-1"></a>                <span class="at">newdata =</span> <span class="fu">subset</span>(A <span class="sc">==</span> <span class="dv">1</span>),</span>
-<span id="cb14-12"><a href="#cb14-12" tabindex="-1"></a>                <span class="at">wts =</span> <span class="st">&quot;SW&quot;</span>)</span></code></pre></div>
-<pre><code>## 
-##  Estimate Std. Error    z Pr(&gt;|z|)    S 2.5 % 97.5 %
-##      1.83       0.39 4.69   &lt;0.001 18.5  1.06   2.59
-## 
-## Term: A
-## Type:  response 
-## Comparison: 1 - 0
-## Columns: term, contrast, estimate, std.error, statistic, p.value, s.value, conf.low, conf.high, predicted_lo, predicted_hi, predicted</code></pre>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" tabindex="-1"></a>md_F_s <span class="ot">&lt;-</span> <span class="fu">match_data</span>(mF_s)</span>
+<span id="cb8-2"><a href="#cb8-2" tabindex="-1"></a></span>
+<span id="cb8-3"><a href="#cb8-3" tabindex="-1"></a>fit <span class="ot">&lt;-</span> <span class="fu">lm</span>(Y_C <span class="sc">~</span> A <span class="sc">*</span> (X1 <span class="sc">+</span> X2 <span class="sc">+</span> X3 <span class="sc">+</span> X4 <span class="sc">+</span> X5 <span class="sc">+</span> </span>
+<span id="cb8-4"><a href="#cb8-4" tabindex="-1"></a>                       X6 <span class="sc">+</span> X7 <span class="sc">+</span> X8 <span class="sc">+</span> X9), <span class="at">data =</span> md_F_s,</span>
+<span id="cb8-5"><a href="#cb8-5" tabindex="-1"></a>          <span class="at">weights =</span> weights)</span>
+<span id="cb8-6"><a href="#cb8-6" tabindex="-1"></a></span>
+<span id="cb8-7"><a href="#cb8-7" tabindex="-1"></a><span class="fu">library</span>(<span class="st">&quot;marginaleffects&quot;</span>)</span>
+<span id="cb8-8"><a href="#cb8-8" tabindex="-1"></a><span class="fu">avg_comparisons</span>(fit,</span>
+<span id="cb8-9"><a href="#cb8-9" tabindex="-1"></a>                <span class="at">variables =</span> <span class="st">&quot;A&quot;</span>,</span>
+<span id="cb8-10"><a href="#cb8-10" tabindex="-1"></a>                <span class="at">vcov =</span> <span class="sc">~</span>subclass,</span>
+<span id="cb8-11"><a href="#cb8-11" tabindex="-1"></a>                <span class="at">newdata =</span> <span class="fu">subset</span>(A <span class="sc">==</span> <span class="dv">1</span>),</span>
+<span id="cb8-12"><a href="#cb8-12" tabindex="-1"></a>                <span class="at">wts =</span> <span class="st">&quot;SW&quot;</span>)</span></code></pre></div>
 <p>Note that <code>match_data()</code> and <code>get_weights()</code>
 have the option <code>include.s.weights</code>, which, when set to
 <code>FALSE</code>, makes it so the returned weights do not incorporate
@@ -687,47 +586,47 @@ they are already included in the returned weights).</p>
 </div>
 <div id="code-to-generate-data-used-in-examples" class="section level2">
 <h2>Code to Generate Data used in Examples</h2>
-<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" tabindex="-1"></a><span class="co">#Generatng data similar to Austin (2009) for demonstrating </span></span>
-<span id="cb16-2"><a href="#cb16-2" tabindex="-1"></a><span class="co">#treatment effect estimation with sampling weights</span></span>
-<span id="cb16-3"><a href="#cb16-3" tabindex="-1"></a>gen_X <span class="ot">&lt;-</span> <span class="cf">function</span>(n) {</span>
-<span id="cb16-4"><a href="#cb16-4" tabindex="-1"></a>  X <span class="ot">&lt;-</span> <span class="fu">matrix</span>(<span class="fu">rnorm</span>(<span class="dv">9</span> <span class="sc">*</span> n), <span class="at">nrow =</span> n, <span class="at">ncol =</span> <span class="dv">9</span>)</span>
-<span id="cb16-5"><a href="#cb16-5" tabindex="-1"></a>  X[,<span class="dv">5</span>] <span class="ot">&lt;-</span> <span class="fu">as.numeric</span>(X[,<span class="dv">5</span>] <span class="sc">&lt;</span> .<span class="dv">5</span>)</span>
-<span id="cb16-6"><a href="#cb16-6" tabindex="-1"></a>  X</span>
-<span id="cb16-7"><a href="#cb16-7" tabindex="-1"></a>}</span>
-<span id="cb16-8"><a href="#cb16-8" tabindex="-1"></a></span>
-<span id="cb16-9"><a href="#cb16-9" tabindex="-1"></a><span class="co">#~20% treated</span></span>
-<span id="cb16-10"><a href="#cb16-10" tabindex="-1"></a>gen_A <span class="ot">&lt;-</span> <span class="cf">function</span>(X) {</span>
-<span id="cb16-11"><a href="#cb16-11" tabindex="-1"></a>  LP_A <span class="ot">&lt;-</span> <span class="sc">-</span> <span class="fl">1.2</span> <span class="sc">+</span> <span class="fu">log</span>(<span class="dv">2</span>)<span class="sc">*</span>X[,<span class="dv">1</span>] <span class="sc">-</span> <span class="fu">log</span>(<span class="fl">1.5</span>)<span class="sc">*</span>X[,<span class="dv">2</span>] <span class="sc">+</span> <span class="fu">log</span>(<span class="dv">2</span>)<span class="sc">*</span>X[,<span class="dv">4</span>] <span class="sc">-</span> <span class="fu">log</span>(<span class="fl">2.4</span>)<span class="sc">*</span>X[,<span class="dv">5</span>] <span class="sc">+</span> </span>
-<span id="cb16-12"><a href="#cb16-12" tabindex="-1"></a>    <span class="fu">log</span>(<span class="dv">2</span>)<span class="sc">*</span>X[,<span class="dv">7</span>] <span class="sc">-</span> <span class="fu">log</span>(<span class="fl">1.5</span>)<span class="sc">*</span>X[,<span class="dv">8</span>]</span>
-<span id="cb16-13"><a href="#cb16-13" tabindex="-1"></a>  P_A <span class="ot">&lt;-</span> <span class="fu">plogis</span>(LP_A)</span>
-<span id="cb16-14"><a href="#cb16-14" tabindex="-1"></a>  <span class="fu">rbinom</span>(<span class="fu">nrow</span>(X), <span class="dv">1</span>, P_A)</span>
-<span id="cb16-15"><a href="#cb16-15" tabindex="-1"></a>}</span>
-<span id="cb16-16"><a href="#cb16-16" tabindex="-1"></a></span>
-<span id="cb16-17"><a href="#cb16-17" tabindex="-1"></a><span class="co"># Continuous outcome</span></span>
-<span id="cb16-18"><a href="#cb16-18" tabindex="-1"></a>gen_Y_C <span class="ot">&lt;-</span> <span class="cf">function</span>(A, X) {</span>
-<span id="cb16-19"><a href="#cb16-19" tabindex="-1"></a>  <span class="dv">2</span><span class="sc">*</span>A <span class="sc">+</span> <span class="dv">2</span><span class="sc">*</span>X[,<span class="dv">1</span>] <span class="sc">+</span> <span class="dv">2</span><span class="sc">*</span>X[,<span class="dv">2</span>] <span class="sc">+</span> <span class="dv">2</span><span class="sc">*</span>X[,<span class="dv">3</span>] <span class="sc">+</span> <span class="dv">1</span><span class="sc">*</span>X[,<span class="dv">4</span>] <span class="sc">+</span> <span class="dv">2</span><span class="sc">*</span>X[,<span class="dv">5</span>] <span class="sc">+</span> <span class="dv">1</span><span class="sc">*</span>X[,<span class="dv">6</span>] <span class="sc">+</span> <span class="fu">rnorm</span>(<span class="fu">length</span>(A), <span class="dv">0</span>, <span class="dv">5</span>)</span>
-<span id="cb16-20"><a href="#cb16-20" tabindex="-1"></a>}</span>
-<span id="cb16-21"><a href="#cb16-21" tabindex="-1"></a><span class="co">#Conditional:</span></span>
-<span id="cb16-22"><a href="#cb16-22" tabindex="-1"></a><span class="co">#  MD: 2</span></span>
-<span id="cb16-23"><a href="#cb16-23" tabindex="-1"></a><span class="co">#Marginal:</span></span>
-<span id="cb16-24"><a href="#cb16-24" tabindex="-1"></a><span class="co">#  MD: 2</span></span>
-<span id="cb16-25"><a href="#cb16-25" tabindex="-1"></a></span>
-<span id="cb16-26"><a href="#cb16-26" tabindex="-1"></a>gen_SW <span class="ot">&lt;-</span> <span class="cf">function</span>(X) {</span>
-<span id="cb16-27"><a href="#cb16-27" tabindex="-1"></a>  e <span class="ot">&lt;-</span> <span class="fu">rbinom</span>(<span class="fu">nrow</span>(X), <span class="dv">1</span>, .<span class="dv">3</span>)</span>
-<span id="cb16-28"><a href="#cb16-28" tabindex="-1"></a>  <span class="dv">1</span><span class="sc">/</span><span class="fu">plogis</span>(<span class="fu">log</span>(<span class="fl">1.4</span>)<span class="sc">*</span>X[,<span class="dv">2</span>] <span class="sc">+</span> <span class="fu">log</span>(.<span class="dv">7</span>)<span class="sc">*</span>X[,<span class="dv">4</span>] <span class="sc">+</span> <span class="fu">log</span>(.<span class="dv">9</span>)<span class="sc">*</span>X[,<span class="dv">6</span>] <span class="sc">+</span> <span class="fu">log</span>(<span class="fl">1.5</span>)<span class="sc">*</span>X[,<span class="dv">8</span>] <span class="sc">+</span> <span class="fu">log</span>(.<span class="dv">9</span>)<span class="sc">*</span>e <span class="sc">+</span></span>
-<span id="cb16-29"><a href="#cb16-29" tabindex="-1"></a>             <span class="sc">-</span><span class="fu">log</span>(.<span class="dv">5</span>)<span class="sc">*</span>e<span class="sc">*</span>X[,<span class="dv">2</span>] <span class="sc">+</span> <span class="fu">log</span>(.<span class="dv">6</span>)<span class="sc">*</span>e<span class="sc">*</span>X[,<span class="dv">4</span>])</span>
-<span id="cb16-30"><a href="#cb16-30" tabindex="-1"></a>}</span>
-<span id="cb16-31"><a href="#cb16-31" tabindex="-1"></a></span>
-<span id="cb16-32"><a href="#cb16-32" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">19599</span>)</span>
-<span id="cb16-33"><a href="#cb16-33" tabindex="-1"></a></span>
-<span id="cb16-34"><a href="#cb16-34" tabindex="-1"></a>n <span class="ot">&lt;-</span> <span class="dv">2000</span></span>
-<span id="cb16-35"><a href="#cb16-35" tabindex="-1"></a>X <span class="ot">&lt;-</span> <span class="fu">gen_X</span>(n)</span>
-<span id="cb16-36"><a href="#cb16-36" tabindex="-1"></a>A <span class="ot">&lt;-</span> <span class="fu">gen_A</span>(X)</span>
-<span id="cb16-37"><a href="#cb16-37" tabindex="-1"></a>SW <span class="ot">&lt;-</span> <span class="fu">gen_SW</span>(X)</span>
-<span id="cb16-38"><a href="#cb16-38" tabindex="-1"></a></span>
-<span id="cb16-39"><a href="#cb16-39" tabindex="-1"></a>Y_C <span class="ot">&lt;-</span> <span class="fu">gen_Y_C</span>(A, X)</span>
-<span id="cb16-40"><a href="#cb16-40" tabindex="-1"></a></span>
-<span id="cb16-41"><a href="#cb16-41" tabindex="-1"></a>d <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(A, X, Y_C, SW)</span></code></pre></div>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" tabindex="-1"></a><span class="co">#Generatng data similar to Austin (2009) for demonstrating </span></span>
+<span id="cb9-2"><a href="#cb9-2" tabindex="-1"></a><span class="co">#treatment effect estimation with sampling weights</span></span>
+<span id="cb9-3"><a href="#cb9-3" tabindex="-1"></a>gen_X <span class="ot">&lt;-</span> <span class="cf">function</span>(n) {</span>
+<span id="cb9-4"><a href="#cb9-4" tabindex="-1"></a>  X <span class="ot">&lt;-</span> <span class="fu">matrix</span>(<span class="fu">rnorm</span>(<span class="dv">9</span> <span class="sc">*</span> n), <span class="at">nrow =</span> n, <span class="at">ncol =</span> <span class="dv">9</span>)</span>
+<span id="cb9-5"><a href="#cb9-5" tabindex="-1"></a>  X[,<span class="dv">5</span>] <span class="ot">&lt;-</span> <span class="fu">as.numeric</span>(X[,<span class="dv">5</span>] <span class="sc">&lt;</span> .<span class="dv">5</span>)</span>
+<span id="cb9-6"><a href="#cb9-6" tabindex="-1"></a>  X</span>
+<span id="cb9-7"><a href="#cb9-7" tabindex="-1"></a>}</span>
+<span id="cb9-8"><a href="#cb9-8" tabindex="-1"></a></span>
+<span id="cb9-9"><a href="#cb9-9" tabindex="-1"></a><span class="co">#~20% treated</span></span>
+<span id="cb9-10"><a href="#cb9-10" tabindex="-1"></a>gen_A <span class="ot">&lt;-</span> <span class="cf">function</span>(X) {</span>
+<span id="cb9-11"><a href="#cb9-11" tabindex="-1"></a>  LP_A <span class="ot">&lt;-</span> <span class="sc">-</span> <span class="fl">1.2</span> <span class="sc">+</span> <span class="fu">log</span>(<span class="dv">2</span>)<span class="sc">*</span>X[,<span class="dv">1</span>] <span class="sc">-</span> <span class="fu">log</span>(<span class="fl">1.5</span>)<span class="sc">*</span>X[,<span class="dv">2</span>] <span class="sc">+</span> <span class="fu">log</span>(<span class="dv">2</span>)<span class="sc">*</span>X[,<span class="dv">4</span>] <span class="sc">-</span> <span class="fu">log</span>(<span class="fl">2.4</span>)<span class="sc">*</span>X[,<span class="dv">5</span>] <span class="sc">+</span> </span>
+<span id="cb9-12"><a href="#cb9-12" tabindex="-1"></a>    <span class="fu">log</span>(<span class="dv">2</span>)<span class="sc">*</span>X[,<span class="dv">7</span>] <span class="sc">-</span> <span class="fu">log</span>(<span class="fl">1.5</span>)<span class="sc">*</span>X[,<span class="dv">8</span>]</span>
+<span id="cb9-13"><a href="#cb9-13" tabindex="-1"></a>  P_A <span class="ot">&lt;-</span> <span class="fu">plogis</span>(LP_A)</span>
+<span id="cb9-14"><a href="#cb9-14" tabindex="-1"></a>  <span class="fu">rbinom</span>(<span class="fu">nrow</span>(X), <span class="dv">1</span>, P_A)</span>
+<span id="cb9-15"><a href="#cb9-15" tabindex="-1"></a>}</span>
+<span id="cb9-16"><a href="#cb9-16" tabindex="-1"></a></span>
+<span id="cb9-17"><a href="#cb9-17" tabindex="-1"></a><span class="co"># Continuous outcome</span></span>
+<span id="cb9-18"><a href="#cb9-18" tabindex="-1"></a>gen_Y_C <span class="ot">&lt;-</span> <span class="cf">function</span>(A, X) {</span>
+<span id="cb9-19"><a href="#cb9-19" tabindex="-1"></a>  <span class="dv">2</span><span class="sc">*</span>A <span class="sc">+</span> <span class="dv">2</span><span class="sc">*</span>X[,<span class="dv">1</span>] <span class="sc">+</span> <span class="dv">2</span><span class="sc">*</span>X[,<span class="dv">2</span>] <span class="sc">+</span> <span class="dv">2</span><span class="sc">*</span>X[,<span class="dv">3</span>] <span class="sc">+</span> <span class="dv">1</span><span class="sc">*</span>X[,<span class="dv">4</span>] <span class="sc">+</span> <span class="dv">2</span><span class="sc">*</span>X[,<span class="dv">5</span>] <span class="sc">+</span> <span class="dv">1</span><span class="sc">*</span>X[,<span class="dv">6</span>] <span class="sc">+</span> <span class="fu">rnorm</span>(<span class="fu">length</span>(A), <span class="dv">0</span>, <span class="dv">5</span>)</span>
+<span id="cb9-20"><a href="#cb9-20" tabindex="-1"></a>}</span>
+<span id="cb9-21"><a href="#cb9-21" tabindex="-1"></a><span class="co">#Conditional:</span></span>
+<span id="cb9-22"><a href="#cb9-22" tabindex="-1"></a><span class="co">#  MD: 2</span></span>
+<span id="cb9-23"><a href="#cb9-23" tabindex="-1"></a><span class="co">#Marginal:</span></span>
+<span id="cb9-24"><a href="#cb9-24" tabindex="-1"></a><span class="co">#  MD: 2</span></span>
+<span id="cb9-25"><a href="#cb9-25" tabindex="-1"></a></span>
+<span id="cb9-26"><a href="#cb9-26" tabindex="-1"></a>gen_SW <span class="ot">&lt;-</span> <span class="cf">function</span>(X) {</span>
+<span id="cb9-27"><a href="#cb9-27" tabindex="-1"></a>  e <span class="ot">&lt;-</span> <span class="fu">rbinom</span>(<span class="fu">nrow</span>(X), <span class="dv">1</span>, .<span class="dv">3</span>)</span>
+<span id="cb9-28"><a href="#cb9-28" tabindex="-1"></a>  <span class="dv">1</span><span class="sc">/</span><span class="fu">plogis</span>(<span class="fu">log</span>(<span class="fl">1.4</span>)<span class="sc">*</span>X[,<span class="dv">2</span>] <span class="sc">+</span> <span class="fu">log</span>(.<span class="dv">7</span>)<span class="sc">*</span>X[,<span class="dv">4</span>] <span class="sc">+</span> <span class="fu">log</span>(.<span class="dv">9</span>)<span class="sc">*</span>X[,<span class="dv">6</span>] <span class="sc">+</span> <span class="fu">log</span>(<span class="fl">1.5</span>)<span class="sc">*</span>X[,<span class="dv">8</span>] <span class="sc">+</span> <span class="fu">log</span>(.<span class="dv">9</span>)<span class="sc">*</span>e <span class="sc">+</span></span>
+<span id="cb9-29"><a href="#cb9-29" tabindex="-1"></a>             <span class="sc">-</span><span class="fu">log</span>(.<span class="dv">5</span>)<span class="sc">*</span>e<span class="sc">*</span>X[,<span class="dv">2</span>] <span class="sc">+</span> <span class="fu">log</span>(.<span class="dv">6</span>)<span class="sc">*</span>e<span class="sc">*</span>X[,<span class="dv">4</span>])</span>
+<span id="cb9-30"><a href="#cb9-30" tabindex="-1"></a>}</span>
+<span id="cb9-31"><a href="#cb9-31" tabindex="-1"></a></span>
+<span id="cb9-32"><a href="#cb9-32" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">19599</span>)</span>
+<span id="cb9-33"><a href="#cb9-33" tabindex="-1"></a></span>
+<span id="cb9-34"><a href="#cb9-34" tabindex="-1"></a>n <span class="ot">&lt;-</span> <span class="dv">2000</span></span>
+<span id="cb9-35"><a href="#cb9-35" tabindex="-1"></a>X <span class="ot">&lt;-</span> <span class="fu">gen_X</span>(n)</span>
+<span id="cb9-36"><a href="#cb9-36" tabindex="-1"></a>A <span class="ot">&lt;-</span> <span class="fu">gen_A</span>(X)</span>
+<span id="cb9-37"><a href="#cb9-37" tabindex="-1"></a>SW <span class="ot">&lt;-</span> <span class="fu">gen_SW</span>(X)</span>
+<span id="cb9-38"><a href="#cb9-38" tabindex="-1"></a></span>
+<span id="cb9-39"><a href="#cb9-39" tabindex="-1"></a>Y_C <span class="ot">&lt;-</span> <span class="fu">gen_Y_C</span>(A, X)</span>
+<span id="cb9-40"><a href="#cb9-40" tabindex="-1"></a></span>
+<span id="cb9-41"><a href="#cb9-41" tabindex="-1"></a>d <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(A, X, Y_C, SW)</span></code></pre></div>
 </div>
 <div id="references" class="section level2 unnumbered">
 <h2 class="unnumbered">References</h2>
