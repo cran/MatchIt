@@ -127,7 +127,23 @@ IntegerMatrix nn_matchC_vec(const IntegerVector& treat_,
   if (caliper_covs_.isNotNull()) {
     caliper_covs = as<NumericVector>(caliper_covs_);
     caliper_covs_mat = as<NumericMatrix>(caliper_covs_mat_);
+
     ncc = caliper_covs_mat.ncol();
+    double a;
+
+    // Find if caliper placed on distance
+    for (int cci = 0; cci < ncc; cci++) {
+      a = get_affine_transformation(caliper_covs_mat.column(cci),
+                                    distance);
+
+      if (std::abs(a) > 1e-10) {
+        if (caliper_dist_.isNull() ||
+            (caliper_covs[cci] >= 0 && caliper_dist > a * caliper_covs[cci]) ||
+            (caliper_covs[cci] < 0 && caliper_dist < a * caliper_covs[cci])) {
+          caliper_dist = a * caliper_covs[cci];
+        }
+      }
+    }
   }
 
   //antiexact
@@ -172,8 +188,9 @@ IntegerMatrix nn_matchC_vec(const IntegerVector& treat_,
 
     for (r = 1; r <= max_ratio; r++) {
       ord_r = ord[as<IntegerVector>(ratio[ord - 1]) >= r];
+      ord_r = ord_r - 1;
 
-      for (int t_id_t_i : ord_r - 1) {
+      for (int t_id_t_i : ord_r) {
         // t_id_t_i; index of treated unit to match among treated units
         // t_id_i: index of treated unit to match among all units
         counter++;
@@ -269,7 +286,9 @@ IntegerMatrix nn_matchC_vec(const IntegerVector& treat_,
     }
   }
   else {
-    for (int t_id_t_i : ord - 1) {
+    int t_id_t_i;
+
+    for (int t_id_t_i_ : ord) {
       // t_id_t_i; index of treated unit to match among treated units
       // t_id_i: index of treated unit to match among all units
       counter++;
@@ -277,6 +296,8 @@ IntegerMatrix nn_matchC_vec(const IntegerVector& treat_,
         counter = 0;
         Rcpp::checkUserInterrupt();
       }
+
+      t_id_t_i = t_id_t_i_ - 1;
 
       t_id_i = ind_focal[t_id_t_i];
 

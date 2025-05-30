@@ -91,14 +91,7 @@ IntegerMatrix nn_matchC_mahcovs(const IntegerVector& treat_,
 
   Function o("order");
 
-  NumericVector match_var = mah_covs.column(0);
-  double match_var_caliper = R_PosInf;
 
-  IntegerVector ind_d_ord = o(match_var);
-  ind_d_ord = ind_d_ord - 1; //location of each unit after sorting
-
-  IntegerVector match_d_ord = o(ind_d_ord);
-  match_d_ord = match_d_ord - 1;
 
   //exact
   bool use_exact = false;
@@ -126,17 +119,6 @@ IntegerMatrix nn_matchC_mahcovs(const IntegerVector& treat_,
     caliper_covs = as<NumericVector>(caliper_covs_);
     caliper_covs_mat = as<NumericMatrix>(caliper_covs_mat_);
     ncc = caliper_covs_mat.ncol();
-
-    //Find if caliper placed on match_var
-    for (int cci = 0; cci < ncc; cci++) {
-      if (std::equal(caliper_covs_mat.column(cci).begin(),
-                     caliper_covs_mat.column(cci).end(),
-                     match_var.begin(),
-                     match_var.end())) {
-        match_var_caliper = caliper_covs[cci];
-        break;
-      }
-    }
   }
 
   //antiexact
@@ -158,6 +140,43 @@ IntegerMatrix nn_matchC_mahcovs(const IntegerVector& treat_,
     use_unit_id = true;
     use_reuse_max = true;
   }
+
+  // Matching variable: if any mah_covs equal to caliper_covs, use
+  // that caliper_covs and caliper as matching variable
+  NumericVector match_var;
+  double match_var_caliper = R_PosInf;
+  int n_mah_covs = mah_covs.ncol();
+  if (ncc > 0) {
+    double a;
+    for (int mci = 0; match_var.size() == 0 && mci < n_mah_covs; mci++) {
+      for (int cci = 0; match_var.size() == 0 && cci < ncc; cci++) {
+        if (caliper_covs[cci] < 0) {
+          continue;
+        }
+
+        a = get_affine_transformation(caliper_covs_mat.column(cci),
+                                      mah_covs.column(mci));
+
+        if (std::abs(a) > 1e-10) {
+          caliper_covs_mat.column(cci) = mah_covs.column(mci);
+          caliper_covs[cci] *= a;
+
+          match_var = mah_covs.column(mci);
+          match_var_caliper = caliper_covs[cci];
+        }
+      }
+    }
+  }
+
+  if (match_var.size() == 0) {
+    match_var = mah_covs.column(0);
+  }
+
+  IntegerVector ind_d_ord = o(match_var);
+  ind_d_ord = ind_d_ord - 1; //location of each unit after sorting
+
+  IntegerVector match_d_ord = o(ind_d_ord);
+  match_d_ord = match_d_ord - 1;
 
   IntegerVector matches_i(1 + max_ratio * (g - 1));
   int k_total;
@@ -181,8 +200,9 @@ IntegerMatrix nn_matchC_mahcovs(const IntegerVector& treat_,
 
     for (r = 1; r <= max_ratio; r++) {
       ord_r = ord[as<IntegerVector>(ratio[ord - 1]) >= r];
+      ord_r = ord_r - 1;
 
-      for (int t_id_t_i : ord_r - 1) {
+      for (int t_id_t_i : ord_r) {
         // t_id_t_i; index of treated unit to match among treated units
         // t_id_i: index of treated unit to match among all units
         counter++;
@@ -273,7 +293,9 @@ IntegerMatrix nn_matchC_mahcovs(const IntegerVector& treat_,
     }
   }
   else {
-    for (int t_id_t_i : ord - 1) {
+    int t_id_t_i;
+
+    for (int t_id_t_i_ : ord) {
       // t_id_t_i; index of treated unit to match among treated units
       // t_id_i: index of treated unit to match among all units
       counter++;
@@ -281,6 +303,8 @@ IntegerMatrix nn_matchC_mahcovs(const IntegerVector& treat_,
         counter = 0;
         Rcpp::checkUserInterrupt();
       }
+
+      t_id_t_i = t_id_t_i_ - 1;
 
       t_id_i = ind_focal[t_id_t_i];
 
