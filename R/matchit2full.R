@@ -1,6 +1,6 @@
 #' Optimal Full Matching
 #' @name method_full
-#' @aliases method_full
+#'
 #' @usage NULL
 #'
 #' @description
@@ -36,65 +36,36 @@
 #'         estimand = "ATT",
 #'         exact = NULL,
 #'         mahvars = NULL,
-#'         anitexact = NULL,
+#'         antiexact = NULL,
 #'         discard = "none",
 #'         reestimate = FALSE,
 #'         s.weights = NULL,
 #'         caliper = NULL,
 #'         std.caliper = TRUE,
 #'         verbose = FALSE,
-#'         ...)
+#'         ...) }
+#'
+#' @section Arguments:
+#' @section Arguments:
+#' \tabular{ll}{
+#'   `formula` \tab a two-sided [formula] object containing the treatment and covariates to be used in creating the distance measure used in the matching. This formula will be supplied to the functions that estimate the distance measure. \cr
+#'   `data` \tab a data frame containing the variables named in `formula`. If not found in `data`, the variables will be sought in the environment. \cr
+#'   `method` \tab set here to `"full"`. \cr
+#'   `distance` \tab the distance measure to be used. See [`distance`] for allowable options. Can be supplied as a distance matrix. \cr
+#'   `link` \tab when `distance` is specified as a method of estimating propensity scores, an additional argument controlling the link function used in estimating the distance measure. See [`distance`] for allowable options with each option. \cr
+#'   `distance.options` \tab a named list containing additional arguments supplied to the function that estimates the distance measure as determined by the argument to `distance`. \cr
+#'   `estimand` \tab a string containing the desired estimand. Allowable options include `"ATT"`, `"ATC"`, and `"ATE"`. The estimand controls how the weights are computed; see the Computing Weights section at [matchit()] for details. \cr
+#'   `exact` \tab for which variables exact matching should take place. \cr
+#'   `mahvars` \tab for which variables Mahalanobis distance matching should take place when `distance` corresponds to a propensity score (e.g., for caliper matching or to discard units for common support). If specified, the distance measure will not be used in matching. \cr
+#'   `antiexact` \tab for which variables anti-exact matching should take place. Anti-exact matching is processed using \pkgfun{optmatch}{antiExactMatch}. \cr
+#'   `discard` \tab a string containing a method for discarding units outside a region of common support. Only allowed when `distance` corresponds to a propensity score. \cr
+#'   `reestimate` \tab if `discard` is not `"none"`, whether to re-estimate the propensity score in the remaining sample prior to matching. \cr
+#'   `s.weights` \tab the variable containing sampling weights to be incorporated into propensity score models and balance statistics. \cr
+#'   `caliper` \tab the width(s) of the caliper(s) used for caliper matching. Calipers are processed by \pkgfun{optmatch}{caliper}. Positive and negative calipers are allowed. See Notes and Examples. \cr
+#'   `std.caliper` \tab `logical`; when calipers are specified, whether they are in standard deviation units (`TRUE`) or raw units (`FALSE`). \cr
+#'   `verbose` \tab `logical`; whether information about the matching process should be printed to the console. \cr
+#'   `...` \tab additional arguments passed to \pkgfun{optmatch}{fullmatch}. Allowed arguments include `min.controls`, `max.controls`, `omit.fraction`, `mean.controls`, `tol`, and `solver`. See the \pkgfun{optmatch}{fullmatch} documentation for details. In general, `tol` should be set to a low number (e.g., `1e-7`) to get a more precise solution. The arguments `replace`, `m.order`, and `ratio` are ignored with a warning. \cr
 #' }
-#'
-#' @param formula a two-sided [formula] object containing the treatment and
-#' covariates to be used in creating the distance measure used in the matching.
-#' This formula will be supplied to the functions that estimate the distance
-#' measure.
-#' @param data a data frame containing the variables named in `formula`.
-#' If not found in `data`, the variables will be sought in the
-#' environment.
-#' @param method set here to `"full"`.
-#' @param distance the distance measure to be used. See [`distance`]
-#' for allowable options. Can be supplied as a distance matrix.
-#' @param link when `distance` is specified as a method of estimating
-#' propensity scores, an additional argument controlling the link function used
-#' in estimating the distance measure. See [`distance`] for allowable
-#' options with each option.
-#' @param distance.options a named list containing additional arguments
-#' supplied to the function that estimates the distance measure as determined
-#' by the argument to `distance`.
-#' @param estimand a string containing the desired estimand. Allowable options
-#' include `"ATT"`, `"ATC"`, and `"ATE"`. The estimand controls
-#' how the weights are computed; see the Computing Weights section at
-#' [matchit()] for details.
-#' @param exact for which variables exact matching should take place.
-#' @param mahvars for which variables Mahalanobis distance matching should take
-#' place when `distance` corresponds to a propensity score (e.g., for
-#' caliper matching or to discard units for common support). If specified, the
-#' distance measure will not be used in matching.
-#' @param antiexact for which variables anti-exact matching should take place.
-#' Anti-exact matching is processed using \pkgfun{optmatch}{antiExactMatch}.
-#' @param discard a string containing a method for discarding units outside a
-#' region of common support. Only allowed when `distance` corresponds to a
-#' propensity score.
-#' @param reestimate if `discard` is not `"none"`, whether to
-#' re-estimate the propensity score in the remaining sample prior to matching.
-#' @param s.weights the variable containing sampling weights to be incorporated
-#' into propensity score models and balance statistics.
-#' @param caliper the width(s) of the caliper(s) used for caliper matching.
-#' Calipers are processed by \pkgfun{optmatch}{caliper}. Positive and negative calipers are allowed. See Notes and Examples.
-#' @param std.caliper `logical`; when calipers are specified, whether they
-#' are in standard deviation units (`TRUE`) or raw units (`FALSE`).
-#' @param verbose `logical`; whether information about the matching
-#' process should be printed to the console.
-#' @param \dots additional arguments passed to \pkgfun{optmatch}{fullmatch}.
-#' Allowed arguments include `min.controls`, `max.controls`,
-#' `omit.fraction`, `mean.controls`, `tol`, and `solver`.
-#' See the \pkgfun{optmatch}{fullmatch} documentation for details. In general,
-#' `tol` should be set to a low number (e.g., `1e-7`) to get a more
-#' precise solution.
-#'
-#' The arguments `replace`, `m.order`, and `ratio` are ignored with a warning.
 #'
 #' @section Outputs: All outputs described in [matchit()] are returned with
 #' `method = "full"` except for `match.matrix`. This is because
@@ -104,7 +75,7 @@
 #' included in the output. When `exact` is specified, this will be a list
 #' of such objects, one for each stratum of the `exact` variables.
 #'
-#' @details
+#' @section Details:
 #' ## Mahalanobis Distance Matching
 #'
 #' Mahalanobis distance matching can be done one of two ways:
@@ -152,7 +123,8 @@
 #' }
 #' }
 #'
-#' @note Calipers can only be used when `min.controls` is left at its
+#' @note
+#' Calipers can only be used when `min.controls` is left at its
 #' default.
 #'
 #' The option `"optmatch_max_problem_size"` is automatically set to
@@ -161,7 +133,8 @@
 #' may also let huge, infeasible problems get through and potentially take a
 #' long time or crash R. See \pkgfun{optmatch}{setMaxProblemSize} for more details.
 #'
-#' @seealso [matchit()] for a detailed explanation of the inputs and outputs of
+#' @seealso
+#' [matchit()] for a detailed explanation of the inputs and outputs of
 #' a call to `matchit()`.
 #'
 #' \pkgfun{optmatch}{fullmatch}, which is the workhorse.
@@ -173,18 +146,14 @@
 #'
 #' [`method_quick`] for fast generalized quick matching, which is very similar to optimal full matching but can be dramatically faster at the expense of optimality and is less customizable.
 #'
-#' @references In a manuscript, be sure to cite the following paper if using
-#' `matchit()` with `method = "full"`:
+#' @references
+#' In a manuscript, be sure to cite the following paper if using `matchit()` with `method = "full"`:
 #'
-#' Hansen, B. B., & Klopfer, S. O. (2006). Optimal Full Matching and Related
-#' Designs via Network Flows. *Journal of Computational and Graphical Statistics*,
-#' 15(3), 609–627. \doi{10.1198/106186006X137047}
+#' Hansen, B. B., & Klopfer, S. O. (2006). Optimal Full Matching and Related Designs via Network Flows. *Journal of Computational and Graphical Statistics*, 15(3), 609–627. \doi{10.1198/106186006X137047}
 #'
 #' For example, a sentence might read:
 #'
-#' *Optimal full matching was performed using the MatchIt package (Ho,
-#' Imai, King, & Stuart, 2011) in R, which calls functions from the optmatch
-#' package (Hansen & Klopfer, 2006).*
+#' *Optimal full matching was performed using the MatchIt package (Ho, Imai, King, & Stuart, 2011) in R, which calls functions from the optmatch package (Hansen & Klopfer, 2006).*
 #'
 #' Theory is also developed in the following article:
 #'
@@ -192,7 +161,7 @@
 #' for the SAT. Journal of the American Statistical Association, 99(467),
 #' 609–618. \doi{10.1198/016214504000000647}
 #'
-#' @examplesIf requireNamespace("optmatch", quietly = TRUE)
+#' @examplesIf rlang::is_installed("optmatch")
 #' data("lalonde")
 #'
 #' # Optimal full PS matching
@@ -243,8 +212,8 @@ matchit2full <- function(treat, formula, data, distance, discarded,
   A <- ...mget(.args)
   A[lengths(A) == 0L] <- NULL
 
-  estimand <- toupper(estimand)
-  estimand <- match_arg(estimand, c("ATT", "ATC", "ATE"))
+  estimand <- arg::match_arg(estimand, c("ATT", "ATC", "ATE"))
+
   if (estimand == "ATC") {
     tc <- c("control", "treated")
     focal <- 0
@@ -254,15 +223,16 @@ matchit2full <- function(treat, formula, data, distance, discarded,
     focal <- 1
   }
 
-  treat_ <- setNames(as.integer(treat[!discarded] == focal), names(treat)[!discarded])
+  treat_ <- setNames(as.integer(treat[!discarded] == focal),
+                     names(treat)[!discarded])
 
   # if (is_not_null(data)) data <- data[!discarded,]
 
   if (is.full.mahalanobis) {
     if (is_null(attr(terms(formula, data = data), "term.labels"))) {
-      .err(sprintf("covariates must be specified in the input formula when `distance = \"%s\"`",
-                   attr(is.full.mahalanobis, "transform")))
+      arg::err('covariates must be specified in the input formula when {.code distance = {.str {attr(is.full.mahalanobis, "transform")}}}')
     }
+
     mahvars <- formula
   }
 
@@ -277,7 +247,7 @@ matchit2full <- function(treat, formula, data, distance, discarded,
     cc <- Reduce("intersect", lapply(unique(treat_), function(t) unclass(ex)[treat_ == t]))
 
     if (is_null(cc)) {
-      .err("No matches were found")
+      arg::err("no matches were found")
     }
   }
   else {
@@ -288,7 +258,8 @@ matchit2full <- function(treat, formula, data, distance, discarded,
   #Create distance matrix; note that Mahalanobis distance computed using entire
   #sample (minus discarded), like method2nearest, as opposed to within exact strata, like optmatch.
   if (is_not_null(mahvars)) {
-    transform <- if (is.full.mahalanobis) attr(is.full.mahalanobis, "transform") else "mahalanobis"
+    transform <- attr(is.full.mahalanobis, "transform") %or% "mahalanobis"
+
     mahcovs <- transform_covariates(mahvars, data = data, method = transform,
                                     s.weights = s.weights, treat = treat,
                                     discarded = discarded)
@@ -310,8 +281,8 @@ matchit2full <- function(treat, formula, data, distance, discarded,
   mo <- mo[!discarded[treat == focal], !discarded[treat != focal], drop = FALSE]
   dimnames(mo) <- list(names(treat_)[treat_ == 1], names(treat_)[treat_ == 0])
 
-  mo <- optmatch::match_on(mo, data = as.data.frame(data)[!discarded, , drop = FALSE])
-  mo <- optmatch::as.InfinitySparseMatrix(mo)
+  mo <- optmatch::match_on(mo, data = as.data.frame(data)[!discarded, , drop = FALSE]) |>
+    optmatch::as.InfinitySparseMatrix()
 
   #Process antiexact
   if (is_not_null(antiexact)) {
@@ -324,7 +295,7 @@ matchit2full <- function(treat, formula, data, distance, discarded,
   #Process caliper
   if (is_not_null(caliper)) {
     if (min.controls != 0) {
-      .err("calipers cannot be used with `method = \"full\"` when `min.controls` is specified")
+      arg::err("calipers cannot be used with {.code method = {.str full}} when {.arg min.controls} is specified")
     }
 
     if (any(nzchar(names(caliper)))) {
@@ -352,7 +323,7 @@ matchit2full <- function(treat, formula, data, distance, discarded,
 
   #Initialize pair membership; must include names
   pair <- rep_with(NA_character_, treat)
-  p <- setNames(vector("list", nlevels(ex)), levels(ex))
+  p <- make_list(levels(ex))
 
   A$data <- data.frame(treat) #just to get rownames; not actually used in matching
   A$min.controls <- min.controls
@@ -390,12 +361,12 @@ matchit2full <- function(treat, formula, data, distance, discarded,
     pair[names(p[[e]])[!is.na(p[[e]])]] <- paste(as.character(p[[e]][!is.na(p[[e]])]), e, sep = "|")
   }
 
-  if (all(is.na(pair))) {
-    .err("No matches were found")
+  if (allNA(pair)) {
+    arg::err("No matches were found")
   }
 
   if (length(p) == 1L) {
-    p <- p[[1]]
+    p <- p[[1L]]
   }
 
   psclass <- factor(pair)
@@ -409,7 +380,7 @@ matchit2full <- function(treat, formula, data, distance, discarded,
                verbose = verbose)
 
   res <- list(subclass = psclass,
-              weights = get_weights_from_subclass(psclass, treat, estimand),
+              weights = get_weights_from_subclass(psclass, treat, estimand, s.weights),
               obj = p)
 
   .cat_verbose("Done.\n", verbose = verbose)

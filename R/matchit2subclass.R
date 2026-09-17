@@ -1,6 +1,6 @@
 #' Subclassification
 #' @name method_subclass
-#' @aliases method_subclass
+#'
 #' @usage NULL
 #'
 #' @description
@@ -31,51 +31,39 @@
 #'         verbose = FALSE,
 #'         ...) }
 #'
-#' @param formula a two-sided [formula] object containing the treatment and
-#' covariates to be used in creating the distance measure used in the
-#' subclassification.
-#' @param data a data frame containing the variables named in `formula`.
-#' If not found in `data`, the variables will be sought in the
-#' environment.
-#' @param method set here to `"subclass"`.
-#' @param distance the distance measure to be used. See [`distance`]
-#' for allowable options. Must be a vector of distance scores or the name of a method of estimating propensity scores.
-#' @param link when `distance` is specified as a string, an additional
-#' argument controlling the link function used in estimating the distance
-#' measure. See [`distance`] for allowable options with each option.
-#' @param distance.options a named list containing additional arguments
-#' supplied to the function that estimates the distance measure as determined
-#' by the argument to `distance`.
-#' @param estimand the target `estimand`. If `"ATT"`, the default,
-#' subclasses are formed based on quantiles of the distance measure in the
-#' treated group; if `"ATC"`, subclasses are formed based on quantiles of
-#' the distance measure in the control group; if `"ATE"`, subclasses are
-#' formed based on quantiles of the distance measure in the full sample. The
-#' estimand also controls how the subclassification weights are computed; see
-#' the Computing Weights section at [matchit()] for details.
-#' @param discard a string containing a method for discarding units outside a
-#' region of common support.
-#' @param reestimate if `discard` is not `"none"`, whether to
-#' re-estimate the propensity score in the remaining sample prior to
-#' subclassification.
-#' @param s.weights the variable containing sampling weights to be incorporated
-#' into propensity score models and balance statistics.
-#' @param verbose `logical`; whether information about the matching
-#' process should be printed to the console.
-#' @param \dots additional arguments that control the subclassification:
-#' \describe{
-#' \item{`subclass`}{either the number of subclasses desired
-#' or a vector of quantiles used to divide the distance measure into
-#' subclasses. Default is 6.}
-#' \item{`min.n`}{ the minimum number of
-#' units of each treatment group that are to be assigned each subclass. If the
-#' distance measure is divided in such a way that fewer than `min.n` units
-#' of a treatment group are assigned a given subclass, units from other
-#' subclasses will be reassigned to fill the deficient subclass. Default is 1.
-#' }
+#' @section Arguments:
+#' @section Arguments:
+#' \tabular{ll}{
+#'   `formula` \tab a two-sided [formula] object containing the treatment and covariates to be used in creating the distance measure used in the subclassification. \cr
+#'   `data` \tab a data frame containing the variables named in `formula`. If not found in `data`, the variables will be sought in the environment. \cr
+#'   `method` \tab set here to `"subclass"`. \cr
+#'   `distance` \tab the distance measure to be used. See [`distance`] for allowable options. Must be a vector of distance scores or the name of a method of estimating propensity scores. \cr
+#'   `link` \tab when `distance` is specified as a string, an additional argument controlling the link function used in estimating the distance measure. See [`distance`] for allowable options with each option. \cr
+#'   `distance.options` \tab a named list containing additional arguments supplied to the function that estimates the distance measure as determined by the argument to `distance`. \cr
+#'   `estimand` \tab the target `estimand`. If `"ATT"`, the default, subclasses are formed based on quantiles of the distance measure in the treated group; if `"ATC"`, subclasses are formed based on quantiles of the distance measure in the control group; if `"ATE"`, subclasses are formed based on quantiles of the distance measure in the full sample. The estimand also controls how the subclassification weights are computed; see the Computing Weights section at [matchit()] for details. \cr
+#'   `discard` \tab a string containing a method for discarding units outside a region of common support. \cr
+#'   `reestimate` \tab if `discard` is not `"none"`, whether to re-estimate the propensity score in the remaining sample prior to subclassification. \cr
+#'   `s.weights` \tab the variable containing sampling weights to be incorporated into propensity score models and balance statistics. \cr
+#'   `verbose` \tab `logical`; whether information about the matching process should be printed to the console. \cr
+#'   `...` \tab additional arguments that control the subclassification, described below. \cr
 #' }
 #'
-#' The arguments `exact`, `mahvars`, `replace`, `m.order`, `caliper` (and related arguments), and `ratio` are ignored with a warning.
+#' Arguments that can be supplied through `...`:
+#'
+#'   \itemize{
+#'   \item `subclass`: either the number of subclasses desired
+#'   or a vector of quantiles used to divide the distance measure into
+#'   subclasses. Default is 6.
+#'   \item `min.n`: the minimum number of
+#'   units of each treatment group that are to be assigned each subclass. If the
+#'   distance measure is divided in such a way that fewer than `min.n` units
+#'   of a treatment group are assigned a given subclass, units from other
+#'   subclasses will be reassigned to fill the deficient subclass. Default is 1.
+#'
+#'   }
+#'
+#'   The arguments `exact`, `mahvars`, `replace`, `m.order`, `caliper` (and related arguments), and `ratio` are ignored with a warning.
+#'
 #'
 #' @section Outputs:
 #'
@@ -86,7 +74,7 @@
 #' `min.n > 0`, the subclass assignments may not strictly obey the
 #' quantiles listed in `q.cut`. `include.obj` is ignored.
 #'
-#' @details
+#' @section Details:
 #' After subclassification, effect estimates can be computed separately in the
 #' subclasses and combined, or a single marginal effect can be estimated by
 #' using the weights in the full sample. When using the weights, the method is
@@ -107,34 +95,28 @@
 #' propensity scores. Where propensity score-estimation methods overlap, both
 #' packages will yield the same weights.
 #'
-#' @seealso [matchit()] for a detailed explanation of the inputs and outputs of
+#' @seealso
+#' [matchit()] for a detailed explanation of the inputs and outputs of
 #' a call to `matchit()`.
 #'
 #' [`method_full`] for optimal full matching and [`method_quick`] for generalized full matching, which are similar to
 #' subclassification except that the number of subclasses and subclass
 #' membership are chosen to optimize the within-subclass distance.
 #'
-#' @references In a manuscript, you don't need to cite another package when
+#' @references
+#' In a manuscript, you don't need to cite another package when
 #' using `method = "subclass"` because the subclassification is performed
 #' completely within *MatchIt*. For example, a sentence might read:
 #'
-#' *Propensity score subclassification was performed using the MatchIt
-#' package (Ho, Imai, King, & Stuart, 2011) in R.*
+#' *Propensity score subclassification was performed using the MatchIt package (Ho, Imai, King, & Stuart, 2011) in R.*
 #'
-#' It may be a good idea to cite Hong (2010) or Desai et al. (2017) if the
-#' treatment effect is estimated using the subclassification weights.
+#' It may be a good idea to cite Hong (2010) or Desai et al. (2017) if the treatment effect is estimated using the subclassification weights.
 #'
-#' Desai, R. J., Rothman, K. J., Bateman, B. . T., Hernandez-Diaz, S., &
-#' Huybrechts, K. F. (2017). A Propensity-score-based Fine Stratification
-#' Approach for Confounding Adjustment When Exposure Is Infrequent:
-#' Epidemiology, 28(2), 249–257. \doi{10.1097/EDE.0000000000000595}
+#' Desai, R. J., Rothman, K. J., Bateman, B. . T., Hernandez-Diaz, S., & Huybrechts, K. F. (2017). A Propensity-score-based Fine Stratification Approach for Confounding Adjustment When Exposure Is Infrequent. *Epidemiology*, 28(2), 249–257. \doi{10.1097/EDE.0000000000000595}
 #'
-#' Hong, G. (2010). Marginal mean weighting through stratification: Adjustment
-#' for selection bias in multilevel data. Journal of Educational and Behavioral
-#' Statistics, 35(5), 499–531. \doi{10.3102/1076998609359785}
+#' Hong, G. (2010). Marginal mean weighting through stratification: Adjustment for selection bias in multilevel data. *Journal of Educational and Behavioral Statistics*, 35(5), 499–531. \doi{10.3102/1076998609359785}
 #'
 #' @examples
-#'
 #' data("lalonde")
 #'
 #' # PS subclassification for the ATT with 7 subclasses
@@ -162,41 +144,35 @@ NULL
 
 matchit2subclass <- function(treat, distance, discarded,
                              replace = FALSE, exact = NULL,
-                             estimand = "ATT", verbose = FALSE,
+                             estimand = "ATT", s.weights = NULL, verbose = FALSE,
                              subclass = 6L, min.n = 1L,
                              ...) {
 
   .cat_verbose("Subclassifying...\n", verbose = verbose)
 
-  #Checks
-  chk::chk_numeric(subclass)
-
-  if (length(subclass) == 1L) {
-    chk::chk_gt(subclass, 1)
-  }
-  else if (any(subclass > 1) || any(subclass < 0)) {
-    .err("when specifying `subclass` as a vector of quantiles, all values must be between 0 and 1")
-  }
-
-  if (is_not_null(...get("sub.by"))) {
-    .err("`sub.by` is defunct and has been replaced with `estimand`")
-  }
-
-  estimand <- toupper(estimand)
-  estimand <- match_arg(estimand, c("ATT", "ATC", "ATE"))
-
-  chk::chk_count(min.n)
-
   ## Setting Cut Points
-  if (length(subclass) == 1L) {
-    sprobs <- seq(0, 1, length.out = round(subclass) + 1)
+  if (rlang::is_scalar_integerish(subclass) && is.finite(subclass) && subclass > 1) {
+    sprobs <- seq(0, 1, length.out = subclass + 1)
   }
-  else {
-    sprobs <- sort(subclass)
-    if (sprobs[1] != 0) sprobs <- c(0, sprobs)
-    if (sprobs[length(sprobs)] != 1) sprobs <- c(sprobs, 1)
+  else if (is.numeric(subclass) &&
+           all(is.finite(subclass)) &&
+           all(subclass >= 0 & subclass <= 1) &&
+           !all(subclass == 0 | subclass == 1)) {
+    sprobs <- sort(unique(c(0, 1, subclass)))
     subclass <- length(sprobs) - 1L
   }
+  else {
+    arg::err("{.arg subclass} must either be the number of desired subclasses (a whole number greater than 1) or a vector of quantiles (a numeric vector with values between 0 and 1)")
+  }
+
+  #Checks
+  if (is_not_null(...get("sub.by"))) {
+    arg::err("{.arg sub.by} is defunct and has been replaced with {.arg estimand}")
+  }
+
+  estimand <- arg::match_arg(estimand, c("ATT", "ATC", "ATE"))
+
+  arg::arg_count(min.n)
 
   qu <- switch(estimand,
                "ATT" = quantile(distance[treat == 1], probs = sprobs, na.rm = TRUE),
@@ -207,14 +183,16 @@ matchit2subclass <- function(treat, distance, discarded,
   psclass <- rep_with(NA_integer_, treat)
   psclass[!discarded] <- as.integer(findInterval(distance[!discarded], qu, all.inside = TRUE))
 
-  if (!has_n_unique(na.omit(psclass), subclass)) {
-    .wrn("due to discreteness in the distance measure, fewer subclasses were generated than were requested")
+  if (!has_n_unique(na.omit(psclass), as.integer(round(subclass)))) {
+    arg::wrn("due to discreteness in the distance measure, fewer subclasses were generated than were requested")
   }
 
   if (min.n == 0) {
     ## If any subclass are missing treated or control units, set all to NA
-    is.na(psclass)[!discarded & !psclass %in% intersect(psclass[!discarded & treat == 1],
-                                                        psclass[!discarded & treat == 0])] <- TRUE
+    ok_subclass <- intersect(psclass[!discarded & treat == 1],
+                             psclass[!discarded & treat == 0])
+
+    is.na(psclass[!discarded & !psclass %in% ok_subclass]) <- TRUE
   }
   else {
     ## If any subclasses don't have members of a treatment group, fill them
@@ -226,14 +204,15 @@ matchit2subclass <- function(treat, distance, discarded,
                                           min.n)
   }
 
-  psclass <- setNames(factor(psclass, nmax = length(qu)), names(treat))
+  psclass <- setNames(factor(psclass, nmax = length(qu)),
+                      names(treat))
   levels(psclass) <- as.character(seq_len(nlevels(psclass)))
 
   .cat_verbose("Calculating matching weights... ", verbose = verbose)
 
   res <- list(subclass = psclass,
               q.cut = qu,
-              weights = get_weights_from_subclass(psclass, treat, estimand))
+              weights = get_weights_from_subclass(psclass, treat, estimand, s.weights))
 
   .cat_verbose("Done.\n", verbose = verbose)
 

@@ -12,7 +12,7 @@
 
 <meta name="author" content="Noah Greifer" />
 
-<meta name="date" content="2025-05-29" />
+<meta name="date" content="2026-09-16" />
 
 <title>Matching with Sampling Weights</title>
 
@@ -50,8 +50,9 @@ overflow: visible;
 }
 </style>
 <style type="text/css" data-origin="pandoc">
+html { -webkit-text-size-adjust: 100%; }
 pre > code.sourceCode { white-space: pre; position: relative; }
-pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
 pre > code.sourceCode > span:empty { height: 1.2em; }
 .sourceCode { overflow: visible; }
 code.sourceCode > span { color: inherit; text-decoration: inherit; }
@@ -62,7 +63,7 @@ div.sourceCode { overflow: auto; }
 }
 @media print {
 pre > code.sourceCode { white-space: pre-wrap; }
-pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
 }
 pre.numberSource code
 { counter-reset: source-line 0; }
@@ -150,7 +151,6 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; }
 div.csl-bib-body { }
 div.csl-entry {
 clear: both;
-margin-bottom: 0em;
 }
 .hanging div.csl-entry {
 margin-left:2em;
@@ -363,7 +363,7 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 
 <h1 class="title toc-ignore">Matching with Sampling Weights</h1>
 <h4 class="author">Noah Greifer</h4>
-<h4 class="date">2025-05-29</h4>
+<h4 class="date">2026-09-16</h4>
 
 
 <div id="TOC">
@@ -396,17 +396,16 @@ any estimated quantities generalize to a target population defined by
 the weights. Evidence suggests that sampling weights need to be
 incorporated into a propensity score matching analysis to obtain valid
 and unbiased estimates of the treatment effect in the sampling weighted
-population <span class="citation">(<a href="#ref-dugoff2014">DuGoff,
-Schuler, and Stuart 2014</a>; <a href="#ref-austin2016">Austin, Jembere,
-and Chiu 2016</a>; <a href="#ref-lenis2019">Lenis et al.
-2019</a>)</span>. In this guide, we demonstrate how to use sampling
-weights with <code>MatchIt</code> for propensity score estimation,
-balance assessment, and effect estimation. Fortunately, doing so is not
-complicated, but some care must be taken to ensure sampling weights are
-incorporated correctly. It is assumed one has read the other vignettes
-explaining matching (<code>vignette(&quot;matching-methods&quot;)</code>), balance
-assessment (<code>vignette(&quot;assessing-balance&quot;)</code>), and effect
-estimation (<code>vignette(&quot;estimating-effects&quot;)</code>.</p>
+population <span class="citation">(<a href="#ref-dugoff2014">DuGoff et
+al. 2014</a>; <a href="#ref-austin2016">Austin et al. 2016</a>; <a href="#ref-lenis2019">Lenis et al. 2019</a>)</span>. In this guide, we
+demonstrate how to use sampling weights with <em>MatchIt</em> for
+propensity score estimation, matching, balance assessment, and effect
+estimation. Fortunately, doing so is not complicated, but some care must
+be taken to ensure sampling weights are incorporated correctly. It is
+assumed one has read the other vignettes explaining matching
+(<code>vignette(&quot;matching-methods&quot;)</code>), balance assessment
+(<code>vignette(&quot;assessing-balance&quot;)</code>), and effect estimation
+(<code>vignette(&quot;estimating-effects&quot;)</code>.</p>
 <p>We will use the same simulated toy dataset used in
 <code>vignette(&quot;estimating-effects&quot;)</code> except with the addition of
 a sampling weights variable, <code>SW</code>, which is used to
@@ -430,99 +429,114 @@ effect of binary treatment <code>A</code> on continuous outcome
 </div>
 <div id="matching" class="section level2">
 <h2>Matching</h2>
+<p>Sampling weights can enter the matching specification in two ways: 1)
+in computing the distance measure (e.g., the propensity score) and 2) in
+computing matching weights from stratum membership.</p>
 <p>When using sampling weights with propensity score matching, one has
 the option of including the sampling weights in the model used to
 estimate the propensity scores. Although evidence is mixed on whether
-this is required <span class="citation">(<a href="#ref-austin2016">Austin, Jembere, and Chiu 2016</a>; <a href="#ref-lenis2019">Lenis et al. 2019</a>)</span>, it can be a good
+this is required <span class="citation">(<a href="#ref-austin2016">Austin et al. 2016</a>; <a href="#ref-lenis2019">Lenis et al. 2019</a>)</span>, it can be a good
 idea. The choice should depend on whether including the sampling weights
 improves the quality of the matches. Specifications including and
 excluding sampling weights should be tried to determine which is
 preferred.</p>
+<p>For stratification methods, including (coarsened) exact matching,
+full matching, and propensity score subclassification, sampling weights
+can also enter the calculation of the matching weights from stratum
+membership. Without sampling weights, matching weights are computed
+using the proportion of treated units in each stratum. With sampling
+weights, matching weights are computed using the <em>weighted</em>
+proportion of treated units in each stratum, weighted by the sampling
+weights. This does not affect pair matching methods, which compute
+matching weights from the match matrix rather than stratum
+membership.</p>
 <p>To supply sampling weights to the propensity score-estimating
-function in <code>matchit()</code>, the sampling weights variable should
-be supplied to the <code>s.weights</code> argument. It can be supplied
-either as a numerical vector containing the sampling weights, or a
-string or one-sided formula with the name of the sampling weights
-variable in the supplied dataset. Below we demonstrate including
-sampling weights into propensity scores estimated using logistic
-regression for optimal full matching for the average treatment effect in
-the population (ATE) (note that all methods and steps apply the same way
-to all forms of matching and all estimands).</p>
-<p>Note: if the <code>optmatch</code>, <code>marginaleffects</code>, or
-<code>sandwich</code> packages are not available, the subsequent lines
-will not run.</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a>mF_s <span class="ot">&lt;-</span> <span class="fu">matchit</span>(A <span class="sc">~</span> X1 <span class="sc">+</span> X2 <span class="sc">+</span> X3 <span class="sc">+</span> X4 <span class="sc">+</span> X5 <span class="sc">+</span> </span>
+function and calculation of the matching weights in
+<code>matchit()</code>, the sampling weights variable should be supplied
+to the <code>s.weights</code> argument. It can be supplied either as a
+numerical vector containing the sampling weights, or a string or
+one-sided formula with the name of the sampling weights variable in the
+supplied dataset. Below we demonstrate including sampling weights into
+propensity scores estimated using logistic regression for generalized
+full matching for the average treatment effect in the treated (ATT)
+(note that all methods and steps apply the same way to all forms of
+matching and all estimands).</p>
+<p>Note: if the <code>quickmatch</code>, <code>marginaleffects</code>,
+or <code>sandwich</code> packages are not available, the subsequent
+lines will not run.</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a>mF_s <span class="ot">&lt;-</span> <span class="fu">matchit</span>(A <span class="sc">~</span> X1 <span class="sc">+</span> X2 <span class="sc">+</span> X3 <span class="sc">+</span> X4 <span class="sc">+</span> X5 <span class="sc">+</span> SW <span class="sc">+</span></span>
 <span id="cb4-2"><a href="#cb4-2" tabindex="-1"></a>                  X6 <span class="sc">+</span> X7 <span class="sc">+</span> X8 <span class="sc">+</span> X9, <span class="at">data =</span> d,</span>
-<span id="cb4-3"><a href="#cb4-3" tabindex="-1"></a>                <span class="at">method =</span> <span class="st">&quot;full&quot;</span>, <span class="at">distance =</span> <span class="st">&quot;glm&quot;</span>,</span>
-<span id="cb4-4"><a href="#cb4-4" tabindex="-1"></a>                <span class="at">estimand =</span> <span class="st">&quot;ATE&quot;</span>, <span class="at">s.weights =</span> <span class="sc">~</span>SW)</span>
+<span id="cb4-3"><a href="#cb4-3" tabindex="-1"></a>                <span class="at">method =</span> <span class="st">&quot;quick&quot;</span>, <span class="at">distance =</span> <span class="st">&quot;glm&quot;</span>,</span>
+<span id="cb4-4"><a href="#cb4-4" tabindex="-1"></a>                <span class="at">estimand =</span> <span class="st">&quot;ATT&quot;</span>, <span class="at">s.weights =</span> <span class="sc">~</span>SW)</span>
 <span id="cb4-5"><a href="#cb4-5" tabindex="-1"></a>mF_s</span></code></pre></div>
 <pre><code>## A `matchit` object
-##  - method: Optimal full matching
+##  - method: Generalized full matching
 ##  - distance: Propensity score
 ##              - estimated with logistic regression
 ##              - sampling weights included in estimation
 ##  - number of obs.: 2000 (original), 2000 (matched)
 ##  - sampling weights: present
-##  - target estimand: ATE
-##  - covariates: X1, X2, X3, X4, X5, X6, X7, X8, X9</code></pre>
+##  - target estimand: ATT
+##  - covariates: X1, X2, X3, X4, X5, SW, X6, X7, X8, X9</code></pre>
 <p>Notice that the description of the matching specification when the
 <code>matchit</code> object is printed includes lines indicating that
 the sampling weights were included in the estimation of the propensity
 score and that they are present in the <code>matchit</code> object. It
 is stored in the <code>s.weights</code> component of the
-<code>matchit</code> object. Note that at this stage, the matching
-weights (stored in the <code>weights</code> component of the
-<code>matchit</code> object) do not incorporate the sampling weights;
-they are calculated simply as a result of the matching.</p>
-<p>Now let’s perform full matching on a propensity score that does not
+<code>matchit</code> object. The matching weights (stored in the
+<code>weights</code> component of the <code>matchit</code> object) were
+computed incorporating the sampling weights with stratum membership, but
+the matching weights alone are not ready for use in estimating the
+treatment effect.</p>
+<p>We’ll also perform full matching on a propensity score that does not
 include the sampling weights in its estimation. Here we use the same
 specification as was used in
 <code>vignette(&quot;estimating-effects&quot;)</code>.</p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" tabindex="-1"></a>mF <span class="ot">&lt;-</span> <span class="fu">matchit</span>(A <span class="sc">~</span> X1 <span class="sc">+</span> X2 <span class="sc">+</span> X3 <span class="sc">+</span> X4 <span class="sc">+</span> X5 <span class="sc">+</span> </span>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" tabindex="-1"></a>mF <span class="ot">&lt;-</span> <span class="fu">matchit</span>(A <span class="sc">~</span> X1 <span class="sc">+</span> X2 <span class="sc">+</span> X3 <span class="sc">+</span> X4 <span class="sc">+</span> X5 <span class="sc">+</span> SW <span class="sc">+</span></span>
 <span id="cb6-2"><a href="#cb6-2" tabindex="-1"></a>                X6 <span class="sc">+</span> X7 <span class="sc">+</span> X8 <span class="sc">+</span> X9, <span class="at">data =</span> d,</span>
-<span id="cb6-3"><a href="#cb6-3" tabindex="-1"></a>              <span class="at">method =</span> <span class="st">&quot;full&quot;</span>, <span class="at">distance =</span> <span class="st">&quot;glm&quot;</span>,</span>
-<span id="cb6-4"><a href="#cb6-4" tabindex="-1"></a>              <span class="at">estimand =</span> <span class="st">&quot;ATE&quot;</span>)</span>
+<span id="cb6-3"><a href="#cb6-3" tabindex="-1"></a>              <span class="at">method =</span> <span class="st">&quot;quick&quot;</span>, <span class="at">distance =</span> <span class="st">&quot;glm&quot;</span>,</span>
+<span id="cb6-4"><a href="#cb6-4" tabindex="-1"></a>              <span class="at">estimand =</span> <span class="st">&quot;ATT&quot;</span>)</span>
 <span id="cb6-5"><a href="#cb6-5" tabindex="-1"></a>mF</span></code></pre></div>
 <pre><code>## A `matchit` object
-##  - method: Optimal full matching
+##  - method: Generalized full matching
 ##  - distance: Propensity score
 ##              - estimated with logistic regression
 ##  - number of obs.: 2000 (original), 2000 (matched)
-##  - target estimand: ATE
-##  - covariates: X1, X2, X3, X4, X5, X6, X7, X8, X9</code></pre>
+##  - target estimand: ATT
+##  - covariates: X1, X2, X3, X4, X5, SW, X6, X7, X8, X9</code></pre>
 <p>Notice that there is no mention of sampling weights in the
-description of the matching specification. However, to properly assess
-balance and estimate effects, we need the sampling weights to be
-included in the <code>matchit</code> object, even if they were not used
-at all in the matching. To do so, we use the function
+description of the matching specification. However, to properly
+incorporate sampling weights into the calculation of the matching
+weights and to assess balance and estimate effects, we need the sampling
+weights to be included in the <code>matchit</code> object, even if they
+were not used at all in the matching. To do so, we use the function
 <code>add_s.weights()</code>, which adds sampling weights to the
-supplied <code>matchit</code> objects.</p>
+supplied <code>matchit</code> objects and recomputes the matching
+weights.</p>
 <div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" tabindex="-1"></a>mF <span class="ot">&lt;-</span> <span class="fu">add_s.weights</span>(mF, <span class="sc">~</span>SW)</span>
 <span id="cb8-2"><a href="#cb8-2" tabindex="-1"></a></span>
 <span id="cb8-3"><a href="#cb8-3" tabindex="-1"></a>mF</span></code></pre></div>
 <pre><code>## A `matchit` object
-##  - method: Optimal full matching
+##  - method: Generalized full matching
 ##  - distance: Propensity score
 ##              - estimated with logistic regression
 ##              - sampling weights not included in estimation
 ##  - number of obs.: 2000 (original), 2000 (matched)
 ##  - sampling weights: present
-##  - target estimand: ATE
-##  - covariates: X1, X2, X3, X4, X5, X6, X7, X8, X9</code></pre>
+##  - target estimand: ATT
+##  - covariates: X1, X2, X3, X4, X5, SW, X6, X7, X8, X9</code></pre>
 <p>Now when we print the <code>matchit</code> object, we can see lines
 have been added identifying that sampling weights are present but they
 were not used in the estimation of the propensity score used in the
 matching.</p>
 <p>Note that not all methods can involve sampling weights in the
-estimation. Only methods that use the propensity score will be affected
-by sampling weights; coarsened exact matching or Mahalanobis distance
-optimal pair matching, for example, ignore the sampling weights, and
-some propensity score estimation methods, like <code>randomForest</code>
-and <code>bart</code> (as presently implemented), cannot incorporate
-sampling weights. Sampling weights should still be supplied to
+estimation. Some propensity score estimation methods, like
+<code>randomForest</code> and <code>bart</code> (as presently
+implemented), cannot incorporate sampling weights; one alternative is to
+include the sampling weights as a predictor in the propensity score
+model. Sampling weights should still be supplied to
 <code>matchit()</code> even when using these methods to avoid having to
-use <code>add_s.weights()</code> and remembering which methods do or do
-not involve sampling weights.</p>
+use <code>add_s.weights()</code>.</p>
 </div>
 <div id="assessing-balance" class="section level2">
 <h2>Assessing Balance</h2>
@@ -551,72 +565,75 @@ the balance statistics.</p>
 <span id="cb10-2"><a href="#cb10-2" tabindex="-1"></a><span class="fu">summary</span>(mF_s)</span></code></pre></div>
 <pre><code>## 
 ## Call:
-## matchit(formula = A ~ X1 + X2 + X3 + X4 + X5 + X6 + X7 + X8 + 
-##     X9, data = d, method = &quot;full&quot;, distance = &quot;glm&quot;, estimand = &quot;ATE&quot;, 
+## matchit(formula = A ~ X1 + X2 + X3 + X4 + X5 + SW + X6 + X7 + 
+##     X8 + X9, data = d, method = &quot;quick&quot;, distance = &quot;glm&quot;, estimand = &quot;ATT&quot;, 
 ##     s.weights = ~SW)
 ## 
 ## Summary of Balance for All Data:
 ##          Means Treated Means Control Std. Mean Diff. Var. Ratio eCDF Mean eCDF Max
-## distance         0.470         0.225           1.200      1.533     0.281    0.467
-## X1               0.185        -0.120           0.287      1.309     0.105    0.171
-## X2              -0.565        -0.202          -0.368      0.854     0.108    0.194
+## distance         0.487         0.218           1.087      1.909     0.297    0.463
+## X1               0.185        -0.120           0.270      1.309     0.105    0.171
+## X2              -0.565        -0.202          -0.384      0.854     0.108    0.194
 ## X3              -0.059        -0.057          -0.003      0.739     0.041    0.083
-## X4               0.852         0.150           0.680      1.016     0.180    0.293
-## X5               0.567         0.713          -0.307          .     0.146    0.146
+## X4               0.852         0.150           0.677      1.016     0.180    0.293
+## X5               0.567         0.713          -0.294          .     0.146    0.146
+## SW               8.748         3.701           0.407     10.227     0.193    0.315
 ## X6               0.169        -0.008           0.171      1.014     0.048    0.103
-## X7               0.378        -0.089           0.474      1.205     0.130    0.210
-## X8              -0.376        -0.142          -0.216      1.190     0.071    0.129
-## X9               0.088        -0.001           0.090      0.945     0.027    0.066
+## X7               0.378        -0.089           0.454      1.205     0.130    0.210
+## X8              -0.376        -0.142          -0.208      1.190     0.071    0.129
+## X9               0.088        -0.001           0.091      0.945     0.027    0.066
 ## 
 ## Summary of Balance for Matched Data:
 ##          Means Treated Means Control Std. Mean Diff. Var. Ratio eCDF Mean eCDF Max Std. Pair Dist.
-## distance         0.310         0.292           0.087      1.011     0.025    0.061           0.007
-## X1               0.091        -0.025           0.109      1.089     0.047    0.104           0.955
-## X2              -0.310        -0.282          -0.028      1.030     0.014    0.061           1.067
-## X3              -0.095        -0.016          -0.084      0.647     0.046    0.104           1.126
-## X4               0.297         0.334          -0.036      1.127     0.022    0.064           0.899
-## X5               0.660         0.669          -0.020          .     0.009    0.009           0.842
-## X6               0.028         0.061          -0.031      1.065     0.024    0.065           1.123
-## X7               0.147         0.028           0.120      1.130     0.027    0.062           1.050
-## X8              -0.225        -0.226           0.001      1.137     0.014    0.052           1.010
-## X9               0.015         0.034          -0.019      1.192     0.020    0.066           1.164
+## distance         0.487         0.481           0.026      1.069     0.002    0.082           0.007
+## X1               0.185         0.382          -0.174      1.124     0.035    0.092           0.873
+## X2              -0.565        -0.273          -0.308      1.071     0.075    0.212           1.164
+## X3              -0.059         0.123          -0.213      0.740     0.057    0.144           1.191
+## X4               0.852         0.751           0.097      1.027     0.021    0.109           0.939
+## X5               0.567         0.507           0.121          .     0.060    0.060           0.814
+## SW               8.748         4.761           0.322      5.998     0.065    0.180           0.099
+## X6               0.169         0.232          -0.061      1.137     0.030    0.106           1.133
+## X7               0.378         0.615          -0.230      1.151     0.070    0.158           0.949
+## X8              -0.376        -0.285          -0.080      1.366     0.039    0.113           0.920
+## X9               0.088         0.099          -0.012      1.140     0.033    0.092           1.180
 ## 
 ## Sample Sizes:
 ##               Control Treated
-## All (ESS)       987.1   177.1
-## All            1559.    441. 
-## Matched (ESS)   513.3   175.3
-## Matched        1559.    441. 
-## Unmatched         0.      0. 
-## Discarded         0.      0.</code></pre>
+## All (ESS)      987.12   177.1
+## All           1559.     441. 
+## Matched (ESS)   62.91   177.1
+## Matched       1559.     441. 
+## Unmatched        0.       0. 
+## Discarded        0.       0.</code></pre>
 <div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" tabindex="-1"></a><span class="co">#Balance for the non-SW propensity score full matching</span></span>
 <span id="cb12-2"><a href="#cb12-2" tabindex="-1"></a><span class="fu">summary</span>(mF, <span class="at">un =</span> <span class="cn">FALSE</span>)</span></code></pre></div>
 <pre><code>## 
 ## Call:
-## matchit(formula = A ~ X1 + X2 + X3 + X4 + X5 + X6 + X7 + X8 + 
-##     X9, data = d, method = &quot;full&quot;, distance = &quot;glm&quot;, estimand = &quot;ATE&quot;)
+## matchit(formula = A ~ X1 + X2 + X3 + X4 + X5 + SW + X6 + X7 + 
+##     X8 + X9, data = d, method = &quot;quick&quot;, distance = &quot;glm&quot;, estimand = &quot;ATT&quot;)
 ## 
 ## Summary of Balance for Matched Data:
 ##          Means Treated Means Control Std. Mean Diff. Var. Ratio eCDF Mean eCDF Max Std. Pair Dist.
-## distance         0.282         0.276           0.033      0.970     0.021    0.070           0.009
-## X1              -0.182         0.020          -0.190      1.253     0.046    0.110           0.948
-## X2              -0.324        -0.255          -0.070      1.015     0.033    0.101           1.147
-## X3              -0.062        -0.073           0.012      0.661     0.048    0.081           1.112
-## X4               0.503         0.280           0.217      1.136     0.058    0.143           0.962
-## X5               0.663         0.672          -0.018          .     0.009    0.009           0.817
-## X6               0.062        -0.016           0.075      1.021     0.027    0.053           1.121
-## X7               0.026         0.038          -0.013      1.059     0.017    0.056           0.984
-## X8              -0.312        -0.221          -0.085      1.260     0.019    0.080           0.988
-## X9              -0.032         0.036          -0.070      0.881     0.032    0.107           1.101
+## distance         0.476         0.473           0.015      1.042     0.002    0.100           0.008
+## X1               0.185         0.368          -0.161      1.351     0.037    0.108           0.852
+## X2              -0.565        -0.334          -0.244      1.115     0.059    0.182           1.141
+## X3              -0.059         0.025          -0.098      0.580     0.070    0.137           1.215
+## X4               0.852         0.814           0.036      0.845     0.033    0.113           0.981
+## X5               0.567         0.445           0.246          .     0.122    0.122           0.826
+## SW               8.748         6.026           0.220      3.031     0.075    0.162           0.108
+## X6               0.169         0.025           0.139      1.152     0.041    0.129           1.126
+## X7               0.378         0.378           0.000      1.242     0.025    0.068           0.993
+## X8              -0.376        -0.249          -0.113      1.301     0.057    0.151           0.930
+## X9               0.088         0.106          -0.019      1.074     0.025    0.113           1.114
 ## 
 ## Sample Sizes:
 ##               Control Treated
-## All (ESS)       987.1   177.1
-## All            1559.    441. 
-## Matched (ESS)   582.5   108.6
-## Matched        1559.    441. 
-## Unmatched         0.      0. 
-## Discarded         0.      0.</code></pre>
+## All (ESS)      987.12   177.1
+## All           1559.     441. 
+## Matched (ESS)   58.24   177.1
+## Matched       1559.     441. 
+## Unmatched        0.       0. 
+## Discarded        0.       0.</code></pre>
 <p>The results of the two matching specifications are similar. Balance
 appears to be slightly better when using the sampling weight-estimated
 propensity scores than when using the unweighted propensity scores.
@@ -630,11 +647,11 @@ analysis, we will move forward with the matching that used the sampling
 weight-estimated propensity scores (<code>mF_s</code>) because of its
 superior balance. Some of the remaining imbalance may be eliminated by
 adjusting for the covariates in the outcome model.</p>
-<p>Note that had we not added sampling weights to <code>mF</code>, the
-matching specification that did not include the sampling weights, our
+<p>Note that had we not added sampling weights to <code>mF</code> (the
+matching specification that did not include the sampling weights), our
 balance assessment would be inaccurate because the balance statistics
 would not include the sampling weights. In this case, in fact, assessing
-balance on <code>mF</code> without incorporated the sampling weights
+balance on <code>mF</code> without incorporating the sampling weights
 would have yielded radically different results and a different
 conclusion. It is critical to incorporate sampling weights into the
 <code>matchit</code> object using <code>add_s.weights()</code> even if
@@ -659,8 +676,8 @@ to improve precision and decrease bias.</p>
 <div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" tabindex="-1"></a>md_F_s <span class="ot">&lt;-</span> <span class="fu">match_data</span>(mF_s)</span>
 <span id="cb14-2"><a href="#cb14-2" tabindex="-1"></a></span>
 <span id="cb14-3"><a href="#cb14-3" tabindex="-1"></a>fit <span class="ot">&lt;-</span> <span class="fu">lm</span>(Y_C <span class="sc">~</span> A <span class="sc">*</span> (X1 <span class="sc">+</span> X2 <span class="sc">+</span> X3 <span class="sc">+</span> X4 <span class="sc">+</span> X5 <span class="sc">+</span> </span>
-<span id="cb14-4"><a href="#cb14-4" tabindex="-1"></a>                       X6 <span class="sc">+</span> X7 <span class="sc">+</span> X8 <span class="sc">+</span> X9), <span class="at">data =</span> md_F_s,</span>
-<span id="cb14-5"><a href="#cb14-5" tabindex="-1"></a>          <span class="at">weights =</span> weights)</span>
+<span id="cb14-4"><a href="#cb14-4" tabindex="-1"></a>                       X6 <span class="sc">+</span> X7 <span class="sc">+</span> X8 <span class="sc">+</span> X9),</span>
+<span id="cb14-5"><a href="#cb14-5" tabindex="-1"></a>          <span class="at">data =</span> md_F_s, <span class="at">weights =</span> weights)</span>
 <span id="cb14-6"><a href="#cb14-6" tabindex="-1"></a></span>
 <span id="cb14-7"><a href="#cb14-7" tabindex="-1"></a><span class="fu">library</span>(<span class="st">&quot;marginaleffects&quot;</span>)</span>
 <span id="cb14-8"><a href="#cb14-8" tabindex="-1"></a><span class="fu">avg_comparisons</span>(fit,</span>
@@ -670,7 +687,7 @@ to improve precision and decrease bias.</p>
 <span id="cb14-12"><a href="#cb14-12" tabindex="-1"></a>                <span class="at">wts =</span> <span class="st">&quot;SW&quot;</span>)</span></code></pre></div>
 <pre><code>## 
 ##  Estimate Std. Error    z Pr(&gt;|z|)    S 2.5 % 97.5 %
-##      1.83       0.39 4.69   &lt;0.001 18.5  1.06   2.59
+##      1.74      0.463 3.77   &lt;0.001 12.6 0.837   2.65
 ## 
 ## Term: A
 ## Type: response
@@ -681,8 +698,8 @@ have the option <code>include.s.weights</code>, which, when set to
 the sampling weights and are simply the matching weights. Because one
 might to forget to multiply the two sets of weights together, it is
 easier to just use the default of <code>include.s.weights = TRUE</code>
-and ignore the sampling weights in the rest of the analysis (because
-they are already included in the returned weights).</p>
+and ignore the sampling weights in the outcome model (because they are
+already included in the returned weights).</p>
 </div>
 <div id="code-to-generate-data-used-in-examples" class="section level2">
 <h2>Code to Generate Data used in Examples</h2>
@@ -730,7 +747,7 @@ they are already included in the returned weights).</p>
 </div>
 <div id="references" class="section level2 unnumbered">
 <h2 class="unnumbered">References</h2>
-<div id="refs" class="references csl-bib-body hanging-indent" entry-spacing="0">
+<div id="refs" class="references csl-bib-body hanging-indent">
 <div id="ref-austin2016" class="csl-entry">
 Austin, Peter C., Nathaniel Jembere, and Maria Chiu. 2016.
 <span>“Propensity Score Matching and Complex Surveys.”</span>

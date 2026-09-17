@@ -3,64 +3,6 @@
 \name{method_quick}
 \alias{method_quick}
 \title{Fast Generalized Full Matching}
-\arguments{
-\item{formula}{a two-sided \link{formula} object containing the treatment and
-covariates to be used in creating the distance measure used in the matching.
-This formula will be supplied to the functions that estimate the distance
-measure.}
-
-\item{data}{a data frame containing the variables named in \code{formula}.
-If not found in \code{data}, the variables will be sought in the
-environment.}
-
-\item{method}{set here to \code{"quick"}.}
-
-\item{distance}{the distance measure to be used. See \code{\link{distance}}
-for allowable options. Cannot be supplied as a matrix.}
-
-\item{link}{when \code{distance} is specified as a method of estimating
-propensity scores, an additional argument controlling the link function used
-in estimating the distance measure. See \code{\link{distance}} for allowable
-options with each option.}
-
-\item{distance.options}{a named list containing additional arguments
-supplied to the function that estimates the distance measure as determined
-by the argument to \code{distance}.}
-
-\item{estimand}{a string containing the desired estimand. Allowable options
-include \code{"ATT"}, \code{"ATC"}, and \code{"ATE"}. The estimand controls
-how the weights are computed; see the Computing Weights section at
-\code{\link[=matchit]{matchit()}} for details.}
-
-\item{exact}{for which variables exact matching should take place.}
-
-\item{mahvars}{for which variables Mahalanobis distance matching should take
-place when \code{distance} corresponds to a propensity score (e.g., to discard units for common support). If specified, the
-distance measure will not be used in matching.}
-
-\item{discard}{a string containing a method for discarding units outside a
-region of common support. Only allowed when \code{distance} corresponds to a
-propensity score.}
-
-\item{reestimate}{if \code{discard} is not \code{"none"}, whether to
-re-estimate the propensity score in the remaining sample prior to matching.}
-
-\item{s.weights}{the variable containing sampling weights to be incorporated
-into propensity score models and balance statistics.}
-
-\item{caliper}{the width of the caliper used for caliper matching. A caliper can only be placed on the propensity score and cannot be negative.}
-
-\item{std.caliper}{\code{logical}; when a caliper is specified, whether it
-is in standard deviation units (\code{TRUE}) or raw units (\code{FALSE}).}
-
-\item{verbose}{\code{logical}; whether information about the matching
-process should be printed to the console.}
-
-\item{\dots}{additional arguments passed to \pkgfun{quickmatch}{quickmatch}. Allowed arguments include \code{treatment_constraints}, \code{size_constraint}, \code{target}, and other arguments passed to \code{scclust::sc_clustering()} (see \pkgfun{quickmatch}{quickmatch} for details). In particular, changing \code{seed_method} from its default can improve performance.
-No arguments will be passed to \code{distances::distances()}.
-
-The arguments \code{replace}, \code{ratio}, \code{min.controls}, \code{max.controls}, \code{m.order}, and \code{antiexact} are ignored with a warning.}
-}
 \description{
 In \code{\link[=matchit]{matchit()}}, setting \code{method = "quick"} performs generalized full
 matching, which is a form of subclassification wherein all units, both
@@ -100,12 +42,32 @@ matchit(formula,
         caliper = NULL,
         std.caliper = TRUE,
         verbose = FALSE,
-        ...)
+        ...) }
+}
+\section{Arguments}{
+
+
+
+\tabular{ll}{
+\code{formula} \tab a two-sided \link{formula} object containing the treatment and covariates to be used in creating the distance measure used in the matching. This formula will be supplied to the functions that estimate the distance measure. \cr
+\code{data} \tab a data frame containing the variables named in \code{formula}. If not found in \code{data}, the variables will be sought in the environment. \cr
+\code{method} \tab set here to \code{"quick"}. \cr
+\code{distance} \tab the distance measure to be used. See \code{\link{distance}} for allowable options. Cannot be supplied as a matrix. \cr
+\code{link} \tab when \code{distance} is specified as a method of estimating propensity scores, an additional argument controlling the link function used in estimating the distance measure. See \code{\link{distance}} for allowable options with each option. \cr
+\code{distance.options} \tab a named list containing additional arguments supplied to the function that estimates the distance measure as determined by the argument to \code{distance}. \cr
+\code{estimand} \tab a string containing the desired estimand. Allowable options include \code{"ATT"}, \code{"ATC"}, and \code{"ATE"}. The estimand controls how the weights are computed; see the Computing Weights section at \code{\link[=matchit]{matchit()}} for details. \cr
+\code{exact} \tab for which variables exact matching should take place. \cr
+\code{mahvars} \tab for which variables Mahalanobis distance matching should take place when \code{distance} corresponds to a propensity score (e.g., to discard units for common support). If specified, the distance measure will not be used in matching. \cr
+\code{discard} \tab a string containing a method for discarding units outside a region of common support. Only allowed when \code{distance} corresponds to a propensity score. \cr
+\code{reestimate} \tab if \code{discard} is not \code{"none"}, whether to re-estimate the propensity score in the remaining sample prior to matching. \cr
+\code{s.weights} \tab the variable containing sampling weights to be incorporated into propensity score models and balance statistics. \cr
+\code{caliper} \tab the width of the caliper used for caliper matching. A caliper can only be placed on the propensity score and cannot be negative. \cr
+\code{std.caliper} \tab \code{logical}; when a caliper is specified, whether it is in standard deviation units (\code{TRUE}) or raw units (\code{FALSE}). \cr
+\code{verbose} \tab \code{logical}; whether information about the matching process should be printed to the console. \cr
+\code{...} \tab additional arguments passed to \pkgfun{quickmatch}{quickmatch}. Allowed arguments include \code{treatment_constraints}, \code{size_constraint}, \code{target}, and other arguments passed to \code{scclust::sc_clustering()} (see \pkgfun{quickmatch}{quickmatch} for details). In particular, changing \code{seed_method} from its default can improve performance. No arguments will be passed to \code{distances::distances()}. The arguments \code{replace}, \code{ratio}, \code{min.controls}, \code{max.controls}, \code{m.order}, and \code{antiexact} are ignored with a warning. \cr
 }
 }
-\details{
-Generalized full matching is similar to optimal full matching, but has some additional flexibility that can be controlled by some of the extra arguments available. By default, \code{method = "quick"} performs a standard full match in which all units are matched (unless restricted by the caliper) and assigned to a subclass. Each subclass could contain multiple units from each treatment group. The subclasses are chosen to minimize the largest within-subclass distance between units (including between units of the same treatment group). Notably, generalized full matching requires less memory and can run much faster than optimal full matching and optimal pair matching and, in some cases, even than nearest neighbor matching, and it can be used with huge datasets (e.g., in the millions) while running in under a minute.
-}
+
 \section{Outputs}{
 
 
@@ -118,8 +80,13 @@ included in the output. When \code{exact} is specified, this will be a list
 of such objects, one for each stratum of the \code{exact} variables.
 }
 
+\section{Details}{
+
+Generalized full matching is similar to optimal full matching, but has some additional flexibility that can be controlled by some of the extra arguments available. By default, \code{method = "quick"} performs a standard full match in which all units are matched (unless restricted by the caliper) and assigned to a subclass. Each subclass could contain multiple units from each treatment group. The subclasses are chosen to minimize the largest within-subclass distance between units (including between units of the same treatment group). Notably, generalized full matching requires less memory and can run much faster than optimal full matching and optimal pair matching and, in some cases, even than nearest neighbor matching, and it can be used with huge datasets (e.g., in the millions) while running in under a minute.
+}
+
 \examples{
-\dontshow{if (requireNamespace("quickmatch", quietly = TRUE)) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
+\dontshow{if (rlang::is_installed("quickmatch")) withAutoprint(\{ # examplesIf}
 data("lalonde")
 
 # Generalized full PS matching
@@ -132,14 +99,9 @@ summary(m.out1)
 \dontshow{\}) # examplesIf}
 }
 \references{
-In a manuscript, be sure to cite the \emph{quickmatch} package if using
-\code{matchit()} with \code{method = "quick"}. A citation can be generated using \code{citation("quickmatch")}.
+In a manuscript, be sure to cite the \emph{quickmatch} package if using \code{matchit()} with \code{method = "quick"}. A citation can be generated using \code{citation("quickmatch")}. For example, a sentence might read:
 
-For example, a sentence might read:
-
-\emph{Generalized full matching was performed using the MatchIt package (Ho,
-Imai, King, & Stuart, 2011) in R, which calls functions from the quickmatch
-package (Sävje, Sekhon, & Higgins, 2024).}
+\emph{Generalized full matching was performed using the MatchIt package (Ho, Imai, King, & Stuart, 2011) in R, which calls functions from the quickmatch package (Sävje, Sekhon, & Higgins, 2024).}
 
 You should also cite the following paper, which develops and describes the method:
 

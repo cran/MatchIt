@@ -3,8 +3,6 @@
 #include "internal.h"
 using namespace Rcpp;
 
-// [[Rcpp::plugins(cpp11)]]
-
 // [[Rcpp::export]]
 IntegerMatrix nn_matchC_vec_closest(const IntegerVector& treat,
                                     const IntegerVector& ratio,
@@ -37,9 +35,6 @@ IntegerMatrix nn_matchC_vec_closest(const IntegerVector& treat,
   ind_match.fill(NA_INTEGER);
 
   LogicalVector eligible = !discarded;
-
-  // IntegerVector g_c = Range(0, g - 1);
-  // g_c = g_c[g_c != focal];
 
   IntegerVector n_eligible(g);
   for (i = 0; i < n; i++) {
@@ -79,80 +74,78 @@ IntegerMatrix nn_matchC_vec_closest(const IntegerVector& treat,
   // Output matrix with sample indices of control units
   IntegerMatrix mm(nf, max_ratio);
   mm.fill(NA_INTEGER);
-  CharacterVector lab = treat.names();
 
-  //Use base::order() because faster than C++ std::sort()
-  Function o("order");
+  //Next column to fill in each row of `mm`. Tracked rather than recomputed with
+  //`sum(!is_na(mm(row, _)))`, which allocates twice for every match written.
+  std::vector<int> mm_filled(mm.nrow(), 0);
+
+  const CharacterVector lab = treat.names();
+
+  //`base::order()`'s radix sort beats every C++ alternative measured here by 3-8x at
+  //these sizes; see _dev/cpp-cleanup-notes.md. Looked up in the base environment
+  //because `Function("order")` searches from the global environment, where a user
+  //object of that name would mask it.
+  Function o = Environment::base_env()["order"];
 
   IntegerVector ind_d_ord = o(distance);
-  ind_d_ord = ind_d_ord - 1;
+  ind_d_ord = ind_d_ord - 1; //location of each unit after sorting
 
-  IntegerVector match_d_ord = o(ind_d_ord);
-  match_d_ord = match_d_ord - 1;
+  //`ind_d_ord` is a permutation, so its order is just its inverse; computing that
+  //directly avoids a second call into R
+  IntegerVector match_d_ord(n);
+  for (i = 0; i < n; i++) {
+    match_d_ord[ind_d_ord[i]] = static_cast<int>(i);
+  }
 
   IntegerVector last_control(g);
   last_control.fill(n - 1);
   IntegerVector first_control(g);
   first_control.fill(0);
 
-  //exact
-  bool use_exact = false;
-  IntegerVector exact;
-  if (exact_.isNotNull()) {
-    exact = as<IntegerVector>(exact_);
-    use_exact = true;
-  }
+  //`as<>()` on a `Nullable` wraps the caller's SEXP rather than copying it, so every
+  //object taken from an argument below is `const`. Writing through one of them would
+  //modify the R object the caller passed in, and the change would outlive the call.
 
-  //caliper_dist
-  double caliper_dist;
-  if (caliper_dist_.isNotNull()) {
-    caliper_dist = as<double>(caliper_dist_);
-  }
-  else {
-    caliper_dist = max_finite(distance) - min_finite(distance) + 1;
-  }
+  //exact
+  const bool use_exact = exact_.isNotNull();
+  const IntegerVector exact = use_exact ? as<IntegerVector>(exact_) : IntegerVector(0);
 
   //caliper_covs
-  NumericVector caliper_covs;
-  NumericMatrix caliper_covs_mat;
-  int ncc = 0;
-  if (caliper_covs_.isNotNull()) {
-    caliper_covs = as<NumericVector>(caliper_covs_);
-    caliper_covs_mat = as<NumericMatrix>(caliper_covs_mat_);
-
-    ncc = caliper_covs_mat.ncol();
-
-    double a;
-
-    // Find if caliper placed on distance
-    for (int cci = 0; cci < ncc; cci++) {
-      a = get_affine_transformation(caliper_covs_mat.column(cci),
-                                    distance);
-
-      if (std::abs(a) > 1e-10) {
-        if (caliper_dist_.isNull() ||
-            (caliper_covs[cci] >= 0 && caliper_dist > a * caliper_covs[cci]) ||
-            (caliper_covs[cci] < 0 && caliper_dist < a * caliper_covs[cci])) {
-          caliper_dist = a * caliper_covs[cci];
-        }
-      }
-    }
-  }
+  const NumericVector caliper_covs = caliper_covs_.isNotNull() ? as<NumericVector>(caliper_covs_) : NumericVector(0);
+  const NumericMatrix caliper_covs_mat = caliper_covs_.isNotNull() ? as<NumericMatrix>(caliper_covs_mat_) : NumericMatrix(0, 0);
+  const int ncc = caliper_covs_mat.ncol();
 
   //antiexact
-  IntegerMatrix antiexact_covs;
-  int aenc = 0;
-  if (antiexact_covs_.isNotNull()) {
-    antiexact_covs = as<IntegerMatrix>(antiexact_covs_);
-    aenc = antiexact_covs.ncol();
-  }
+  const IntegerMatrix antiexact_covs = antiexact_covs_.isNotNull() ? as<IntegerMatrix>(antiexact_covs_) : IntegerMatrix(0, 0);
+  const int aenc = antiexact_covs.ncol();
 
   //unit_id
-  IntegerVector unit_id;
-  bool use_unit_id = false;
-  if (unit_id_.isNotNull()) {
-    unit_id = as<IntegerVector>(unit_id_);
-    use_unit_id = true;
+  const bool use_unit_id = unit_id_.isNotNull();
+  const IntegerVector unit_id = use_unit_id ? as<IntegerVector>(unit_id_) : IntegerVector(0);
+
+  //caliper_dist. Not `const`: the loop below may tighten it.
+  double caliper_dist = caliper_dist_.isNotNull() ? as<double>(caliper_dist_) : max_finite(distance) - min_finite(distance) + 1;
+
+  //A caliper on a covariate that is an affine transformation of `distance` is
+  //equivalent to a caliper on `distance` itself, which the sorted scan can stop early
+  //on; the covariate caliper stays in force either way.
+  for (int cci = 0; cci < ncc; cci++) {
+    double a = get_affine_transformation(caliper_covs_mat.column(cci),
+                                         distance);
+
+    if (std::abs(a) <= 1e-10) {
+      continue;
+    }
+
+    //`std::abs()` because a negative `a` would otherwise flip the sign of the
+    //caliper, and a negative caliper means the opposite of a positive one
+    double caliper_dist_cci = std::abs(a) * caliper_covs[cci];
+
+    if (caliper_dist_.isNull() ||
+        (caliper_covs[cci] >= 0 && caliper_dist > caliper_dist_cci) ||
+        (caliper_covs[cci] < 0 && caliper_dist < caliper_dist_cci)) {
+      caliper_dist = caliper_dist_cci;
+    }
   }
 
   //storing closeness
@@ -189,13 +182,15 @@ IntegerMatrix nn_matchC_vec_closest(const IntegerVector& treat,
 
   IntegerVector::iterator ci;
 
-  std::function<bool(int, int)> cmp;
-  if (close) {
-    cmp = [&dist](const int& a, const int& b) {return dist[a] < dist[b];};
-  }
-  else {
-    cmp = [&dist](const int& a, const int& b) {return dist[a] >= dist[b];};
-  }
+  //One lambda rather than two wrapped in a `std::function`, so the comparison can
+  //be inlined into `std::lower_bound()` below
+  auto cmp = [&dist, close](const int& a, const int& b) {
+    if (close) {
+      return dist[a] < dist[b];
+    }
+
+    return dist[a] >= dist[b];
+  };
 
   for (r = 1; r <= max_ratio; r++) {
     //Find closest control unit to each treated unit
@@ -325,7 +320,7 @@ IntegerMatrix nn_matchC_vec_closest(const IntegerVector& treat,
         continue;
       }
 
-      mm(t_id_t_i, sum(!is_na(mm(t_id_t_i, _)))) = c_id_i;
+      mm(t_id_t_i, mm_filled[t_id_t_i]++) = c_id_i;
 
       ck_ = {c_id_i, t_id_i};
 

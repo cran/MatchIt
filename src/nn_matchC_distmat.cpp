@@ -3,8 +3,6 @@
 #include "internal.h"
 using namespace Rcpp;
 
-// [[Rcpp::plugins(cpp11)]]
-
 // [[Rcpp::export]]
 IntegerMatrix nn_matchC_distmat(const IntegerVector& treat_,
                                 const IntegerVector& ord,
@@ -96,54 +94,39 @@ IntegerMatrix nn_matchC_distmat(const IntegerVector& treat_,
   // Output matrix with sample indices of control units
   IntegerMatrix mm(nf, max_ratio);
   mm.fill(NA_INTEGER);
-  CharacterVector lab = treat_.names();
+
+  //Next column to fill in each row of `mm`. Tracked rather than recomputed with
+  //`sum(!is_na(mm(row, _)))`, which allocates twice for every match written.
+  std::vector<int> mm_filled(mm.nrow(), 0);
+
+  const CharacterVector lab = treat_.names();
+
+  //`as<>()` on a `Nullable` wraps the caller's SEXP rather than copying it, so every
+  //object taken from an argument below is `const`. Writing through one of them would
+  //modify the R object the caller passed in, and the change would outlive the call.
 
   //exact
-  bool use_exact = false;
-  IntegerVector exact;
-  if (exact_.isNotNull()) {
-    exact = as<IntegerVector>(exact_);
-    use_exact = true;
-  }
-
-  //caliper_dist
-  double caliper_dist;
-  if (caliper_dist_.isNotNull()) {
-    caliper_dist = as<double>(caliper_dist_);
-  }
-  else {
-    caliper_dist = max_finite(distance_mat) + .1;
-  }
+  const bool use_exact = exact_.isNotNull();
+  const IntegerVector exact = use_exact ? as<IntegerVector>(exact_) : IntegerVector(0);
 
   //caliper_covs
-  NumericVector caliper_covs;
-  NumericMatrix caliper_covs_mat;
-  int ncc = 0;
-  if (caliper_covs_.isNotNull()) {
-    caliper_covs = as<NumericVector>(caliper_covs_);
-    caliper_covs_mat = as<NumericMatrix>(caliper_covs_mat_);
-    ncc = caliper_covs_mat.ncol();
-  }
+  const NumericVector caliper_covs = caliper_covs_.isNotNull() ? as<NumericVector>(caliper_covs_) : NumericVector(0);
+  const NumericMatrix caliper_covs_mat = caliper_covs_.isNotNull() ? as<NumericMatrix>(caliper_covs_mat_) : NumericMatrix(0, 0);
+  const int ncc = caliper_covs_mat.ncol();
 
   //antiexact
-  IntegerMatrix antiexact_covs;
-  int aenc = 0;
-  if (antiexact_covs_.isNotNull()) {
-    antiexact_covs = as<IntegerMatrix>(antiexact_covs_);
-    aenc = antiexact_covs.ncol();
-  }
-
-  //reuse_max
-  bool use_reuse_max = (reuse_max < nf);
+  const IntegerMatrix antiexact_covs = antiexact_covs_.isNotNull() ? as<IntegerMatrix>(antiexact_covs_) : IntegerMatrix(0, 0);
+  const int aenc = antiexact_covs.ncol();
 
   //unit_id
-  IntegerVector unit_id;
-  bool use_unit_id = false;
-  if (unit_id_.isNotNull()) {
-    unit_id = as<IntegerVector>(unit_id_);
-    use_unit_id = true;
-    use_reuse_max = true;
-  }
+  const bool use_unit_id = unit_id_.isNotNull();
+  const IntegerVector unit_id = use_unit_id ? as<IntegerVector>(unit_id_) : IntegerVector(0);
+
+  //caliper_dist
+  const double caliper_dist = caliper_dist_.isNotNull() ? as<double>(caliper_dist_) : max_finite(distance_mat) + .1;
+
+  //reuse_max
+  const bool use_reuse_max = use_unit_id || (reuse_max < nf);
 
   IntegerVector matches_i(1 + max_ratio * (g - 1));
   int k_total;
@@ -178,7 +161,17 @@ IntegerMatrix nn_matchC_distmat(const IntegerVector& treat_,
           Rcpp::checkUserInterrupt();
         }
 
-        if (max(as<IntegerVector>(n_eligible[g_c])) == 0) {
+        //Any control group left with eligible units? Checked with a loop because
+        //`max(as<IntegerVector>(n_eligible[g_c]))` allocates twice per unit.
+        bool any_eligible = false;
+        for (int gj : g_c) {
+          if (n_eligible[gj] > 0) {
+            any_eligible = true;
+            break;
+          }
+        }
+
+        if (!any_eligible) {
           break;
         }
 
@@ -229,7 +222,7 @@ IntegerMatrix nn_matchC_distmat(const IntegerVector& treat_,
         }
 
         for (c = 0; c < k_total; c++) {
-          mm(t_id_t_i, sum(!is_na(mm(t_id_t_i, _)))) = matches_i[c];
+          mm(t_id_t_i, mm_filled[t_id_t_i]++) = matches_i[c];
         }
 
         matches_i[k_total] = t_id_i;
@@ -312,7 +305,7 @@ IntegerMatrix nn_matchC_distmat(const IntegerVector& treat_,
       }
 
       for (c = 0; c < k_total; c++) {
-        mm(t_id_t_i, sum(!is_na(mm(t_id_t_i, _)))) = matches_i[c];
+        mm(t_id_t_i, mm_filled[t_id_t_i]++) = matches_i[c];
       }
     }
   }

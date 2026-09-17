@@ -1,6 +1,6 @@
 #' Exact Matching
 #' @name method_exact
-#' @aliases method_exact
+#'
 #' @usage NULL
 #'
 #' @description
@@ -30,27 +30,19 @@
 #'         estimand = "ATT",
 #'         s.weights = NULL,
 #'         verbose = FALSE,
-#'         ...)
-#'}
+#'         ...) }
 #'
-#' @param formula a two-sided [formula] object containing the treatment and
-#' covariates to be used in creating the subclasses defined by a full cross of
-#' the covariate levels.
-#' @param data a data frame containing the variables named in `formula`.
-#' If not found in `data`, the variables will be sought in the
-#' environment.
-#' @param method set here to `"exact"`.
-#' @param estimand a string containing the desired estimand. Allowable options
-#' include `"ATT"`, `"ATC"`, and `"ATE"`. The estimand controls
-#' how the weights are computed; see the Computing Weights section at
-#' [matchit()] for details.
-#' @param s.weights the variable containing sampling weights to be incorporated
-#' into balance statistics. These weights do not affect the matching process.
-#' @param verbose `logical`; whether information about the matching
-#' process should be printed to the console.
-#' @param \dots ignored.
-#'
-#' The arguments `distance` (and related arguments), `exact`, `mahvars`, `discard` (and related arguments), `replace`, `m.order`, `caliper` (and related arguments), and `ratio` are ignored with a warning.
+#' @section Arguments:
+#' @section Arguments:
+#' \tabular{ll}{
+#'   `formula` \tab a two-sided [formula] object containing the treatment and covariates to be used in creating the subclasses defined by a full cross of the covariate levels. \cr
+#'   `data` \tab a data frame containing the variables named in `formula`. If not found in `data`, the variables will be sought in the environment. \cr
+#'   `method` \tab set here to `"exact"`. \cr
+#'   `estimand` \tab a string containing the desired estimand. Allowable options include `"ATT"`, `"ATC"`, and `"ATE"`. The estimand controls how the weights are computed; see the Computing Weights section at [matchit()] for details. \cr
+#'   `s.weights` \tab the variable containing sampling weights to be incorporated into balance statistics. These weights do not affect the matching process. \cr
+#'   `verbose` \tab `logical`; whether information about the matching process should be printed to the console. \cr
+#'   `...` \tab ignored. The arguments `distance` (and related arguments), `exact`, `mahvars`, `discard` (and related arguments), `replace`, `m.order`, `caliper` (and related arguments), and `ratio` are ignored with a warning. \cr
+#' }
 #'
 #' @section Outputs:
 #'
@@ -59,7 +51,8 @@
 #' matching strata are not indexed by treated units as they are in some other
 #' forms of matching. `include.obj` is ignored.
 #'
-#' @seealso [matchit()] for a detailed explanation of the inputs and outputs of
+#' @seealso
+#' [matchit()] for a detailed explanation of the inputs and outputs of
 #' a call to `matchit()`. The `exact` argument can be used with other
 #' methods to perform exact matching in combination with other matching
 #' methods.
@@ -72,8 +65,7 @@
 #' using `method = "exact"` because the matching is performed completely
 #' within *MatchIt*. For example, a sentence might read:
 #'
-#' *Exact matching was performed using the MatchIt package (Ho, Imai,
-#' King, & Stuart, 2011) in R.*
+#' *Exact matching was performed using the MatchIt package (Ho, Imai, King, & Stuart, 2011) in R.*
 #'
 #' @examples
 #'
@@ -89,30 +81,31 @@
 #'
 NULL
 
-matchit2exact <- function(treat, covs, data, estimand = "ATT", verbose = FALSE, ...) {
+matchit2exact <- function(treat, covs, data, s.weights = NULL, estimand = "ATT", focal = NULL, verbose = FALSE, ...) {
 
   .cat_verbose("Exact matching...\n", verbose = verbose)
 
   if (is_null(covs)) {
-    .err("covariates must be specified in the input formula to use exact matching")
+    arg::err("covariates must be specified in the input formula to use exact matching")
   }
 
-  estimand <- toupper(estimand)
-  estimand <- match_arg(estimand, c("ATT", "ATC", "ATE"))
+  estimand <- arg::match_arg(estimand, c("ATT", "ATC", "ATE"))
 
   xx <- exactify(covs, names(treat))
   cc <- Reduce("intersect", lapply(unique(treat), function(t) xx[treat == t]))
 
   if (is_null(cc)) {
-    .err("no exact matches were found")
+    arg::err("no exact matches were found")
   }
 
-  psclass <- setNames(factor(match(xx, cc), nmax = length(cc)), names(treat))
+  psclass <- match(xx, cc) |>
+    factor(nmax = length(cc)) |>
+    setNames(names(treat))
 
   .cat_verbose("Calculating matching weights... ", verbose = verbose)
 
   res <- list(subclass = psclass,
-              weights = get_weights_from_subclass(psclass, treat, estimand))
+              weights = get_weights_from_subclass(psclass, treat, estimand, s.weights))
 
   .cat_verbose("Done.\n", verbose = verbose)
 

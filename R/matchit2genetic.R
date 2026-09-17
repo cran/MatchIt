@@ -1,6 +1,6 @@
 #' Genetic Matching
 #' @name method_genetic
-#' @aliases method_genetic
+#'
 #' @usage NULL
 #'
 #' @description
@@ -43,83 +43,30 @@
 #'         verbose = FALSE,
 #'         ...) }
 #'
-#' @param formula a two-sided [formula] object containing the treatment and
-#' covariates to be used in creating the distance measure used in the matching.
-#' This formula will be supplied to the functions that estimate the distance
-#' measure and is used to determine the covariates whose balance is to be
-#' optimized.
-#' @param data a data frame containing the variables named in `formula`.
-#' If not found in `data`, the variables will be sought in the
-#' environment.
-#' @param method set here to `"genetic"`.
-#' @param distance the distance measure to be used. See [`distance`]
-#' for allowable options. When set to a method of estimating propensity scores
-#' or a numeric vector of distance values, the distance measure is included
-#' with the covariates in `formula` to be supplied to the generalized
-#' Mahalanobis distance matrix unless `mahvars` is specified. Otherwise,
-#' only the covariates in `formula` are supplied to the generalized
-#' Mahalanobis distance matrix to have their scaling factors chosen.
-#' `distance` *cannot* be supplied as a distance matrix. Supplying
-#' any method of computing a distance matrix (e.g., `"mahalanobis"`) has
-#' the same effect of omitting propensity score but does not affect how the
-#' distance between units is computed otherwise.
-#' @param link when `distance` is specified as a method of estimating
-#' propensity scores, an additional argument controlling the link function used
-#' in estimating the distance measure. See [`distance`] for allowable
-#' options with each option.
-#' @param distance.options a named list containing additional arguments
-#' supplied to the function that estimates the distance measure as determined
-#' by the argument to `distance`.
-#' @param estimand a string containing the desired estimand. Allowable options
-#' include `"ATT"` and `"ATC"`. See Details.
-#' @param exact for which variables exact matching should take place.
-#' @param mahvars when a distance corresponds to a propensity score (e.g., for
-#' caliper matching or to discard units for common support), which covariates
-#' should be supplied to the generalized Mahalanobis distance matrix for
-#' matching. If unspecified, all variables in `formula` will be supplied
-#' to the distance matrix. Use `mahvars` to only supply a subset. Even if
-#' `mahvars` is specified, balance will be optimized on all covariates in
-#' `formula`. See Details.
-#' @param antiexact for which variables anti-exact matching should take place.
-#' Anti-exact matching is processed using the `restrict` argument to
-#' `Matching::GenMatch()` and `Matching::Match()`.
-#' @param discard a string containing a method for discarding units outside a
-#' region of common support. Only allowed when `distance` corresponds to a
-#' propensity score.
-#' @param reestimate if `discard` is not `"none"`, whether to
-#' re-estimate the propensity score in the remaining sample prior to matching.
-#' @param s.weights the variable containing sampling weights to be incorporated
-#' into propensity score models and balance statistics. These are also supplied
-#' to `GenMatch()` for use in computing the balance t-test p-values in the
-#' process of matching.
-#' @param replace whether matching should be done with replacement.
-#' @param m.order the order that the matching takes place. Allowable options
-#'   include `"largest"`, where matching takes place in descending order of
-#'   distance measures; `"smallest"`, where matching takes place in ascending
-#'   order of distance measures; `"random"`, where matching takes place
-#'   in a random order; and `"data"` where matching takes place based on the
-#'   order of units in the data. When `m.order = "random"`, results may differ
-#'   across different runs of the same code unless a seed is set and specified
-#'   with [set.seed()]. The default of `NULL` corresponds to `"largest"` when a
-#'   propensity score is estimated or supplied as a vector and `"data"`
-#'   otherwise.
-#' @param caliper the width(s) of the caliper(s) used for caliper matching. See
-#' Details and Examples.
-#' @param std.caliper `logical`; when calipers are specified, whether they
-#' are in standard deviation units (`TRUE`) or raw units (`FALSE`).
-#' @param ratio how many control units should be matched to each treated unit
-#' for k:1 matching. Should be a single integer value.
-#' @param verbose `logical`; whether information about the matching
-#' process should be printed to the console. When `TRUE`, output from
-#' `GenMatch()` with `print.level = 2` will be displayed. Default is
-#' `FALSE` for no printing other than warnings.
-#' @param \dots additional arguments passed to \pkgfun{Matching}{GenMatch}.
-#' Potentially useful options include `pop.size`, `max.generations`,
-#' and `fit.func`. If `pop.size` is not specified, a warning from
-#' *Matching* will be thrown reminding you to change it. Note that the
-#' `ties` and `CommonSupport` arguments are set to `FALSE` and
-#' cannot be changed. If `distance.tolerance` is not specified, it is set
-#' to 0, whereas the default in *Matching* is 1e-5.
+#' @section Arguments:
+#' @section Arguments:
+#' \tabular{ll}{
+#'   `formula` \tab a two-sided [formula] object containing the treatment and covariates to be used in creating the distance measure used in the matching. This formula will be supplied to the functions that estimate the distance measure and is used to determine the covariates whose balance is to be optimized. \cr
+#'   `data` \tab a data frame containing the variables named in `formula`. If not found in `data`, the variables will be sought in the environment. \cr
+#'   `method` \tab set here to `"genetic"`. \cr
+#'   `distance` \tab the distance measure to be used. See [`distance`] for allowable options. When set to a method of estimating propensity scores or a numeric vector of distance values, the distance measure is included with the covariates in `formula` to be supplied to the generalized Mahalanobis distance matrix unless `mahvars` is specified. Otherwise, only the covariates in `formula` are supplied to the generalized Mahalanobis distance matrix to have their scaling factors chosen. `distance` *cannot* be supplied as a distance matrix. Supplying any method of computing a distance matrix (e.g., `"mahalanobis"`) has the same effect of omitting propensity score but does not affect how the distance between units is computed otherwise. \cr
+#'   `link` \tab when `distance` is specified as a method of estimating propensity scores, an additional argument controlling the link function used in estimating the distance measure. See [`distance`] for allowable options with each option. \cr
+#'   `distance.options` \tab a named list containing additional arguments supplied to the function that estimates the distance measure as determined by the argument to `distance`. \cr
+#'   `estimand` \tab a string containing the desired estimand. Allowable options include `"ATT"` and `"ATC"`. See Details. \cr
+#'   `exact` \tab for which variables exact matching should take place. \cr
+#'   `mahvars` \tab when a distance corresponds to a propensity score (e.g., for caliper matching or to discard units for common support), which covariates should be supplied to the generalized Mahalanobis distance matrix for matching. If unspecified, all variables in `formula` will be supplied to the distance matrix. Use `mahvars` to only supply a subset. Even if `mahvars` is specified, balance will be optimized on all covariates in `formula`. See Details. \cr
+#'   `antiexact` \tab for which variables anti-exact matching should take place. Anti-exact matching is processed using the `restrict` argument to `Matching::GenMatch()` and `Matching::Match()`. \cr
+#'   `discard` \tab a string containing a method for discarding units outside a region of common support. Only allowed when `distance` corresponds to a propensity score. \cr
+#'   `reestimate` \tab if `discard` is not `"none"`, whether to re-estimate the propensity score in the remaining sample prior to matching. \cr
+#'   `s.weights` \tab the variable containing sampling weights to be incorporated into propensity score models and balance statistics. These are also supplied to `GenMatch()` for use in computing the balance t-test p-values in the process of matching. \cr
+#'   `replace` \tab whether matching should be done with replacement. \cr
+#'   `m.order` \tab the order that the matching takes place. Allowable options include `"largest"`, where matching takes place in descending order of distance measures; `"smallest"`, where matching takes place in ascending order of distance measures; `"random"`, where matching takes place in a random order; and `"data"` where matching takes place based on the order of units in the data. When `m.order = "random"`, results may differ across different runs of the same code unless a seed is set and specified with [set.seed()]. The default of `NULL` corresponds to `"largest"` when a propensity score is estimated or supplied as a vector and `"data"` otherwise. \cr
+#'   `caliper` \tab the width(s) of the caliper(s) used for caliper matching. See Details and Examples. \cr
+#'   `std.caliper` \tab `logical`; when calipers are specified, whether they are in standard deviation units (`TRUE`) or raw units (`FALSE`). \cr
+#'   `ratio` \tab how many control units should be matched to each treated unit for k:1 matching. Should be a single integer value. \cr
+#'   `verbose` \tab `logical`; whether information about the matching process should be printed to the console. When `TRUE`, output from `GenMatch()` with `print.level = 2` will be displayed. Default is `FALSE` for no printing other than warnings. \cr
+#'   `...` \tab additional arguments passed to \pkgfun{Matching}{GenMatch}. Potentially useful options include `pop.size`, `max.generations`, and `fit.func`. If `pop.size` is not specified, a warning from *Matching* will be thrown reminding you to change it. Note that the `ties` and `CommonSupport` arguments are set to `FALSE` and cannot be changed. If `distance.tolerance` is not specified, it is set to 0, whereas the default in *Matching* is 1e-5. \cr
+#' }
 #'
 #' @section Outputs:
 #' All outputs described in [matchit()] are returned with
@@ -128,7 +75,7 @@
 #' `matchit()`, the output of the call to \pkgfun{Matching}{GenMatch} will be
 #' included in the output.
 #'
-#' @details
+#' @section Details:
 #' In genetic matching, covariates play three roles: 1) as the variables on
 #' which balance is optimized, 2) as the variables in the generalized
 #' Mahalanobis distance between units, and 3) in estimating the propensity
@@ -194,29 +141,24 @@
 #'
 #' Genetic matching involves a random component, so a seed must be set using [set.seed()] to ensure reproducibility. When `cluster` is used for parallel processing, the seed must be compatible with parallel processing (e.g., by setting `kind = "L'Ecuyer-CMRG"`).
 #'
-#' @seealso [matchit()] for a detailed explanation of the inputs and outputs of
+#' @seealso
+#' [matchit()] for a detailed explanation of the inputs and outputs of
 #' a call to `matchit()`.
 #'
 #' \pkgfun{Matching}{GenMatch} and \pkgfun{Matching}{Match}, which do the work.
 #'
-#' @references In a manuscript, be sure to cite the following papers if using
-#' `matchit()` with `method = "genetic"`:
+#' @references
+#' In a manuscript, be sure to cite the following papers if using `matchit()` with `method = "genetic"`:
 #'
-#' Diamond, A., & Sekhon, J. S. (2013). Genetic matching for estimating causal
-#' effects: A general multivariate matching method for achieving balance in
-#' observational studies. Review of Economics and Statistics, 95(3), 932–945. \doi{10.1162/REST_a_00318}
+#' Diamond, A., & Sekhon, J. S. (2013). Genetic matching for estimating causal effects: A general multivariate matching method for achieving balance in observational studies. *Review of Economics and Statistics*, 95(3), 932–945. \doi{10.1162/REST_a_00318}
 #'
-#' Sekhon, J. S. (2011). Multivariate and Propensity Score Matching Software
-#' with Automated Balance Optimization: The Matching package for R. Journal of
-#' Statistical Software, 42(1), 1–52. \doi{10.18637/jss.v042.i07}
+#' Sekhon, J. S. (2011). Multivariate and Propensity Score Matching Software with Automated Balance Optimization: The Matching package for R. *Journal of Statistical Software*, 42(1), 1–52. \doi{10.18637/jss.v042.i07}
 #'
 #' For example, a sentence might read:
 #'
-#' *Genetic matching was performed using the MatchIt package (Ho, Imai,
-#' King, & Stuart, 2011) in R, which calls functions from the Matching package
-#' (Diamond & Sekhon, 2013; Sekhon, 2011).*
+#' *Genetic matching was performed using the MatchIt package (Ho, Imai, King, & Stuart, 2011) in R, which calls functions from the Matching package (Diamond & Sekhon, 2013; Sekhon, 2011).*
 #'
-#' @examplesIf all(sapply(c("Matching", "rgenoud"), requireNamespace, quietly = TRUE))
+#' @examplesIf rlang::is_installed(c("Matching", "rgenoud"))
 #' data("lalonde")
 #'
 #' # 1:1 genetic matching with PS as a covariate
@@ -266,12 +208,13 @@ matchit2genetic <- function(treat, data, distance, discarded,
 
   .cat_verbose("Genetic matching...\n", verbose = verbose)
 
-  .args <- names(formals(Matching::GenMatch))
+  .args <- setdiff(rlang::fn_fmls_names(Matching::GenMatch),
+                   "...")
   A <- ...mget(.args)
   A[lengths(A) == 0L] <- NULL
 
-  estimand <- toupper(estimand)
-  estimand <- match_arg(estimand, c("ATT", "ATC"))
+  estimand <- arg::match_arg(estimand, c("ATT", "ATC"))
+
   if (estimand == "ATC") {
     tc <- c("control", "treated")
     focal <- 0
@@ -283,12 +226,10 @@ matchit2genetic <- function(treat, data, distance, discarded,
 
   if (!replace) {
     if (sum(!discarded & treat != focal) < sum(!discarded & treat == focal)) {
-      .wrn(sprintf("fewer %s units than %s units; not all %s units will get a match",
-                   tc[2L], tc[1L], tc[1L]))
+      arg::wrn("fewer {tc[2L]} units than {tc[1L]} units; not all {tc[1L]} units will get a match")
     }
     else if (sum(!discarded & treat != focal) < sum(!discarded & treat == focal) * ratio) {
-      .err(sprintf("not enough %s units for %s matches for each %s unit",
-                   tc[2L], ratio, tc[1L]))
+      arg::err("not enough {tc[2L]} units for {ratio} matches for each {tc[1L]} unit")
     }
   }
 
@@ -297,12 +238,14 @@ matchit2genetic <- function(treat, data, distance, discarded,
   n.obs <- length(treat)
   n1 <- sum(treat == 1)
 
-  if (is_null(names(treat))) names(treat) <- seq_len(n.obs)
+  if (is_null(names(treat))) {
+    names(treat) <- seq_len(n.obs)
+  }
 
   m.order <- {
-    if (is_null(distance)) match_arg(m.order, c("data", "random"))
+    if (is_null(distance)) arg::match_arg(m.order, c("data", "random"))
     else if (is_null(m.order)) switch(estimand, "ATC" = "smallest", "largest")
-    else match_arg(m.order, c("largest", "smallest", "data", "random"))
+    else arg::match_arg(m.order, c("largest", "smallest", "data", "random"))
   }
 
   ord <- switch(m.order,
@@ -319,7 +262,7 @@ matchit2genetic <- function(treat, data, distance, discarded,
   covs_to_balance <- get_covs_matrix(formula, data = data)
 
   if (ncol(covs_to_balance) == 0L) {
-    .err("covariates must be specified in the input formula to use genetic matching")
+    arg::err("covariates must be specified in the input formula to use genetic matching")
   }
 
   X <- {
@@ -337,7 +280,7 @@ matchit2genetic <- function(treat, data, distance, discarded,
     cc <- intersect(ex[treat == 1], ex[treat == 0])
 
     if (is_null(cc)) {
-      .err("No matches were found")
+      arg::err("No matches were found")
     }
 
     X <- cbind(X, ex)
@@ -426,7 +369,8 @@ matchit2genetic <- function(treat, data, distance, discarded,
     }, numeric(1L))
 
     #cal needs one value per variable in X
-    cal <- setNames(rep.int(Inf, ncol(X)), colnames(X))
+    cal <- setNames(rep.int(Inf, ncol(X)),
+                    colnames(X))
 
     #First put covariate calipers into cal
     if (is_not_null(cov.cals)) {
@@ -434,7 +378,10 @@ matchit2genetic <- function(treat, data, distance, discarded,
     }
 
     #Then put distance caliper into cal
-    if (!all(nzchar(names(caliper)))) {
+    if (all(nzchar(names(caliper)))) {
+      dist.cal <- NULL
+    }
+    else {
       dist.cal <- caliper[!nzchar(names(caliper))]
       if (is_not_null(mahvars)) {
         #If mahvars specified, distance is not yet in X, so add it to X
@@ -442,15 +389,14 @@ matchit2genetic <- function(treat, data, distance, discarded,
         cal <- c(cal, dist.cal)
 
         #Expand exact.log for newly added distance
-        if (is_not_null(exact.log)) exact.log <- c(exact.log, FALSE)
+        if (is_not_null(exact.log)) {
+          exact.log <- c(exact.log, FALSE)
+        }
       }
       else {
         #Otherwise, distance is in X at the specified index
         cal[ncol(covs_to_balance) + 1L] <- dist.cal
       }
-    }
-    else {
-      dist.cal <- NULL
     }
   }
 
@@ -464,7 +410,7 @@ matchit2genetic <- function(treat, data, distance, discarded,
           return(NULL)
         }
 
-        cbind(j, restricted_controls, -1)
+        cbind(j, restricted_controls, -1L)
       }))
     }))
 
@@ -524,13 +470,12 @@ matchit2genetic <- function(treat, data, distance, discarded,
   dont_warn_if = c("replace==FALSE, but there are more (weighted) treated obs than control obs",
                    "no valid matches"))
 
-  if (typeof(m.out) == "logical" && all(is.na(m.out))) {
-    .err("no units were matched")
+  if (typeof(m.out) == "logical" && allNA(m.out)) {
+    arg::err("no units were matched")
   }
 
   #Note: must use character match.matrix because of re-ordering treat into treat_
-  mm <- matrix(NA_integer_, nrow = n1, ncol = max(table(m.out$index.treated)),
-               dimnames = list(lab1, NULL))
+  mm <- make_matrix(max(table(m.out$index.treated)), nrow = lab1, type = "integer")
 
   unique.matched.focal <- unique(m.out$index.treated, nmax = n1)
 

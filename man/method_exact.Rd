@@ -3,32 +3,6 @@
 \name{method_exact}
 \alias{method_exact}
 \title{Exact Matching}
-\arguments{
-\item{formula}{a two-sided \link{formula} object containing the treatment and
-covariates to be used in creating the subclasses defined by a full cross of
-the covariate levels.}
-
-\item{data}{a data frame containing the variables named in \code{formula}.
-If not found in \code{data}, the variables will be sought in the
-environment.}
-
-\item{method}{set here to \code{"exact"}.}
-
-\item{estimand}{a string containing the desired estimand. Allowable options
-include \code{"ATT"}, \code{"ATC"}, and \code{"ATE"}. The estimand controls
-how the weights are computed; see the Computing Weights section at
-\code{\link[=matchit]{matchit()}} for details.}
-
-\item{s.weights}{the variable containing sampling weights to be incorporated
-into balance statistics. These weights do not affect the matching process.}
-
-\item{verbose}{\code{logical}; whether information about the matching
-process should be printed to the console.}
-
-\item{\dots}{ignored.
-
-The arguments \code{distance} (and related arguments), \code{exact}, \code{mahvars}, \code{discard} (and related arguments), \code{replace}, \code{m.order}, \code{caliper} (and related arguments), and \code{ratio} are ignored with a warning.}
-}
 \description{
 In \code{\link[=matchit]{matchit()}}, setting \code{method = "exact"} performs exact matching.
 With exact matching, a complete cross of the covariates is used to form
@@ -56,9 +30,23 @@ matchit(formula,
         estimand = "ATT",
         s.weights = NULL,
         verbose = FALSE,
-        ...)
+        ...) }
+}
+\section{Arguments}{
+
+
+
+\tabular{ll}{
+\code{formula} \tab a two-sided \link{formula} object containing the treatment and covariates to be used in creating the subclasses defined by a full cross of the covariate levels. \cr
+\code{data} \tab a data frame containing the variables named in \code{formula}. If not found in \code{data}, the variables will be sought in the environment. \cr
+\code{method} \tab set here to \code{"exact"}. \cr
+\code{estimand} \tab a string containing the desired estimand. Allowable options include \code{"ATT"}, \code{"ATC"}, and \code{"ATE"}. The estimand controls how the weights are computed; see the Computing Weights section at \code{\link[=matchit]{matchit()}} for details. \cr
+\code{s.weights} \tab the variable containing sampling weights to be incorporated into balance statistics. These weights do not affect the matching process. \cr
+\code{verbose} \tab \code{logical}; whether information about the matching process should be printed to the console. \cr
+\code{...} \tab ignored. The arguments \code{distance} (and related arguments), \code{exact}, \code{mahvars}, \code{discard} (and related arguments), \code{replace}, \code{m.order}, \code{caliper} (and related arguments), and \code{ratio} are ignored with a warning. \cr
 }
 }
+
 \section{Outputs}{
 
 
@@ -86,8 +74,7 @@ In a manuscript, you don't need to cite another package when
 using \code{method = "exact"} because the matching is performed completely
 within \emph{MatchIt}. For example, a sentence might read:
 
-\emph{Exact matching was performed using the MatchIt package (Ho, Imai,
-King, & Stuart, 2011) in R.}
+\emph{Exact matching was performed using the MatchIt package (Ho, Imai, King, & Stuart, 2011) in R.}
 }
 \seealso{
 \code{\link[=matchit]{matchit()}} for a detailed explanation of the inputs and outputs of

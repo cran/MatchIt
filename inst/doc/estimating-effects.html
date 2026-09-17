@@ -12,7 +12,7 @@
 
 <meta name="author" content="Noah Greifer" />
 
-<meta name="date" content="2025-05-29" />
+<meta name="date" content="2026-09-16" />
 
 <title>Estimating Effects After Matching</title>
 
@@ -50,8 +50,9 @@ overflow: visible;
 }
 </style>
 <style type="text/css" data-origin="pandoc">
+html { -webkit-text-size-adjust: 100%; }
 pre > code.sourceCode { white-space: pre; position: relative; }
-pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
 pre > code.sourceCode > span:empty { height: 1.2em; }
 .sourceCode { overflow: visible; }
 code.sourceCode > span { color: inherit; text-decoration: inherit; }
@@ -62,7 +63,7 @@ div.sourceCode { overflow: auto; }
 }
 @media print {
 pre > code.sourceCode { white-space: pre-wrap; }
-pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
 }
 pre.numberSource code
 { counter-reset: source-line 0; }
@@ -150,7 +151,6 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; }
 div.csl-bib-body { }
 div.csl-entry {
 clear: both;
-margin-bottom: 0em;
 }
 .hanging div.csl-entry {
 margin-left:2em;
@@ -363,7 +363,7 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 
 <h1 class="title toc-ignore">Estimating Effects After Matching</h1>
 <h4 class="author">Noah Greifer</h4>
-<h4 class="date">2025-05-29</h4>
+<h4 class="date">2026-09-16</h4>
 
 
 <div id="TOC">
@@ -499,19 +499,19 @@ should not be used when marginal effects are desired.</p>
 <div id="g-computation" class="section level3">
 <h3>G-computation</h3>
 <p>To estimate marginal effects, we use a method known as g-computation
-<span class="citation">(<a href="#ref-snowdenImplementationGComputationSimulated2011">Snowden,
-Rose, and Mortimer 2011</a>)</span> or regression estimation <span class="citation">(<a href="#ref-schaferAverageCausalEffects2008">Schafer
-and Kang 2008</a>)</span>. This involves first specifying a model for
-the outcome as a function of the treatment and covariates. Then, for
-each unit, we compute their predicted values of the outcome setting
-their treatment status to treated, and then again for control, leaving
-us with two predicted outcome values for each unit, which are estimates
-of the potential outcomes under each treatment level. We compute the
-mean of each of the estimated potential outcomes across the entire
-sample, which leaves us with two average estimated potential outcomes.
-Finally, the contrast of these average estimated potential outcomes
-(e.g., their difference or ratio, depending on the effect measure
-desired) is the estimate of the treatment effect.</p>
+<span class="citation">(<a href="#ref-snowdenImplementationGComputationSimulated2011">Snowden et
+al. 2011</a>)</span> or regression estimation <span class="citation">(<a href="#ref-schaferAverageCausalEffects2008">Schafer and Kang
+2008</a>)</span>. This involves first specifying a model for the outcome
+as a function of the treatment and covariates. Then, for each unit, we
+compute their predicted values of the outcome setting their treatment
+status to treated, and then again for control, leaving us with two
+predicted outcome values for each unit, which are estimates of the
+potential outcomes under each treatment level. We compute the mean of
+each of the estimated potential outcomes across the entire sample, which
+leaves us with two average estimated potential outcomes. Finally, the
+contrast of these average estimated potential outcomes (e.g., their
+difference or ratio, depending on the effect measure desired) is the
+estimate of the treatment effect.</p>
 <p>When doing g-computation after matching, a few additional
 considerations are required. First, when we take the average of the
 estimated potential outcomes under each treatment level, this must be a
@@ -858,9 +858,9 @@ the outcome model (if any) are interacted with the treatment.</p>
 <span id="cb11-3"><a href="#cb11-3" tabindex="-1"></a>                <span class="at">vcov =</span> <span class="sc">~</span>subclass,</span>
 <span id="cb11-4"><a href="#cb11-4" tabindex="-1"></a>                <span class="at">newdata =</span> <span class="fu">subset</span>(A <span class="sc">==</span> <span class="dv">1</span>))</span></code></pre></div>
 <pre><code>## 
-##  A Estimate Std. Error     z Pr(&gt;|z|)     S 2.5 % 97.5 %  Df
-##  0     1.87      0.206  9.06   &lt;0.001  62.8  1.47   2.27 Inf
-##  1     3.89      0.235 16.56   &lt;0.001 202.1  3.43   4.35 Inf
+##  A Estimate Std. Error     z Pr(&gt;|z|)     S 2.5 % 97.5 %
+##  0     1.87      0.206  9.06   &lt;0.001  62.8  1.47   2.27
+##  1     3.89      0.235 16.56   &lt;0.001 202.1  3.43   4.35
 ## 
 ## Type: response</code></pre>
 <p>We can see that the difference in potential outcome means is equal to
@@ -1581,15 +1581,15 @@ interactions.</p>
 </div>
 <div id="references" class="section level2">
 <h2>References</h2>
-<div id="refs" class="references csl-bib-body hanging-indent" entry-spacing="0">
+<div id="refs" class="references csl-bib-body hanging-indent">
 <div id="ref-abadie2008" class="csl-entry">
 Abadie, Alberto, and Guido W. Imbens. 2008. <span>“On the Failure of the
 Bootstrap for Matching Estimators.”</span> <em>Econometrica</em> 76 (6):
 1537–57. <a href="https://doi.org/10.3982/ECTA6474">https://doi.org/10.3982/ECTA6474</a>.
 </div>
 <div id="ref-abadie2019" class="csl-entry">
-Abadie, Alberto, and Jann Spiess. 2019. <span>“Robust Post-Matching
-Inference,”</span> January, 34. <a href="https://doi.org/10.1080/01621459.2020.1840383">https://doi.org/10.1080/01621459.2020.1840383</a>.
+Abadie, Alberto, and Jann Spiess. 2019. <em>Robust Post-Matching
+Inference</em>. January, 34. <a href="https://doi.org/10.1080/01621459.2020.1840383">https://doi.org/10.1080/01621459.2020.1840383</a>.
 </div>
 <div id="ref-austin2009a" class="csl-entry">
 Austin, Peter C. 2009. <span>“Type i Error Rates, Coverage of Confidence
@@ -1598,20 +1598,20 @@ Analyses.”</span> <em>The International Journal of Biostatistics</em> 5
 (1). <a href="https://doi.org/10.2202/1557-4679.1146">https://doi.org/10.2202/1557-4679.1146</a>.
 </div>
 <div id="ref-austin2013" class="csl-entry">
-———. 2013a. <span>“The Performance of Different Propensity Score Methods
-for Estimating Marginal Hazard Ratios.”</span> <em>Statistics in
-Medicine</em> 32 (16): 2837–49. <a href="https://doi.org/10.1002/sim.5705">https://doi.org/10.1002/sim.5705</a>.
+Austin, Peter C. 2013a. <span>“The Performance of Different Propensity
+Score Methods for Estimating Marginal Hazard Ratios.”</span>
+<em>Statistics in Medicine</em> 32 (16): 2837–49. <a href="https://doi.org/10.1002/sim.5705">https://doi.org/10.1002/sim.5705</a>.
 </div>
 <div id="ref-austin2013a" class="csl-entry">
-———. 2013b. <span>“The Use of Propensity Score Methods with Survival or
-Time-to-Event Outcomes: Reporting Measures of Effect Similar to Those
-Used in Randomized Experiments.”</span> <em>Statistics in Medicine</em>
-33 (7): 1242–58. <a href="https://doi.org/10.1002/sim.5984">https://doi.org/10.1002/sim.5984</a>.
+Austin, Peter C. 2013b. <span>“The Use of Propensity Score Methods with
+Survival or Time-to-Event Outcomes: Reporting Measures of Effect Similar
+to Those Used in Randomized Experiments.”</span> <em>Statistics in
+Medicine</em> 33 (7): 1242–58. <a href="https://doi.org/10.1002/sim.5984">https://doi.org/10.1002/sim.5984</a>.
 </div>
 <div id="ref-austinDoublePropensityscoreAdjustment2017" class="csl-entry">
-———. 2017. <span>“Double Propensity-Score Adjustment: A Solution to
-Design Bias or Bias Due to Incomplete Matching.”</span> <em>Statistical
-Methods in Medical Research</em> 26 (1): 201–22. <a href="https://doi.org/10.1177/0962280214543508">https://doi.org/10.1177/0962280214543508</a>.
+Austin, Peter C. 2017. <span>“Double Propensity-Score Adjustment: A
+Solution to Design Bias or Bias Due to Incomplete Matching.”</span>
+<em>Statistical Methods in Medical Research</em> 26 (1): 201–22. <a href="https://doi.org/10.1177/0962280214543508">https://doi.org/10.1177/0962280214543508</a>.
 </div>
 <div id="ref-austin2020a" class="csl-entry">
 Austin, Peter C., and Guy Cafri. 2020. <span>“Variance Estimation When
@@ -1676,7 +1676,7 @@ Green, Kerry M., and Elizabeth A. Stuart. 2014. <span>“Examining
 Moderation Analyses in Propensity Score Methods:
 <span>Application</span> to Depression and Substance Use.”</span>
 <em>Journal of Consulting and Clinical Psychology</em>, Advances in
-<span>Data Analytic Methods</span>, 82 (5): 773–83. <a href="https://doi.org/10.1037/a0036515">https://doi.org/10.1037/a0036515</a>.
+<span>Data Analytic Methods</span>, vol. 82 (5): 773–83. <a href="https://doi.org/10.1037/a0036515">https://doi.org/10.1037/a0036515</a>.
 </div>
 <div id="ref-greiferChoosingEstimandWhen2021" class="csl-entry">
 Greifer, Noah, and Elizabeth A. Stuart. 2021. <span>“Choosing the
@@ -1704,7 +1704,7 @@ Data.”</span> <em>Journal of Educational and Behavioral Statistics</em>
 <div id="ref-king2015" class="csl-entry">
 King, Gary, and Margaret E. Roberts. 2015. <span>“How Robust Standard
 Errors Expose Methodological Problems They Do Not Fix, and What to Do
-About It.”</span> <em>Political Analysis</em> 23 (2): 159–79. <a href="https://doi.org/10.1093/pan/mpu015">https://doi.org/10.1093/pan/mpu015</a>.
+about It.”</span> <em>Political Analysis</em> 23 (2): 159–79. <a href="https://doi.org/10.1093/pan/mpu015">https://doi.org/10.1093/pan/mpu015</a>.
 </div>
 <div id="ref-kreifMethodsEstimatingSubgroup2012" class="csl-entry">
 Kreif, Noemi, Richard Grieve, Rosalba Radice, Zia Sadique, Roland
@@ -1728,8 +1728,7 @@ Finite Sample Properties.”</span> <em>Journal of Econometrics</em> 29
 (3): 305–25. <a href="https://doi.org/10.1016/0304-4076(85)90158-7">https://doi.org/10.1016/0304-4076(85)90158-7</a>.
 </div>
 <div id="ref-nguyen2017" class="csl-entry">
-Nguyen, Tri-Long, Gary S. Collins, Jessica Spence, Jean-Pierre Daurès,
-P. J. Devereaux, Paul Landais, and Yannick Le Manach. 2017.
+Nguyen, Tri-Long, Gary S. Collins, Jessica Spence, et al. 2017.
 <span>“Double-Adjustment in Propensity Score Matching Analysis: Choosing
 a Threshold for Considering Residual Imbalance.”</span> <em>BMC Medical
 Research Methodology</em> 17: 78. <a href="https://doi.org/10.1186/s12874-017-0338-0">https://doi.org/10.1186/s12874-017-0338-0</a>.
@@ -1741,7 +1740,7 @@ Example.”</span> <em>Psychological Methods</em> 13 (4): 279–313. <a href="ht
 </div>
 <div id="ref-snowdenImplementationGComputationSimulated2011" class="csl-entry">
 Snowden, Jonathan M., Sherri Rose, and Kathleen M. Mortimer. 2011.
-<span>“Implementation of G-Computation on a Simulated Data Set:
+<span>“Implementation of g-Computation on a Simulated Data Set:
 Demonstration of a Causal Inference Technique.”</span> <em>American
 Journal of Epidemiology</em> 173 (7): 731–38. <a href="https://doi.org/10.1093/aje/kwq472">https://doi.org/10.1093/aje/kwq472</a>.
 </div>
@@ -1751,11 +1750,10 @@ Propensity<span>-</span>Score<span></span>matched Data?”</span>
 <em>Statistics in Medicine</em> 38 (2): 289–300. <a href="https://doi.org/10.1002/sim.7976">https://doi.org/10.1002/sim.7976</a>.
 </div>
 <div id="ref-wangRelativePerformancePropensity2018" class="csl-entry">
-Wang, Shirley V., Yinzhu Jin, Bruce Fireman, Susan Gruber, Mengdong He,
-Richard Wyss, HoJin Shin, et al. 2018. <span>“Relative
-<span>Performance</span> of <span>Propensity Score Matching
-Strategies</span> for <span>Subgroup Analyses</span>.”</span>
-<em>American Journal of Epidemiology</em> 187 (8): 1799–1807. <a href="https://doi.org/10.1093/aje/kwy049">https://doi.org/10.1093/aje/kwy049</a>.
+Wang, Shirley V., Yinzhu Jin, Bruce Fireman, et al. 2018.
+<span>“Relative <span>Performance</span> of <span>Propensity Score
+Matching Strategies</span> for <span>Subgroup Analyses</span>.”</span>
+<em>American Journal of Epidemiology</em> 187 (8): 1799–807. <a href="https://doi.org/10.1093/aje/kwy049">https://doi.org/10.1093/aje/kwy049</a>.
 </div>
 <div id="ref-westreich2013" class="csl-entry">
 Westreich, D., and S. Greenland. 2013. <span>“The Table 2 Fallacy:
@@ -1865,7 +1863,7 @@ may go below 0 or above 1; this is because an approximation is used. To
 avoid this problem, bootstrapping or simulation-based inference can be
 used instead.<a href="#fnref7" class="footnote-back">↩︎</a></p></li>
 <li id="fn8"><p>It is not immediately clear how to estimate a marginal
-HR when covariates are included in the outcome model; though <span class="citation">Austin, Thomas, and Rubin (<a href="#ref-austin2020">2020</a>)</span> describe several ways of
+HR when covariates are included in the outcome model; though <span class="citation">Austin et al. (<a href="#ref-austin2020">2020</a>)</span> describe several ways of
 including covariates in a model to estimate the marginal HR, they do not
 develop SEs and little research has been done on this method, so we will
 not present it here. Instead, we fit a simple Cox model with the

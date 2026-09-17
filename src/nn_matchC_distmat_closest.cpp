@@ -3,8 +3,6 @@
 #include "internal.h"
 using namespace Rcpp;
 
-// [[Rcpp::plugins(cpp11)]]
-
 // [[Rcpp::export]]
 IntegerMatrix nn_matchC_distmat_closest(const IntegerVector& treat,
                                         const IntegerVector& ratio,
@@ -85,52 +83,42 @@ IntegerMatrix nn_matchC_distmat_closest(const IntegerVector& treat,
   // Output matrix with sample indices of control units
   IntegerMatrix mm(nf, max_ratio);
   mm.fill(NA_INTEGER);
-  CharacterVector lab = treat.names();
 
-  Function o("order");
+  //Next column to fill in each row of `mm`. Tracked rather than recomputed with
+  //`sum(!is_na(mm(row, _)))`, which allocates twice for every match written.
+  std::vector<int> mm_filled(mm.nrow(), 0);
+
+  const CharacterVector lab = treat.names();
+
+  //`base::order()`'s radix sort beats every C++ alternative measured here by 3-8x at
+  //these sizes; see _dev/cpp-cleanup-notes.md. Looked up in the base environment
+  //because `Function("order")` searches from the global environment, where a user
+  //object of that name would mask it.
+  Function o = Environment::base_env()["order"];
+
+  //`as<>()` on a `Nullable` wraps the caller's SEXP rather than copying it, so every
+  //object taken from an argument below is `const`. Writing through one of them would
+  //modify the R object the caller passed in, and the change would outlive the call.
 
   //exact
-  bool use_exact = false;
-  IntegerVector exact;
-  if (exact_.isNotNull()) {
-    exact = as<IntegerVector>(exact_);
-    use_exact = true;
-  }
-
-  //caliper_dist
-  double caliper_dist;
-  if (caliper_dist_.isNotNull()) {
-    caliper_dist = as<double>(caliper_dist_);
-  }
-  else {
-    caliper_dist = max_finite(distance_mat) + .1;
-  }
+  const bool use_exact = exact_.isNotNull();
+  const IntegerVector exact = use_exact ? as<IntegerVector>(exact_) : IntegerVector(0);
 
   //caliper_covs
-  NumericVector caliper_covs;
-  NumericMatrix caliper_covs_mat;
-  int ncc = 0;
-  if (caliper_covs_.isNotNull()) {
-    caliper_covs = as<NumericVector>(caliper_covs_);
-    caliper_covs_mat = as<NumericMatrix>(caliper_covs_mat_);
-    ncc = caliper_covs_mat.ncol();
-  }
+  const NumericVector caliper_covs = caliper_covs_.isNotNull() ? as<NumericVector>(caliper_covs_) : NumericVector(0);
+  const NumericMatrix caliper_covs_mat = caliper_covs_.isNotNull() ? as<NumericMatrix>(caliper_covs_mat_) : NumericMatrix(0, 0);
+  const int ncc = caliper_covs_mat.ncol();
 
   //antiexact
-  IntegerMatrix antiexact_covs;
-  int aenc = 0;
-  if (antiexact_covs_.isNotNull()) {
-    antiexact_covs = as<IntegerMatrix>(antiexact_covs_);
-    aenc = antiexact_covs.ncol();
-  }
+  const IntegerMatrix antiexact_covs = antiexact_covs_.isNotNull() ? as<IntegerMatrix>(antiexact_covs_) : IntegerMatrix(0, 0);
+  const int aenc = antiexact_covs.ncol();
 
   //unit_id
-  IntegerVector unit_id;
-  bool use_unit_id = false;
-  if (unit_id_.isNotNull()) {
-    unit_id = as<IntegerVector>(unit_id_);
-    use_unit_id = true;
-  }
+  const bool use_unit_id = unit_id_.isNotNull();
+  const IntegerVector unit_id = use_unit_id ? as<IntegerVector>(unit_id_) : IntegerVector(0);
+
+  //caliper_dist
+  const double caliper_dist = caliper_dist_.isNotNull() ? as<double>(caliper_dist_) : max_finite(distance_mat) + .1;
 
   //storing closeness
   std::vector<int> t_id, c_id;
@@ -160,13 +148,15 @@ IntegerMatrix nn_matchC_distmat_closest(const IntegerVector& treat,
 
   IntegerVector::iterator ci;
 
-  std::function<bool(int, int)> cmp;
-  if (close) {
-    cmp = [&dist](const int& a, const int& b) {return dist[a] < dist[b];};
-  }
-  else {
-    cmp = [&dist](const int& a, const int& b) {return dist[a] >= dist[b];};
-  }
+  //One lambda rather than two wrapped in a `std::function`, so the comparison can
+  //be inlined into `std::lower_bound()` below
+  auto cmp = [&dist, close](const int& a, const int& b) {
+    if (close) {
+      return dist[a] < dist[b];
+    }
+
+    return dist[a] >= dist[b];
+  };
 
   for (r = 1; r <= max_ratio; r++) {
     for (int ti : ind_focal) {
@@ -279,7 +269,7 @@ IntegerMatrix nn_matchC_distmat_closest(const IntegerVector& treat,
         continue;
       }
 
-      mm(t_id_t_i, sum(!is_na(mm(t_id_t_i, _)))) = c_id_i;
+      mm(t_id_t_i, mm_filled[t_id_t_i]++) = c_id_i;
 
       ck_ = {c_id_i, t_id_i};
 

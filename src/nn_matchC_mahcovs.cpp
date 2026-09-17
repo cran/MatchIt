@@ -3,24 +3,22 @@
 #include "internal.h"
 using namespace Rcpp;
 
-// [[Rcpp::plugins(cpp11)]]
-
 // [[Rcpp::export]]
-IntegerMatrix nn_matchC_mahcovs(const IntegerVector& treat_,
-                                const IntegerVector& ord,
-                                const IntegerVector& ratio,
-                                const LogicalVector& discarded,
-                                const int& reuse_max,
-                                const int& focal_,
-                                const NumericMatrix& mah_covs,
-                                const Nullable<NumericVector>& distance_ = R_NilValue,
-                                const Nullable<IntegerMatrix>& exact_ = R_NilValue,
-                                const Nullable<double>& caliper_dist_ = R_NilValue,
-                                const Nullable<NumericVector>& caliper_covs_ = R_NilValue,
-                                const Nullable<NumericMatrix>& caliper_covs_mat_ = R_NilValue,
-                                const Nullable<IntegerMatrix>& antiexact_covs_ = R_NilValue,
-                                const Nullable<IntegerVector>& unit_id_ = R_NilValue,
-                                const bool& disl_prog = false) {
+IntegerMatrix nn_matchC_mahcovs(const IntegerVector treat_,
+                                const IntegerVector ord,
+                                const IntegerVector ratio,
+                                const LogicalVector discarded,
+                                const int reuse_max,
+                                const int focal_,
+                                const NumericMatrix mah_covs,
+                                const Nullable<NumericVector> distance_ = R_NilValue,
+                                const Nullable<IntegerMatrix> exact_ = R_NilValue,
+                                const Nullable<double> caliper_dist_ = R_NilValue,
+                                const Nullable<NumericVector> caliper_covs_ = R_NilValue,
+                                const Nullable<NumericMatrix> caliper_covs_mat_ = R_NilValue,
+                                const Nullable<IntegerMatrix> antiexact_covs_ = R_NilValue,
+                                const Nullable<IntegerVector> unit_id_ = R_NilValue,
+                                const bool disl_prog = false) {
   IntegerVector unique_treat = unique(treat_);
   std::sort(unique_treat.begin(), unique_treat.end());
   int g = unique_treat.size();
@@ -87,96 +85,90 @@ IntegerMatrix nn_matchC_mahcovs(const IntegerVector& treat_,
   // Output matrix with sample indices of control units
   IntegerMatrix mm(nf, max_ratio);
   mm.fill(NA_INTEGER);
-  CharacterVector lab = treat_.names();
 
-  Function o("order");
+  //Next column to fill in each row of `mm`. Tracked rather than recomputed with
+  //`sum(!is_na(mm(row, _)))`, which allocates twice for every match written.
+  std::vector<int> mm_filled(mm.nrow(), 0);
 
+  const CharacterVector lab = treat_.names();
 
+  //`base::order()`'s radix sort beats every C++ alternative measured here by 3-8x at
+  //these sizes; see _dev/cpp-cleanup-notes.md. Looked up in the base environment
+  //because `Function("order")` searches from the global environment, where a user
+  //object of that name would mask it.
+  Function o = Environment::base_env()["order"];
+
+  //`as<>()` on a `Nullable` wraps the caller's SEXP rather than copying it, so every
+  //object taken from an argument below is `const`. Writing through one of them would
+  //modify the R object the caller passed in, and the change would outlive the call.
 
   //exact
-  bool use_exact = false;
-  IntegerVector exact;
-  if (exact_.isNotNull()) {
-    exact = as<IntegerVector>(exact_);
-    use_exact = true;
-  }
+  const bool use_exact = exact_.isNotNull();
+  const IntegerVector exact = use_exact ? as<IntegerVector>(exact_) : IntegerVector(0);
 
   //distance & caliper_dist
-  bool use_caliper_dist = false;
-  double caliper_dist;
-  NumericVector distance;
-  if (caliper_dist_.isNotNull() && distance_.isNotNull()) {
-    distance = as<NumericVector>(distance_);
-    caliper_dist = as<double>(caliper_dist_);
-    use_caliper_dist = true;
-  }
+  const bool use_caliper_dist = caliper_dist_.isNotNull() && distance_.isNotNull();
+  const NumericVector distance = use_caliper_dist ? as<NumericVector>(distance_) : NumericVector(0);
+  const double caliper_dist = use_caliper_dist ? as<double>(caliper_dist_) : R_PosInf;
 
   //caliper_covs
-  NumericVector caliper_covs;
-  NumericMatrix caliper_covs_mat;
-  int ncc = 0;
-  if (caliper_covs_.isNotNull()) {
-    caliper_covs = as<NumericVector>(caliper_covs_);
-    caliper_covs_mat = as<NumericMatrix>(caliper_covs_mat_);
-    ncc = caliper_covs_mat.ncol();
-  }
+  const NumericVector caliper_covs = caliper_covs_.isNotNull() ? as<NumericVector>(caliper_covs_) : NumericVector(0);
+  const NumericMatrix caliper_covs_mat = caliper_covs_.isNotNull() ? as<NumericMatrix>(caliper_covs_mat_) : NumericMatrix(0, 0);
+  const int ncc = caliper_covs_mat.ncol();
 
   //antiexact
-  IntegerMatrix antiexact_covs;
-  int aenc = 0;
-  if (antiexact_covs_.isNotNull()) {
-    antiexact_covs = as<IntegerMatrix>(antiexact_covs_);
-    aenc = antiexact_covs.ncol();
-  }
-
-  //reuse_max
-  bool use_reuse_max = (reuse_max < nf);
+  const IntegerMatrix antiexact_covs = antiexact_covs_.isNotNull() ? as<IntegerMatrix>(antiexact_covs_) : IntegerMatrix(0, 0);
+  const int aenc = antiexact_covs.ncol();
 
   //unit_id
-  IntegerVector unit_id;
-  bool use_unit_id = false;
-  if (unit_id_.isNotNull()) {
-    unit_id = as<IntegerVector>(unit_id_);
-    use_unit_id = true;
-    use_reuse_max = true;
-  }
+  const bool use_unit_id = unit_id_.isNotNull();
+  const IntegerVector unit_id = use_unit_id ? as<IntegerVector>(unit_id_) : IntegerVector(0);
 
-  // Matching variable: if any mah_covs equal to caliper_covs, use
-  // that caliper_covs and caliper as matching variable
-  NumericVector match_var;
+  //reuse_max
+  const bool use_reuse_max = use_unit_id || (reuse_max < nf);
+
+  //Matching variable: when a caliper covariate is an affine transformation of one of
+  //the `mah_covs` columns, sorting on that column lets the scan in
+  //`find_control_mahcovs()` stop as soon as the caliper is exceeded. Only the caliper
+  //is converted to that column's scale, and only for this function's own use; the
+  //caliper is still enforced on its own scale by `caliper_covs_okay()`, and
+  //`caliper_covs` and `caliper_covs_mat` belong to the caller and are left alone.
+  const int n_mah_covs = mah_covs.ncol();
+  int match_var_col = 0;
   double match_var_caliper = R_PosInf;
-  int n_mah_covs = mah_covs.ncol();
-  if (ncc > 0) {
-    double a;
-    for (int mci = 0; match_var.size() == 0 && mci < n_mah_covs; mci++) {
-      for (int cci = 0; match_var.size() == 0 && cci < ncc; cci++) {
-        if (caliper_covs[cci] < 0) {
-          continue;
-        }
+  bool match_var_found = false;
 
-        a = get_affine_transformation(caliper_covs_mat.column(cci),
-                                      mah_covs.column(mci));
-
-        if (std::abs(a) > 1e-10) {
-          caliper_covs_mat.column(cci) = mah_covs.column(mci);
-          caliper_covs[cci] *= a;
-
-          match_var = mah_covs.column(mci);
-          match_var_caliper = caliper_covs[cci];
-        }
+  for (int mci = 0; !match_var_found && mci < n_mah_covs; mci++) {
+    for (int cci = 0; cci < ncc; cci++) {
+      if (caliper_covs[cci] < 0) {
+        continue;
       }
+
+      double a = get_affine_transformation(caliper_covs_mat.column(cci),
+                                           mah_covs.column(mci));
+
+      if (std::abs(a) <= 1e-10) {
+        continue;
+      }
+
+      match_var_col = mci;
+      match_var_caliper = std::abs(a) * caliper_covs[cci];
+      match_var_found = true;
+      break;
     }
   }
 
-  if (match_var.size() == 0) {
-    match_var = mah_covs.column(0);
-  }
+  const NumericVector match_var = mah_covs.column(match_var_col);
 
   IntegerVector ind_d_ord = o(match_var);
   ind_d_ord = ind_d_ord - 1; //location of each unit after sorting
 
-  IntegerVector match_d_ord = o(ind_d_ord);
-  match_d_ord = match_d_ord - 1;
+  //`ind_d_ord` is a permutation, so its order is just its inverse; computing that
+  //directly avoids a second call into R
+  IntegerVector match_d_ord(n);
+  for (i = 0; i < n; i++) {
+    match_d_ord[ind_d_ord[i]] = static_cast<int>(i);
+  }
 
   IntegerVector matches_i(1 + max_ratio * (g - 1));
   int k_total;
@@ -211,7 +203,17 @@ IntegerMatrix nn_matchC_mahcovs(const IntegerVector& treat_,
           Rcpp::checkUserInterrupt();
         }
 
-        if (max(as<IntegerVector>(n_eligible[g_c])) == 0) {
+        //Any control group left with eligible units? Checked with a loop because
+        //`max(as<IntegerVector>(n_eligible[g_c]))` allocates twice per unit.
+        bool any_eligible = false;
+        for (int gj : g_c) {
+          if (n_eligible[gj] > 0) {
+            any_eligible = true;
+            break;
+          }
+        }
+
+        if (!any_eligible) {
           break;
         }
 
@@ -267,7 +269,7 @@ IntegerMatrix nn_matchC_mahcovs(const IntegerVector& treat_,
         }
 
         for (c = 0; c < k_total; c++) {
-          mm(t_id_t_i, sum(!is_na(mm(t_id_t_i, _)))) = matches_i[c];
+          mm(t_id_t_i, mm_filled[t_id_t_i]++) = matches_i[c];
         }
 
         matches_i[k_total] = t_id_i;
@@ -356,7 +358,7 @@ IntegerMatrix nn_matchC_mahcovs(const IntegerVector& treat_,
       }
 
       for (c = 0; c < k_total; c++) {
-        mm(t_id_t_i, sum(!is_na(mm(t_id_t_i, _)))) = matches_i[c];
+        mm(t_id_t_i, mm_filled[t_id_t_i]++) = matches_i[c];
       }
     }
   }

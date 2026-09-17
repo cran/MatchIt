@@ -1,6 +1,6 @@
 #' Nearest Neighbor Matching
 #' @name method_nearest
-#' @aliases method_nearest
+#'
 #' @usage NULL
 #'
 #' @description
@@ -39,85 +39,58 @@
 #'         verbose = FALSE,
 #'         ...) }
 #'
-#' @param formula a two-sided [formula] object containing the treatment and
-#' covariates to be used in creating the distance measure used in the matching.
-#' @param data a data frame containing the variables named in `formula`.
-#' If not found in `data`, the variables will be sought in the
-#' environment.
-#' @param method set here to `"nearest"`.
-#' @param distance the distance measure to be used. See [`distance`]
-#' for allowable options. Can be supplied as a distance matrix.
-#' @param link when `distance` is specified as a method of estimating
-#' propensity scores, an additional argument controlling the link function used
-#' in estimating the distance measure. See [`distance`] for allowable
-#' options with each option.
-#' @param distance.options a named list containing additional arguments
-#' supplied to the function that estimates the distance measure as determined
-#' by the argument to `distance`.
-#' @param estimand a string containing the desired estimand. Allowable options
-#' include `"ATT"` and `"ATC"`. See Details.
-#' @param exact for which variables exact matching should take place; two units with different values of an exact matching variable will not be paired.
-#' @param mahvars for which variables Mahalanobis distance matching should take
-#' place when `distance` corresponds to a propensity score (e.g., for
-#' caliper matching or to discard units for common support). If specified, the
-#' distance measure will not be used in matching.
-#' @param antiexact for which variables anti-exact matching should take place; two units with the same value of an anti-exact matching variable will not be paired.
-#' @param discard a string containing a method for discarding units outside a
-#' region of common support. Only allowed when `distance` corresponds to a
-#' propensity score.
-#' @param reestimate if `discard` is not `"none"`, whether to
-#' re-estimate the propensity score in the remaining sample prior to matching.
-#' @param s.weights the variable containing sampling weights to be incorporated
-#' into propensity score models and balance statistics.
-#' @param replace whether matching should be done with replacement (i.e., whether control units can be used as matches multiple times). See also the `reuse.max` argument below. Default is `FALSE` for matching without replacement.
-#' @param m.order the order that the matching takes place. Allowable options
-#'   include `"largest"`, where matching takes place in descending order of
-#'   distance measures; `"smallest"`, where matching takes place in ascending
-#'   order of distance measures; `"closest"`, where matching takes place in
-#'   ascending order of the smallest distance between units; `"farthest"`, where matching takes place in
-#'   descending order of the smallest distance between units; `"random"`, where matching takes place
-#'   in a random order; and `"data"` where matching takes place based on the
-#'   order of units in the data. When `m.order = "random"`, results may differ
-#'   across different runs of the same code unless a seed is set and specified
-#'   with [set.seed()]. The default of `NULL` corresponds to `"largest"` when a
-#'   propensity score is estimated or supplied as a vector and `"data"`
-#'   otherwise. See Details for more information.
-#' @param caliper the width(s) of the caliper(s) used for caliper matching. Two units with a difference on a caliper variable larger than the caliper will not be paired. See Details and Examples.
-#' @param std.caliper `logical`; when calipers are specified, whether they
-#' are in standard deviation units (`TRUE`) or raw units (`FALSE`).
-#' @param ratio how many control units should be matched to each treated unit
-#' for k:1 matching. For variable ratio matching, see section "Variable Ratio
-#' Matching" in Details below. When `ratio` is greater than 1, all treated units will be attempted to be matched with a control unit before any treated unit is matched with a second control unit, etc. This reduces the possibility that control units will be used up before some treated units receive any matches.
-#' @param min.controls,max.controls for variable ratio matching, the minimum
-#' and maximum number of controls units to be matched to each treated unit. See
-#' section "Variable Ratio Matching" in Details below.
-#' @param verbose `logical`; whether information about the matching
-#' process should be printed to the console. When `TRUE`, a progress bar
-#' implemented using *RcppProgress* will be displayed along with an estimate of the time remaining.
-#' @param \dots additional arguments that control the matching specification:
-#' \describe{
-#' \item{`reuse.max`}{ `numeric`; the maximum number of
-#' times each control can be used as a match. Setting `reuse.max = 1`
-#' corresponds to matching without replacement (i.e., `replace = FALSE`),
-#' and setting `reuse.max = Inf` corresponds to traditional matching with
-#' replacement (i.e., `replace = TRUE`) with no limit on the number of
-#' times each control unit can be matched. Other values restrict the number of
-#' times each control can be matched when matching with replacement.
-#' `replace` is ignored when `reuse.max` is specified.  }
-#' \item{`unit.id`}{ one or more variables containing a unit ID for each
-#' observation, i.e., in case multiple observations correspond to the same
-#' unit. Once a control observation has been matched, no other observation with
-#' the same unit ID can be used as matches. This ensures each control unit is
-#' used only once even if it has multiple observations associated with it.
-#' Omitting this argument is the same as giving each observation a unique ID.}
+#' @section Arguments:
+#' @section Arguments:
+#' \tabular{ll}{
+#'   `formula` \tab a two-sided [formula] object containing the treatment and covariates to be used in creating the distance measure used in the matching. \cr
+#'   `data` \tab a data frame containing the variables named in `formula`. If not found in `data`, the variables will be sought in the environment. \cr
+#'   `method` \tab set here to `"nearest"`. \cr
+#'   `distance` \tab the distance measure to be used. See [`distance`] for allowable options. Can be supplied as a distance matrix. \cr
+#'   `link` \tab when `distance` is specified as a method of estimating propensity scores, an additional argument controlling the link function used in estimating the distance measure. See [`distance`] for allowable options with each option. \cr
+#'   `distance.options` \tab a named list containing additional arguments supplied to the function that estimates the distance measure as determined by the argument to `distance`. \cr
+#'   `estimand` \tab a string containing the desired estimand. Allowable options include `"ATT"` and `"ATC"`. See Details. \cr
+#'   `exact` \tab for which variables exact matching should take place; two units with different values of an exact matching variable will not be paired. \cr
+#'   `mahvars` \tab for which variables Mahalanobis distance matching should take place when `distance` corresponds to a propensity score (e.g., for caliper matching or to discard units for common support). If specified, the distance measure will not be used in matching. \cr
+#'   `antiexact` \tab for which variables anti-exact matching should take place; two units with the same value of an anti-exact matching variable will not be paired. \cr
+#'   `discard` \tab a string containing a method for discarding units outside a region of common support. Only allowed when `distance` corresponds to a propensity score. \cr
+#'   `reestimate` \tab if `discard` is not `"none"`, whether to re-estimate the propensity score in the remaining sample prior to matching. \cr
+#'   `s.weights` \tab the variable containing sampling weights to be incorporated into propensity score models and balance statistics. \cr
+#'   `replace` \tab whether matching should be done with replacement (i.e., whether control units can be used as matches multiple times). See also the `reuse.max` argument below. Default is `FALSE` for matching without replacement. \cr
+#'   `m.order` \tab the order that the matching takes place. Allowable options include `"largest"`, where matching takes place in descending order of distance measures; `"smallest"`, where matching takes place in ascending order of distance measures; `"closest"`, where matching takes place in ascending order of the smallest distance between units; `"farthest"`, where matching takes place in descending order of the smallest distance between units; `"random"`, where matching takes place in a random order; and `"data"` where matching takes place based on the order of units in the data. When `m.order = "random"`, results may differ across different runs of the same code unless a seed is set and specified with [set.seed()]. The default of `NULL` corresponds to `"largest"` when a propensity score is estimated or supplied as a vector and `"data"` otherwise. See Details for more information. \cr
+#'   `caliper` \tab the width(s) of the caliper(s) used for caliper matching. Two units with a difference on a caliper variable larger than the caliper will not be paired. See Details and Examples. \cr
+#'   `std.caliper` \tab `logical`; when calipers are specified, whether they are in standard deviation units (`TRUE`) or raw units (`FALSE`). \cr
+#'   `ratio` \tab how many control units should be matched to each treated unit for k:1 matching. For variable ratio matching, see section "Variable Ratio Matching" in Details below. When `ratio` is greater than 1, all treated units will be attempted to be matched with a control unit before any treated unit is matched with a second control unit, etc. This reduces the possibility that control units will be used up before some treated units receive any matches. \cr
+#'   `min.controls`, `max.controls` \tab for variable ratio matching, the minimum and maximum number of controls units to be matched to each treated unit. See section "Variable Ratio Matching" in Details below. \cr
+#'   `verbose` \tab `logical`; whether information about the matching process should be printed to the console. When `TRUE`, a progress bar implemented using *RcppProgress* will be displayed along with an estimate of the time remaining. \cr
+#'   `...` \tab additional arguments that control the matching specification, described below. \cr
 #' }
+#'
+#' Arguments that can be supplied through `...`:
+#'
+#'   \itemize{
+#'   \item `reuse.max`: `numeric`; the maximum number of
+#'   times each control can be used as a match. Setting `reuse.max = 1`
+#'   corresponds to matching without replacement (i.e., `replace = FALSE`),
+#'   and setting `reuse.max = Inf` corresponds to traditional matching with
+#'   replacement (i.e., `replace = TRUE`) with no limit on the number of
+#'   times each control unit can be matched. Other values restrict the number of
+#'   times each control can be matched when matching with replacement.
+#'   `replace` is ignored when `reuse.max` is specified.
+#'   \item `unit.id`: one or more variables containing a unit ID for each
+#'   observation, i.e., in case multiple observations correspond to the same
+#'   unit. Once a control observation has been matched, no other observation with
+#'   the same unit ID can be used as matches. This ensures each control unit is
+#'   used only once even if it has multiple observations associated with it.
+#'   Omitting this argument is the same as giving each observation a unique ID.
+#'   }
+#'
 #'
 #' @section Outputs:
 #' All outputs described in [matchit()] are returned with
 #' `method = "nearest"`. When `replace = TRUE`, the `subclass`
 #' component is omitted. `include.obj` is ignored.
 #'
-#' @details
+#' @section Details:
 #' ## Mahalanobis Distance Matching
 #'
 #' Mahalanobis distance matching can be done one of two ways:
@@ -178,8 +151,7 @@
 #'
 #' ## Variable Ratio Matching
 #'
-#' `matchit()` can perform variable ratio "extremal" matching as described by Ming and Rosenbaum (2000; \doi{10.1111/j.0006-341X.2000.00118.x}). This
-#' method tends to result in better balance than fixed ratio matching at the
+#' `matchit()` can perform variable ratio "extremal" matching as described by Ming and Rosenbaum (2000; \doi{10.1111/j.0006-341X.2000.00118.x}). This method tends to result in better balance than fixed ratio matching at the
 #' expense of some precision. When `ratio > 1`, rather than requiring all
 #' treated units to receive `ratio` matches, each treated unit is assigned
 #' a value that corresponds to the number of control units they will be matched
@@ -217,16 +189,16 @@
 #'
 #' Nearest neighbor matching involves a random component only when `m.order = "random"` (or when the propensity is estimated using a method with randomness; see [`distance`] for details), so a seed must be set in that case using [set.seed()] to ensure reproducibility. Otherwise, it is purely deterministic, and any ties are broken based on the order in which the data appear.
 #'
-#' @seealso [matchit()] for a detailed explanation of the inputs and outputs of
+#' @seealso
+#' [matchit()] for a detailed explanation of the inputs and outputs of
 #' a call to `matchit()`.
 #'
-#' [method_optimal()] for optimal pair matching, which is similar to
+#' [`method_optimal`] for optimal pair matching, which is similar to
 #' nearest neighbor matching without replacement except that an overall distance criterion is
 #' minimized (i.e., as an alternative to specifying `m.order`).
 #'
-#' @references In a manuscript, you don't need to cite another package when
-#' using `method = "nearest"` because the matching is performed completely
-#' within *MatchIt*. For example, a sentence might read:
+#' @references
+#' In a manuscript, you don't need to cite another package when using `method = "nearest"` because the matching is performed completely within *MatchIt*. For example, a sentence might read:
 #'
 #' *Nearest neighbor matching was performed using the MatchIt package (Ho, Imai, King, & Stuart, 2011) in R.*
 #'
@@ -290,8 +262,7 @@ matchit2nearest <- function(treat, data, distance, discarded,
 
   .cat_verbose("Nearest neighbor matching... \n", verbose = verbose)
 
-  estimand <- toupper(estimand)
-  estimand <- match_arg(estimand, c("ATT", "ATC"))
+  estimand <- arg::match_arg(estimand, c("ATT", "ATC"))
 
   if (estimand == "ATC") {
     tc <- c("control", "treated")
@@ -306,8 +277,7 @@ matchit2nearest <- function(treat, data, distance, discarded,
 
   if (is.full.mahalanobis) {
     if (is_null(attr(terms(formula, data = data), "term.labels"))) {
-      .err(sprintf("covariates must be specified in the input formula when `distance = %s`",
-                   add_quotes(attr(is.full.mahalanobis, "transform"))))
+      arg::err('covariates must be specified in the input formula when {.code distance = {.str {attr(is.full.mahalanobis, "transform")}}}')
     }
     mahvars <- formula
   }
@@ -321,10 +291,7 @@ matchit2nearest <- function(treat, data, distance, discarded,
 
   mahcovs <- distance_mat <- NULL
   if (is_not_null(mahvars)) {
-    transform <- {
-      if (is.full.mahalanobis) attr(is.full.mahalanobis, "transform")
-      else "mahalanobis"
-    }
+    transform <- attr(is.full.mahalanobis, "transform") %or% "mahalanobis"
 
     mahcovs <- transform_covariates(mahvars, data = data, method = transform,
                                     s.weights = s.weights, treat = treat,
@@ -424,6 +391,8 @@ matchit2nearest <- function(treat, data, distance, discarded,
     unit.id <- NULL
   }
 
+  unit_text <- if (is_null(unit.id)) "units" else "unit IDs"
+
   #Process exact
   ex <- NULL
   if (is_not_null(exact)) {
@@ -435,7 +404,7 @@ matchit2nearest <- function(treat, data, distance, discarded,
     cc <- Reduce("intersect", lapply(unique(treat), function(t) unclass(ex)[treat == t]))
 
     if (is_null(cc)) {
-      .err("no matches were found")
+      arg::err("no matches were found")
     }
 
     cc <- sort(cc)
@@ -453,18 +422,18 @@ matchit2nearest <- function(treat, data, distance, discarded,
         }
 
         if (!w1 && e_ratio < 1) {
-          .wrn(sprintf("fewer %s %s than %s units in some `exact` strata; not all %s units will get a match",
-                       tc[2L], if (is_null(unit.id)) "units" else "unit IDs", tc[1L], tc[1L]))
+          arg::wrn("fewer {tc[2L]} {unit_text} than {tc[1L]} units in some {.arg exact} strata; not all {tc[1L]} units will get a match")
           w1 <- TRUE
         }
 
         if (!w2 && ratio > 1 && e_ratio < ratio) {
-          if (is_null(max.controls) || ratio == max.controls)
-            .wrn(sprintf("not all %s units will get %s matches",
-                         tc[1L], ratio))
-          else
-            .wrn(sprintf("not enough %s %s for an average of %s matches per %s unit in all `exact` strata",
-                         tc[2L], if (is_null(unit.id)) "units" else "unit IDs", ratio, tc[1L]))
+          if (is_null(max.controls) || ratio == max.controls) {
+            arg::wrn("not all {tc[1L]} units will get {ratio} matches")
+          }
+          else {
+            arg::wrn("not enough {tc[2L]} {unit_text} for an average of {ratio} matches per {tc[1L]} unit in all {.arg exact} strata")
+          }
+
           w2 <- TRUE
         }
 
@@ -480,16 +449,15 @@ matchit2nearest <- function(treat, data, distance, discarded,
       }
 
       if (e_ratio < 1) {
-        .wrn(sprintf("fewer %s %s than %s units; not all %s units will get a match",
-                     tc[2L], if (is_null(unit.id)) "units" else "unit IDs", tc[1L], tc[1L]))
+        arg::wrn("fewer {tc[2L]} {unit_text} than {tc[1L]} units; not all {tc[1L]} units will get a match")
       }
       else if (e_ratio < ratio) {
-        if (is_null(max.controls) || ratio == max.controls)
-          .wrn(sprintf("not all %s units will get %s matches",
-                       tc[1], ratio))
-        else
-          .wrn(sprintf("not enough %s %s for an average of %s matches per %s unit",
-                       tc[2L], if (is_null(unit.id)) "units" else "unit IDs", ratio, tc[1L]))
+        if (is_null(max.controls) || ratio == max.controls) {
+          arg::wrn("not all {tc[1]} units will get {ratio} matches")
+        }
+        else {
+          arg::wrn("not enough {tc[2L]} {unit_text} for an average of {ratio} matches per {tc[1L]} unit")
+        }
       }
     }
   }
@@ -499,11 +467,10 @@ matchit2nearest <- function(treat, data, distance, discarded,
   if (is_not_null(max.controls)) {
     if (is_null(distance)) {
       if (is.full.mahalanobis) {
-        .err(sprintf('`distance` cannot be "%s" for variable ratio nearest neighbor matching',
-                     transform))
+        arg::err("{.arg distance} cannot be {.val {transform}} for variable ratio nearest neighbor matching")
       }
       else {
-        .err("`distance` cannot be supplied as a matrix for variable ratio nearest neighbor matching")
+        arg::err("{.arg distance} cannot be supplied as a matrix for variable ratio nearest neighbor matching")
       }
     }
 
@@ -540,9 +507,9 @@ matchit2nearest <- function(treat, data, distance, discarded,
   }
 
   m.order <- {
-    if (is_null(distance)) match_arg(m.order, c("data", "random", "closest", "farthest"))
+    if (is_null(distance)) arg::match_arg(m.order, c("data", "random", "closest", "farthest"))
     else if (is_null(m.order)) switch(estimand, "ATC" = "smallest", "largest")
-    else match_arg(m.order, c("largest", "smallest", "data", "random", "closest", "farthest"))
+    else arg::match_arg(m.order, c("largest", "smallest", "data", "random", "closest", "farthest"))
   }
 
   #If mahcovs is only 1 variable, use vec matching for speed
@@ -613,7 +580,6 @@ matchit2nearest <- function(treat, data, distance, discarded,
       }
 
       ratio_ <- ratio[.e1]
-
       mm_ <- nn_matchC_dispatch(treat_, 1L, ratio_, discarded_, reuse.max, distance_, distance_mat_,
                                 ex.caliper_, caliper.dist, caliper.covs, caliper.covs.mat_, mahcovs_,
                                 antiexactcovs_, NULL, m.order, verbose)
@@ -624,9 +590,9 @@ matchit2nearest <- function(treat, data, distance, discarded,
     })
 
     #Construct match.matrix
-    mm <- matrix(NA_integer_, nrow = n1,
-                 ncol = max(vapply(mm_list, ncol, numeric(1L))),
-                 dimnames = list(names(treat)[treat == 1], NULL))
+    mm <- make_matrix(max(vapply(mm_list, ncol, numeric(1L))),
+                      nrow = names(treat)[treat == 1],
+                      type = "integer")
 
     for (m in mm_list) {
       mm[rownames(m), seq_len(ncol(m))] <- m
