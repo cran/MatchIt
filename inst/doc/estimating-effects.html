@@ -12,7 +12,7 @@
 
 <meta name="author" content="Noah Greifer" />
 
-<meta name="date" content="2026-09-16" />
+<meta name="date" content="2026-09-26" />
 
 <title>Estimating Effects After Matching</title>
 
@@ -363,7 +363,7 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 
 <h1 class="title toc-ignore">Estimating Effects After Matching</h1>
 <h4 class="author">Noah Greifer</h4>
-<h4 class="date">2026-09-16</h4>
+<h4 class="date">2026-09-26</h4>
 
 
 <div id="TOC">
@@ -457,7 +457,7 @@ is the default). The average treatment effect in the population (ATE) is
 the average effect of treatment for the population from which the sample
 is a random sample. This estimand is estimable only for methods that
 allow the ATE and either do not discard units from the sample or
-explicit target full sample balance, which in <code>MatchIt</code> is
+explicit target full sample balance, which in <em>MatchIt</em> is
 limited to full matching, subclassification, and profile matching when
 setting <code>estimand = &quot;ATE&quot;</code>. When treated units are discarded
 (e.g., through the use of common support restrictions, calipers,
@@ -713,19 +713,17 @@ survival outcome.</p>
 <p>We will need to the following packages to perform the desired
 analyses:</p>
 <ul>
-<li><code>marginaleffects</code> provides the
-<code>avg_comparisons()</code> function for performing g-computation and
-estimating the SEs and confidence intervals of the average estimate
-potential outcomes and treatment effects</li>
-<li><code>sandwich</code> is used internally by
-<code>marginaleffects</code> to compute robust and cluster-robust
-SEs</li>
-<li><code>survival</code> provides <code>coxph()</code> to estimate the
+<li><em>marginaleffects</em> provides the <code>avg_comparisons()</code>
+function for performing g-computation and estimating the SEs and
+confidence intervals of the average estimate potential outcomes and
+treatment effects</li>
+<li><em>sandwich</em> is used internally by <em>marginaleffects</em> to
+compute robust and cluster-robust SEs</li>
+<li><em>survival</em> provides <code>coxph()</code> to estimate the
 coefficients in a Cox-proportional hazards model for the marginal hazard
 ratio, which we will use for survival outcomes.</li>
 </ul>
-<p>Of course, we also need <code>MatchIt</code> to perform the
-matching.</p>
+<p>Of course, we also need <em>MatchIt</em> to perform the matching.</p>
 <div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a><span class="fu">library</span>(<span class="st">&quot;MatchIt&quot;</span>)</span>
 <span id="cb3-2"><a href="#cb3-2" tabindex="-1"></a><span class="fu">library</span>(<span class="st">&quot;marginaleffects&quot;</span>)</span></code></pre></div>
 <p>All effect estimates will be computed using
@@ -740,10 +738,10 @@ other coefficients; it automatically incorporates robust and
 cluster-robust SEs if requested; and it always produces average marginal
 effects for the correct population if requested.</p>
 <p>Other packages may be of use but are not used here. There are
-alternatives to the <code>marginaleffects</code> package for computing
-average marginal effects, including <code>margins</code> and
-<code>stdReg</code>. The <code>survey</code> package can be used to
-estimate robust SEs incorporating weights and provides functions for
+alternatives to the <em>marginaleffects</em> package for computing
+average marginal effects, including <em>margins</em> and
+<em>stdReg2</em>. The <em>survey</em> package can be used to estimate
+robust SEs incorporating weights and provides functions for
 survey-weighted generalized linear models and Cox-proportional hazards
 models.</p>
 <div id="the-standard-case" class="section level3">
@@ -1059,7 +1057,7 @@ described.</p>
 the coefficient on treatment in a Cox model fit without covariates<a href="#fn8" class="footnote-ref" id="fnref8"><sup>8</sup></a>. This
 means that we cannot use the procedures from the Standard Case. Here we
 describe estimating the marginal HR using <code>coxph()</code> from the
-<code>survival</code> package. (See
+<em>survival</em> package. (See
 <code>help(&quot;coxph&quot;, package = &quot;survival&quot;)</code> for more information on
 this model.) To request cluster-robust SEs as recommended by <span class="citation">Austin (<a href="#ref-austin2013a">2013b</a>)</span>,
 we need to supply pair membership (stored in the <code>subclass</code>
@@ -1139,7 +1137,7 @@ the bootstrap: 1) the standard bootstrap, which involve resampling units
 and performing matching and effect estimation within each bootstrap
 sample, and 2) the cluster bootstrap, which involves resampling pairs
 after matching and estimating the effect in each bootstrap sample. For
-both, we will use functionality in the <code>boot</code> package. It is
+both, we will use functionality in the <em>boot</em> package. It is
 critical to set a seed using <code>set.seed()</code> prior to performing
 the bootstrap in order for results to be replicable.</p>
 <div id="the-standard-bootstrap" class="section level4">
@@ -1407,7 +1405,7 @@ subgroups. The easiest way to check subgroup balance would be to use
 argument that can be used to assess balance within subgroups, e.g., by
 <code>cobalt::bal.tab(mP, cluster = &quot;X5&quot;)</code>. See the vignette
 “Appendix 2: Using cobalt with Clustered, Multiply Imputed, and Other
-Segmented Data” on the <code>cobalt</code> <a href="https://ngreifer.github.io/cobalt/index.html">website</a> for
+Segmented Data” on the <em>cobalt</em> <a href="https://ngreifer.github.io/cobalt/index.html">website</a> for
 details.</p>
 <p>If we are satisfied with balance, we can then model the outcome with
 an interaction between the treatment and the moderator.</p>
@@ -1483,8 +1481,8 @@ the entire process of matching and effect estimation included in each
 replication)</li>
 <li>R packages and functions used in estimating the effect and its SE
 (e.g., <code>glm()</code> in base R, <code>avg_comparisons()</code> in
-<code>marginaleffects</code>, <code>boot()</code> and
-<code>boot.ci()</code> in <code>boot</code>)</li>
+<em>marginaleffects</em>, <code>boot()</code> and <code>boot.ci()</code>
+in <em>boot</em>)</li>
 <li>The effect and its SE and confidence interval</li>
 </ul>
 <p>All this is in addition to information about the matching method,
@@ -1527,7 +1525,7 @@ maximum likelihood are inaccurate when using matching weights because
 they assume weights are frequency weights rather than probability
 weights. Cluster-robust SEs account for both the matching weights and
 pair membership and should be used when appropriate. Sometimes,
-researchers use functions in the <code>survey</code> package to estimate
+researchers use functions in the <em>survey</em> package to estimate
 robust SEs, especially with inverse probability weighting; this is a
 valid way to compute robust SEs and will give similar results to
 <code>sandwich::vcovHC()</code>.<a href="#fn10" class="footnote-ref" id="fnref10"><sup>10</sup></a></p>
@@ -1871,9 +1869,9 @@ treatment as the sole predictor.<a href="#fnref8" class="footnote-back">↩︎</
 <li id="fn9"><p>For subclassification, only MMWS can be used; this is
 done simply by including the stratification weights in the Cox model and
 omitting the <code>cluster</code> argument.<a href="#fnref9" class="footnote-back">↩︎</a></p></li>
-<li id="fn10"><p>To use <code>survey</code> to adjust for pair
-membership, one can use the following code to specify the survey design
-to be used with <code>svyglm()</code>:
+<li id="fn10"><p>To use <em>survey</em> to adjust for pair membership,
+one can use the following code to specify the survey design to be used
+with <code>svyglm()</code>:
 <code>svydesign(ids = ~subclass, weights = ~weights, data = md)</code>
 where <code>md</code> is the output of <code>match_data()</code>. After
 <code>svyglm()</code>, <code>avg_comparisons()</code> can be used, and

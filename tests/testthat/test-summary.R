@@ -279,6 +279,155 @@ test_that("summary: the subclass argument selects which subclasses to report", {
   expect_length(summary(m, subclass = c(1, 3))$sum.subclass, 2L)
 })
 
+test_that("summary: subclass balance with interactions", {
+  m <- matchit(f_sum, data = lalonde, method = "subclass", subclass = 4)
+
+  s0 <- summary(m, subclass = TRUE)
+  s <- summary(m, subclass = TRUE, interactions = TRUE)
+
+  expect_named(s$sum.subclass, names(s0$sum.subclass))
+
+  for (sub in names(s$sum.subclass)) {
+    ss <- s$sum.subclass[[sub]]
+    ss0 <- s0$sum.subclass[[sub]]
+
+    expect_true(all(c("age²", "age * educ") %in% rownames(ss)))
+    expect_identical(colnames(ss), colnames(ss0))
+
+    #The main effects are unchanged by adding interactions
+    expect_equal(ss[rownames(ss0), ], ss0)
+
+    #The interactions are the ones reported in aggregate, which omit products that
+    #are identically zero or that repeat a dummy variable
+    expect_identical(rownames(ss), rownames(s$sum.across))
+    expect_false(any(c("married²", "raceblack * racehispan") %in% rownames(ss)))
+  }
+})
+
+test_that("summary: eCDF and eQQ statistics in a subclass where a covariate is 0/1 only", {
+  #`x` is not binary overall, but within subclass 1 it takes only 0 and 1, so that
+  #subclass reaches the binary shortcut in `qqsum()`. The distance places units with
+  #`ps < .5` in subclass 1, since the cutpoint is the median treated distance.
+  d <- data.frame(
+    treat = c(1, 1, 1, 1, 0, 0, 0, 0, 0,  1, 1, 1, 1, 0, 0, 0, 0, 0),
+    x     = c(1, 1, 1, 0, 0, 0, 1, 0, 1,  2, 3, 0, 1, 3, 1, 2, 0, 2),
+    ps    = c(.10, .15, .20, .25, .12, .18, .22, .28, .30,
+              .70, .75, .80, .85, .65, .72, .78, .90, .95)
+  )
+
+  m <- matchit(treat ~ x, data = d, method = "subclass", distance = d$ps,
+               subclass = 2)
+  expect_equal(as.integer(m$subclass), ifelse(d$ps < .5, 1L, 2L))
+
+  #Treated mean of `x` in subclass 1 is 3/4 and control mean is 2/5. For a 0/1
+  #variable, both the mean and the maximum eCDF or eQQ difference equal the
+  #difference in means.
+  expected <- abs(3 / 4 - 2 / 5)
+
+  s1 <- summary(m, subclass = TRUE)$sum.subclass[["Subclass 1"]]
+  expect_equal(s1["x", "eCDF Mean"], expected)
+  expect_equal(s1["x", "eCDF Max"], expected)
+
+  s1 <- summary(m, subclass = TRUE, standardize = FALSE)$sum.subclass[["Subclass 1"]]
+  expect_equal(s1["x", "eQQ Mean"], expected)
+  expect_equal(s1["x", "eQQ Max"], expected)
+})
+
+test_that("summary: the binary shortcut in qqsum() is the weighted difference in means", {
+  x <- c(0, 1, 1, 0, 1, 0)
+  t <- c(1, 1, 1, 0, 0, 0)
+  w <- c(1, 2, 3, 10, 20, 30)
+
+  #Treated: (0*1 + 1*2 + 1*3) / 6; control: (0*10 + 1*20 + 0*30) / 60. The groups'
+  #weights are on different scales, which the weighted means absorb.
+  expected <- abs(5 / 6 - 1 / 3)
+
+  expect_equal(qqsum(x, t, w), c(meandiff = expected, maxdiff = expected))
+  expect_equal(qqsum(x, t, w, standardize = TRUE), c(meandiff = expected, maxdiff = expected))
+})
+
+test_that("summary: eCDF statistics within a subclass use the sampling weights", {
+  #The distance places units with `ps < .5` in subclass 1, since the cutpoint is the
+  #median treated distance.
+  d <- data.frame(
+    treat = c(1, 1, 1, 0, 0, 0, 0,  1, 1, 1, 0, 0, 0, 0),
+    x     = c(1, 2, 3, 1, 1, 2, 3,  2, 3, 4, 1, 3, 4, 4),
+    sw    = c(1, 1, 2, 1, 3, 2, 2,  1, 2, 1, 2, 1, 1, 3),
+    ps    = c(.10, .20, .30, .12, .18, .22, .28,
+              .70, .80, .90, .65, .75, .85, .95)
+  )
+
+  m <- matchit(treat ~ x, data = d, method = "subclass", distance = d$ps,
+               subclass = 2, s.weights = d$sw)
+  expect_equal(as.integer(m$subclass), ifelse(d$ps < .5, 1L, 2L))
+
+  #In subclass 1, the weighted eCDF of `x` at 1, 2, and 3 is (1, 2, 4)/4 among the
+  #treated and (4, 6, 8)/8 among the controls, so the differences are .25, .25,
+  #and 0. Ignoring the weights would give 1/6, 1/12, and 0.
+  s1 <- summary(m, subclass = TRUE)$sum.subclass[["Subclass 1"]]
+  expect_equal(s1["x", "eCDF Mean"], (.25 + .25 + 0) / 3)
+  expect_equal(s1["x", "eCDF Max"], .25)
+})
+
+test_that("summary: constant sampling weights leave the subclass statistics unchanged", {
+  m0 <- matchit(f_sum, data = lalonde, method = "subclass", subclass = 4)
+  m3 <- matchit(f_sum, data = lalonde, method = "subclass", subclass = 4,
+                s.weights = rep(3, nrow(lalonde)))
+
+  expect_equal(summary(m3, subclass = TRUE)$sum.subclass,
+               summary(m0, subclass = TRUE)$sum.subclass)
+  expect_equal(summary(m3, subclass = TRUE, standardize = FALSE)$sum.subclass,
+               summary(m0, subclass = TRUE, standardize = FALSE)$sum.subclass)
+})
+
+test_that("summary: within-subclass SMDs use the full-sample standard deviation", {
+  #For the ATT, the denominator is the standard deviation of the treated units in the
+  #full sample, not within the subclass
+  m <- matchit(f_sum, data = lalonde, method = "subclass", subclass = 4)
+  s <- summary(m, subclass = TRUE)
+  s_raw <- summary(m, subclass = TRUE, standardize = FALSE)
+
+  sd_t <- sd(lalonde$age[lalonde$treat == 1])
+
+  for (sub in names(s$sum.subclass)) {
+    expect_equal(s$sum.subclass[[sub]]["age", "Std. Mean Diff."],
+                 s_raw$sum.subclass[[sub]]["age", "Mean Diff"] / sd_t)
+  }
+
+  #For the ATC with sampling weights, it is the weighted standard deviation of the
+  #control units in the full sample
+  m <- matchit(f_sum, data = lalonde, method = "subclass", subclass = 4,
+               estimand = "ATC", s.weights = lalonde_sw)
+  s <- summary(m, subclass = TRUE)
+  s_raw <- summary(m, subclass = TRUE, standardize = FALSE)
+
+  ctrl <- lalonde$treat == 0
+  sd_c <- sqrt(stats::cov.wt(cbind(lalonde$age[ctrl]), wt = lalonde_sw[ctrl])$cov[1L, 1L])
+
+  for (sub in names(s$sum.subclass)) {
+    expect_equal(s$sum.subclass[[sub]]["age", "Std. Mean Diff."],
+                 s_raw$sum.subclass[[sub]]["age", "Mean Diff"] / sd_c)
+  }
+})
+
+test_that("summary: after subclassification, interaction SMDs use the estimand's standard deviation", {
+  #The unmatched and the aggregate matched statistics for a term are standardized by
+  #the same number, which depends on the estimand, so the ratio of the standardized to
+  #the raw mean difference is the same for both
+  for (estimand in c("ATE", "ATC")) {
+    m <- matchit(f_sum, data = lalonde, method = "subclass", subclass = 4,
+                 estimand = estimand)
+    s <- summary(m, interactions = TRUE)
+    s_raw <- summary(m, interactions = TRUE, standardize = FALSE)
+
+    term <- "age * educ"
+    std <- s_raw$sum.all[term, "Mean Diff."] / s$sum.all[term, "Std. Mean Diff."]
+
+    expect_equal(s$sum.across[term, "Std. Mean Diff."],
+                 s_raw$sum.across[term, "Mean Diff."] / std)
+  }
+})
+
 test_that("summary: an out-of-range subclass index is an error", {
   m <- matchit(f_sum, data = lalonde, method = "subclass", subclass = 4)
 
@@ -333,6 +482,31 @@ test_that("summary: pair distances come from the strata, not from match.matrix",
   m_exact <- matchit(treat ~ age + educ + race, data = lalonde, method = "exact")
   pd <- summary(m_exact)$sum.matched[, "Std. Pair Dist."]
   expect_equal(unname(pd[!is.na(pd)]), rep(0, sum(!is.na(pd))))
+})
+
+test_that("summary: pair distances are the mean over every treated-control pair in a stratum", {
+  #Pair distances are computed from running sums over each stratum sorted on the
+  #variable rather than by visiting each pair. Exact matching on two variables gives
+  #strata of up to a few hundred units, and the pairs are counted here directly.
+  m <- matchit(treat ~ race + married, data = lalonde, method = "exact")
+  s <- summary(m, addlvariables = ~ age + re74, standardize = FALSE)
+
+  mean_pair_dist <- function(x) {
+    total <- n_pairs <- 0
+
+    for (sub in levels(m$subclass)) {
+      in_sub <- which(m$subclass == sub)
+      d <- abs(outer(x[in_sub][m$treat[in_sub] == 1], x[in_sub][m$treat[in_sub] == 0], "-"))
+
+      total <- total + sum(d)
+      n_pairs <- n_pairs + length(d)
+    }
+
+    total / n_pairs
+  }
+
+  expect_equal(s$sum.matched["age", "Pair Dist."], mean_pair_dist(lalonde$age))
+  expect_equal(s$sum.matched["re74", "Pair Dist."], mean_pair_dist(lalonde$re74))
 })
 
 # ===== printing =====

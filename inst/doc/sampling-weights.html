@@ -12,7 +12,7 @@
 
 <meta name="author" content="Noah Greifer" />
 
-<meta name="date" content="2026-09-16" />
+<meta name="date" content="2026-09-26" />
 
 <title>Matching with Sampling Weights</title>
 
@@ -363,7 +363,7 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 
 <h1 class="title toc-ignore">Matching with Sampling Weights</h1>
 <h4 class="author">Noah Greifer</h4>
-<h4 class="date">2026-09-16</h4>
+<h4 class="date">2026-09-26</h4>
 
 
 <div id="TOC">
@@ -461,9 +461,9 @@ propensity scores estimated using logistic regression for generalized
 full matching for the average treatment effect in the treated (ATT)
 (note that all methods and steps apply the same way to all forms of
 matching and all estimands).</p>
-<p>Note: if the <code>quickmatch</code>, <code>marginaleffects</code>,
-or <code>sandwich</code> packages are not available, the subsequent
-lines will not run.</p>
+<p>Note: if the <em>quickmatch</em>, <em>marginaleffects</em>, or
+<em>sandwich</em> packages are not available, the subsequent lines will
+not run.</p>
 <div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a>mF_s <span class="ot">&lt;-</span> <span class="fu">matchit</span>(A <span class="sc">~</span> X1 <span class="sc">+</span> X2 <span class="sc">+</span> X3 <span class="sc">+</span> X4 <span class="sc">+</span> X5 <span class="sc">+</span> SW <span class="sc">+</span></span>
 <span id="cb4-2"><a href="#cb4-2" tabindex="-1"></a>                  X6 <span class="sc">+</span> X7 <span class="sc">+</span> X8 <span class="sc">+</span> X9, <span class="at">data =</span> d,</span>
 <span id="cb4-3"><a href="#cb4-3" tabindex="-1"></a>                <span class="at">method =</span> <span class="st">&quot;quick&quot;</span>, <span class="at">distance =</span> <span class="st">&quot;glm&quot;</span>,</span>
@@ -531,12 +531,11 @@ were not used in the estimation of the propensity score used in the
 matching.</p>
 <p>Note that not all methods can involve sampling weights in the
 estimation. Some propensity score estimation methods, like
-<code>randomForest</code> and <code>bart</code> (as presently
-implemented), cannot incorporate sampling weights; one alternative is to
-include the sampling weights as a predictor in the propensity score
-model. Sampling weights should still be supplied to
-<code>matchit()</code> even when using these methods to avoid having to
-use <code>add_s.weights()</code>.</p>
+<code>&quot;bart&quot;</code> (as presently implemented), cannot incorporate
+sampling weights; one alternative is to include the sampling weights as
+a predictor in the propensity score model. Sampling weights should still
+be supplied to <code>matchit()</code> even when using these methods to
+avoid having to use <code>add_s.weights()</code>.</p>
 </div>
 <div id="assessing-balance" class="section level2">
 <h2>Assessing Balance</h2>

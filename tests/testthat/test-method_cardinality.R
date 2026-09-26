@@ -189,9 +189,9 @@ test_that("cardinality matching rejects non-constant s.weights", {
 
 test_that("profile matching accepts s.weights and balances the weighted means", {
   #`estimand = "ATE"` and `ratio = NA` are the two profile-matching routes; both hold a
-  #fixed target, so both take sampling weights.
+  #fixed target, so both take sampling weights. `estimand = "ATE"` with a finite ratio
+  #is tested below.
   for (args in list(list(estimand = "ATE", ratio = NA),
-                    list(estimand = "ATE", ratio = 1),
                     list(estimand = "ATT", ratio = NA))) {
     m <- do.call(matchit, c(list(f, data = lalonde, method = "cardinality",
                                  s.weights = lalonde_sw),
@@ -202,18 +202,57 @@ test_that("profile matching accepts s.weights and balances the weighted means", 
   }
 })
 
-test_that("profile ATE with a finite ratio equates the unweighted group sizes", {
+test_that("profile ATE with a finite ratio equates the group sizes", {
+  for (r in c(1, 2)) {
+    m <- matchit(f, data = lalonde, method = "cardinality", estimand = "ATE",
+                 ratio = r)
+    keep <- m$weights > 0
+    expect_equal(sum(keep & m$treat == 0L), r * sum(keep & m$treat == 1L))
+  }
+})
+
+test_that("profile ATE with a finite ratio and s.weights equates the unweighted group sizes", {
+  #With non-constant sampling weights, a finite ratio makes this a hard MILP: HiGHS
+  #searches more than 10,000 nodes where the unweighted problem above solves at the
+  #root, so how long it takes depends heavily on the machine. On CRAN it has run past
+  #the 120-second default `time`.
+  skip_on_cran()
+
   #The ratio constraint is on counts, not on weighted sizes, so it means the same
   #thing with and without sampling weights.
   for (r in c(1, 2)) {
-    for (sw in list(NULL, lalonde_sw)) {
-      m <- do.call(matchit, c(list(f, data = lalonde, method = "cardinality",
-                                   estimand = "ATE", ratio = r),
-                              if (is_not_null(sw)) list(s.weights = sw)))
-      keep <- m$weights > 0
-      expect_equal(sum(keep & m$treat == 0L), r * sum(keep & m$treat == 1L))
-    }
+    m <- matchit(f, data = lalonde, method = "cardinality", estimand = "ATE",
+                 ratio = r, s.weights = lalonde_sw)
+    expect_good_matchit(m, expect_distance = FALSE, expect_match.matrix = FALSE,
+                        expect_subclass = FALSE)
+    keep <- m$weights > 0
+    expect_equal(sum(keep & m$treat == 0L), r * sum(keep & m$treat == 1L))
   }
+})
+
+test_that("highs returns its incumbent with a warning when the time limit is reached", {
+  #The weighted `ratio = 2` problem above finds a feasible solution in well under a
+  #second but needs several more to prove it optimal, so `time = 2` stops in between.
+  #That depends on the machine, so it is skipped on CRAN for the same reason.
+  skip_on_cran()
+
+  expect_wrn(m <- matchit(f, data = lalonde, method = "cardinality", estimand = "ATE",
+                          ratio = 2, s.weights = lalonde_sw, time = 2),
+             "The returned solution may not be optimal")
+
+  expect_good_matchit(m, expect_distance = FALSE, expect_match.matrix = FALSE,
+                      expect_subclass = FALSE)
+
+  #The incumbent is feasible, so it satisfies the ratio constraint
+  keep <- m$weights > 0
+  expect_gt(sum(keep), 0L)
+  expect_equal(sum(keep & m$treat == 0L), 2 * sum(keep & m$treat == 1L))
+})
+
+test_that("highs errors when the time limit is reached before any solution is found", {
+  expect_err(matchit(f, data = lalonde, method = "cardinality", estimand = "ATE",
+                     ratio = 2, s.weights = lalonde_sw, time = 1e-4),
+             "failed to find any solution in the time allotted")
 })
 
 test_that("s.weights change the profile matching solution", {

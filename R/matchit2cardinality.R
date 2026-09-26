@@ -73,7 +73,9 @@
 #'   free trial or academic license. 
 #'   \item `time`: the maximum amount of
 #'   time before the optimization routine aborts, in seconds. Default is 120 (2
-#'   minutes). For large problems, this should be set much higher.  
+#'   minutes). For large problems, this should be set much higher. When the limit is
+#'   reached, the best solution found so far is returned with a warning; see
+#'   *Dealing with Errors and Warnings* in Details.
 #'   }
 #'
 #'   The arguments `distance` (and related arguments), `replace`, `m.order`, and `caliper` (and related arguments) are ignored with a warning.
@@ -178,6 +180,12 @@
 #' size, the optimizers will stall at one of them, not thinking it has found
 #' the optimum. The result should be checked to see if it can be used as the
 #' solution.
+#'
+#' An error that says `"The optimizer failed to find any solution in the time allotted."`
+#' means that the time limit was reached before any solution satisfying the constraints
+#' was found, so there is nothing to return. Increasing `time` may allow one to be found,
+#' though the problem may also be infeasible (see below). Only HiGHS distinguishes this
+#' case; with GLPK and Gurobi, it produces the error about infeasibility.
 #'
 #' An error that says `"The optimization problem may be infeasible."`
 #' usually means that there is a issue with the optimization problem, i.e.,
@@ -374,14 +382,19 @@ matchit2cardinality <- function(treat, data, discarded, formula,
 
   opt.out <- make_list(levels(ex))
 
-  for (e in levels(ex)[cc]) {
+  #Each stratum's units that are not discarded, found once rather than by comparing
+  #`ex` to every level in turn
+  ex_ind <- split(which(!discarded), ex[!discarded])
+
+  for (i in seq_along(cc)) {
+    e <- levels(ex)[cc[i]]
+
     if (nlevels(ex) > 1L) {
-      .cat_verbose(sprintf("Matching subgroup %s/%s: %s...\n",
-                           match(e, levels(ex)[cc]), length(cc), e),
+      .cat_verbose(sprintf("Matching subgroup %s/%s: %s...\n", i, length(cc), e),
                    verbose = verbose)
     }
 
-    .e <- which(!discarded & ex == e)
+    .e <- ex_ind[[cc[i]]]
 
     treat_in.exact <- treat[.e]
     out <- cardinality_matchit(treat = treat_in.exact,
@@ -405,7 +418,11 @@ matchit2cardinality <- function(treat, data, discarded, formula,
                                   controls = ratio,
                                   data = data.frame(treat_in.exact))
       }, optmatch_max_problem_size = Inf)
-      pair[names(pm)[!is.na(pm)]] <- paste(as.character(pm[!is.na(pm)]), e, sep = "|")
+
+      #Paired units are located among the stratum's units rather than the whole sample
+      paired <- !is.na(pm)
+      in_e_paired <- .e[match(names(pm)[paired], names(treat_in.exact))]
+      pair[in_e_paired] <- paste(as.character(pm[paired]), e, sep = "|")
     }
   }
 
@@ -715,7 +732,14 @@ cardinality_error_report <- function(out, solver) {
       arg::err("the optimization problem may be infeasible. Try increasing the value of {.arg tols}. See {.topic MatchIt::method_cardinality} for additional details")
     }
     if (out$status_message %in% c("Time limit reached", "Iteration limit reached")) {
-      arg::err("the optimizer failed to find an optimal solution in the time allotted. Try increasing the value of {.arg time}. See {.topic MatchIt::method_cardinality} for additional details")
+      #HiGHS keeps the best feasible solution found before the limit (the incumbent);
+      #when there is none, `primal_solution` is all zeros and must not be returned.
+      if (identical(out$info$primal_solution_status, "Feasible")) {
+        arg::wrn("the optimizer failed to find an optimal solution in the time allotted. The returned solution may not be optimal. See {.topic MatchIt::method_cardinality} for additional details")
+      }
+      else {
+        arg::err("the optimizer failed to find any solution in the time allotted. Try increasing the value of {.arg time}. See {.topic MatchIt::method_cardinality} for additional details")
+      }
     }
   }
 }

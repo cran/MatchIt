@@ -1,5 +1,5 @@
 Package: MatchIt
-Version: 4.8.0
+Version: 4.8.1
 Title: Nonparametric Preprocessing for Parametric Causal Inference
 Description: Selects matched samples of the original treated and
     control groups with similar covariate distributions -- can be
@@ -44,7 +44,7 @@ VignetteBuilder: knitr
 Config/testthat/edition: 3
 Config/roxygen2/version: 8.1.0
 NeedsCompilation: yes
-Packaged: 2026-09-16 21:05:36 UTC; NoahGreifer
+Packaged: 2026-09-26 15:13:34 UTC; NoahGreifer
 Author: Daniel Ho [aut] (ORCID: <https://orcid.org/0000-0002-2195-5469>),
   Kosuke Imai [aut] (ORCID: <https://orcid.org/0000-0002-2748-1022>),
   Gary King [aut] (ORCID: <https://orcid.org/0000-0002-5327-7631>),
@@ -54,4 +54,4 @@ Author: Daniel Ho [aut] (ORCID: <https://orcid.org/0000-0002-2195-5469>),
     <https://orcid.org/0000-0003-3067-7154>)
 Maintainer: Noah Greifer <noah.greifer@gmail.com>
 Repository: CRAN
-Date/Publication: 2026-09-17 00:20:02 UTC
+Date/Publication: 2026-09-26 22:00:02 UTC

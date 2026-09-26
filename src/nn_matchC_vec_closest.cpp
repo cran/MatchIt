@@ -109,6 +109,7 @@ IntegerMatrix nn_matchC_vec_closest(const IntegerVector& treat,
   //exact
   const bool use_exact = exact_.isNotNull();
   const IntegerVector exact = use_exact ? as<IntegerVector>(exact_) : IntegerVector(0);
+  const ExactOrder exact_order = use_exact ? make_exact_order(exact, ind_d_ord) : ExactOrder();
 
   //caliper_covs
   const NumericVector caliper_covs = caliper_covs_.isNotNull() ? as<NumericVector>(caliper_covs_) : NumericVector(0);
@@ -128,18 +129,22 @@ IntegerMatrix nn_matchC_vec_closest(const IntegerVector& treat,
 
   //A caliper on a covariate that is an affine transformation of `distance` is
   //equivalent to a caliper on `distance` itself, which the sorted scan can stop early
-  //on; the covariate caliper stays in force either way.
+  //on; the covariate caliper stays in force either way. Restated on the scale of
+  //`distance`, it is loosened enough for rounding that the scan never stops or skips
+  //on a unit the covariate caliper would accept.
   for (int cci = 0; cci < ncc; cci++) {
-    double a = get_affine_transformation(caliper_covs_mat.column(cci),
-                                         distance);
+    AffineFit fit = get_affine_transformation(caliper_covs_mat.column(cci),
+                                              distance);
 
-    if (std::abs(a) <= 1e-10) {
+    if (std::abs(fit.a) <= 1e-10) {
       continue;
     }
 
-    //`std::abs()` because a negative `a` would otherwise flip the sign of the
-    //caliper, and a negative caliper means the opposite of a positive one
-    double caliper_dist_cci = std::abs(a) * caliper_covs[cci];
+    double caliper_dist_cci = caliper_on_affine_scale(caliper_covs[cci], fit);
+
+    if (std::isnan(caliper_dist_cci)) {
+      continue;
+    }
 
     if (caliper_dist_.isNull() ||
         (caliper_covs[cci] >= 0 && caliper_dist > caliper_dist_cci) ||
@@ -226,7 +231,8 @@ IntegerMatrix nn_matchC_vec_closest(const IntegerVector& treat,
                            aenc,
                            antiexact_covs,
                            first_control,
-                           last_control);
+                           last_control,
+                           exact_order);
 
       if (k.empty()) {
         eligible[ti] = false;
@@ -296,6 +302,7 @@ IntegerMatrix nn_matchC_vec_closest(const IntegerVector& treat,
                              antiexact_covs,
                              first_control,
                              last_control,
+                             exact_order,
                              1,
                              c_id_i);
 
